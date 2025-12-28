@@ -13,7 +13,7 @@ declare global {
   const Logo: typeof import('../components/icons').Logo
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
   const NavLink: typeof import('react-router-dom').NavLink
-  const Navbar: typeof import('../components/navbar').Navbar
+  const Navbar: typeof import('../layouts/components/navbar').Navbar
   const Navigate: typeof import('react-router-dom').Navigate
   const Outlet: typeof import('react-router-dom').Outlet
   const Route: typeof import('react-router-dom').Route
@@ -21,6 +21,7 @@ declare global {
   const SearchIcon: typeof import('../components/icons').SearchIcon
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
+  const Titlebar: typeof import('../components/titlebar').Titlebar
   const TwitterIcon: typeof import('../components/icons').TwitterIcon
   const createRef: typeof import('react').createRef
   const default: typeof import('../layouts/default').default

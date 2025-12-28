@@ -1,5 +1,5 @@
 {
-  "name": "starter-tauri",
+  "name": "damn-daily-reports",
   "type": "module",
   "version": "0.1.0",
   "private": true,
@@ -17,6 +17,7 @@
     "@heroui/react": "^2.8.5",
     "@heroui/theme": "2.4.23",
     "@heroui/use-theme": "2.1.10",
+    "@iconify/react": "^6.0.2",
     "@react-aria/visually-hidden": "3.8.28",
     "@tailwindcss/postcss": "4.1.11",
     "@tailwindcss/vite": "4.1.11",

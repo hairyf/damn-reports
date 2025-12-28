@@ -1,4 +1,5 @@
 import { Link } from '@heroui/react'
+import { Navbar } from '@/layouts/components/navbar'
 
 export function DefaultLayout({
   children,
@@ -6,7 +7,7 @@ export function DefaultLayout({
   children: React.ReactNode
 }) {
   return (
-    <div className="relative flex flex-col min-h-screen">
+    <div className="relative flex flex-col min-h-screen bg-background/80 backdrop-blur-xl">
       <Navbar />
       <main className="container mx-auto max-w-7xl px-6 flex-grow pt-16">
         {children}
