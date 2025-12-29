@@ -4,6 +4,22 @@
   "version": "0.1.0",
   "private": true,
   "packageManager": "pnpm@10.17.1",
+  "pnpm": {
+    "resolutions": {
+      "p-retry": "4.2.0"
+    },
+    "onlyBuiltDependencies": [
+      "@parcel/watcher",
+      "@scarf/scarf",
+      "@sentry-internal/node-native-stacktrace",
+      "cpu-features",
+      "msgpackr-extract",
+      "oracledb",
+      "protobufjs",
+      "sqlite3",
+      "ssh2"
+    ]
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",

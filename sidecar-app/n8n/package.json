@@ -1,9 +1,0 @@
-{
-  "name": "n8n",
-  "version": "1.0.0",
-  "packageManager": "pnpm@10.17.1",
-  "main": "index.js",
-  "dependencies": {
-    "n8n": "^2.1.4"
-  }
-}

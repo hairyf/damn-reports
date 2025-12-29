@@ -1,0 +1,14 @@
+{
+  "name": "damn-daily-reports-n8n",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "install": "patch-package"
+  },
+  "dependencies": {
+    "n8n": "^2.1.4"
+  },
+  "devDependencies": {
+    "electron": "^39.2.7"
+  }
+}
