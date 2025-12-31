@@ -13,7 +13,7 @@ export interface DefaultLayoutProps {
 
 export function DefaultLayout(props: DefaultLayoutProps) {
   return (
-    <div className={clsx('relative flex min-h-screen bg-background/80 backdrop-blur-xl', props.classNames?.root)}>
+    <div className={clsx('relative flex min-h-screen', props.classNames?.root)}>
       <Sidebar />
       <div className="flex flex-col flex-1">
         <Navbar />

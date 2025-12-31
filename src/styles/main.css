@@ -1,0 +1,6 @@
+@import 'tailwindcss';
+
+@config "../../tailwind.config.js";
+
+@import './components/view.css';
+@import './components/tiptap.css';

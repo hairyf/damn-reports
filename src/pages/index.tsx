@@ -3,7 +3,7 @@ function Page() {
   const generatedReportsCount = 10
 
   return (
-    <layouts.default title="概览">
+    <layouts.default title="Overview">
       <div className="flex flex-col gap-6 flex-1">
         {/* 统计卡片 */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

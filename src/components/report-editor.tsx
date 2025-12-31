@@ -1,15 +1,39 @@
 import { Button, Card, CardBody, Textarea } from '@heroui/react'
+import { input } from '@heroui/theme'
 import { Icon } from '@iconify/react'
+import Placeholder from '@tiptap/extension-placeholder'
+import { EditorContent, useEditor } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
+import { useRef } from 'react'
+import { useHover, useKey } from 'react-use'
 
 export function ReportEditor() {
   const [hasTodayReport, setHasTodayReport] = useState(false)
-  const [reportContent, setReportContent] = useState('')
   const [isUnsaved, setIsUnsaved] = useState(false)
   const [isAutoSaved, setIsAutoSaved] = useState(false)
 
+  const editor = useEditor({
+    extensions: [
+      StarterKit,
+      Placeholder.configure({
+        placeholder: '输入Markdown格式的报告内容...',
+      }),
+    ],
+    content: '',
+    onUpdate: () => {
+      setIsUnsaved(true)
+      setIsAutoSaved(false)
+    },
+    editorProps: {
+      attributes: {
+        class: 'prose prose-sm max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-sm',
+      },
+    },
+  })
+
   const handleGenerateReport = () => {
     setHasTodayReport(true)
-    setReportContent('# 今日报告\n\n## 概述\n\n这里是报告内容...')
+    editor?.commands.setContent('<h1>今日报告</h1><h2>概述</h2><p>这里是报告内容...</p>')
     setIsUnsaved(false)
     setIsAutoSaved(false)
   }
@@ -18,16 +42,36 @@ export function ReportEditor() {
     setIsUnsaved(false)
     setIsAutoSaved(true)
     // 这里应该调用API保存报告
+    // 可以通过 editor?.getHTML() 获取 HTML 内容
+    // 或通过 editor?.getJSON() 获取 JSON 格式
     setTimeout(() => {
       setIsAutoSaved(false)
     }, 2000)
   }
 
-  const handleContentChange = (value: string) => {
-    setReportContent(value)
-    setIsUnsaved(true)
-    setIsAutoSaved(false)
-  }
+  // 监听 Ctrl+S (或 Mac 上的 Cmd+S) 快捷键保存
+  useKey(
+    event => (event.ctrlKey || event.metaKey) && event.key === 's',
+    (event) => {
+      // 只有在有报告内容且处于已生成状态时才保存
+      if (hasTodayReport && isUnsaved) {
+        event.preventDefault()
+        handleSaveReport()
+      }
+    },
+    { event: 'keydown' },
+  )
+
+  const [hoverable] = useHover((hover) => {
+    return (
+      <div
+        className={input({ isMultiline: true }).inputWrapper({ class: 'flex-1 items-start px-0 hover:' })}
+        {...{ 'data-hover': hover }}
+      >
+        <EditorContent editor={editor} className="size-full [&_>_div]:min-h-full" />
+      </div>
+    )
+  })
 
   return (
     <Card className="flex-1">
@@ -67,31 +111,18 @@ export function ReportEditor() {
               </div>
             )
           : (
-            // 已生成状态 - Markdown编辑器
+            // 已生成状态 - TipTap编辑器
               <div className="flex flex-col flex-1 gap-4">
                 <div className="text-sm text-default-500">
                   {new Date().toISOString().split('T')[0]}
                 </div>
-                <div className="flex-1">
-                  <Textarea
-                    value={reportContent}
-                    onValueChange={handleContentChange}
-                    placeholder="输入Markdown格式的报告内容..."
-                    minRows={15}
-                    classNames={{
-                      base: 'h-full',
-                      input: 'h-full font-mono text-sm',
-                      inputWrapper: 'h-full',
-                    }}
-                    radius="sm"
-                  />
-                </div>
+                {hoverable}
                 <div className="flex justify-end gap-2">
                   <Button
                     variant="light"
                     onPress={() => {
                       setHasTodayReport(false)
-                      setReportContent('')
+                      editor?.commands.clearContent()
                       setIsUnsaved(false)
                       setIsAutoSaved(false)
                     }}
