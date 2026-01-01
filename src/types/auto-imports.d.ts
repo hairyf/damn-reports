@@ -34,7 +34,6 @@ declare global {
   const createContext: typeof import('react').createContext
   const createRef: typeof import('react').createRef
   const createReport: typeof import('../utils/mock-db').createReport
-  const default: typeof import('../layouts/default').default
   const deleteReport: typeof import('../utils/mock-db').deleteReport
   const forwardRef: typeof import('react').forwardRef
   const getAllReports: typeof import('../utils/mock-db').getAllReports

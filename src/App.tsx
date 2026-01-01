@@ -4,11 +4,11 @@ import routes from '~react-pages'
 
 function App() {
   return (
-    <div className="w-full min-h-screen relative">
+    <layouts.default>
       <Suspense fallback={<p>Loading...</p>}>
         {useRoutes(routes)}
       </Suspense>
-    </div>
+    </layouts.default>
   )
 }
 export default App

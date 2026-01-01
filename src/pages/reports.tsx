@@ -19,7 +19,6 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-  Tooltip,
   useDisclosure,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
@@ -128,7 +127,7 @@ function Page() {
 
   useMount(loadReports)
   return (
-    <layouts.default title="Reports">
+    <>
       <Card className="mb-4 flex-shrink-0">
         <CardBody className="gap-4">
           <div className="flex flex-col sm:flex-row gap-4">
@@ -261,7 +260,7 @@ function Page() {
           }}
         </ModalContent>
       </Modal>
-    </layouts.default>
+    </>
   )
 }
 

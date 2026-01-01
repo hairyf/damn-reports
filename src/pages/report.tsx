@@ -198,7 +198,7 @@ function Page() {
   }
 
   return (
-    <layouts.default title={isEditMode ? '编辑报告' : '新建报告'}>
+    <>
       <Card>
         <CardBody className="gap-4">
           <div className="flex items-center gap-2">
@@ -344,7 +344,7 @@ function Page() {
           }}
         </ModalContent>
       </Modal>
-    </layouts.default>
+    </>
   )
 }
 
