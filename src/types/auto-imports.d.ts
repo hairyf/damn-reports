@@ -27,6 +27,9 @@ declare global {
   const Route: typeof import('react-router-dom').Route
   const Routes: typeof import('react-router-dom').Routes
   const SearchIcon: typeof import('../components/icons').SearchIcon
+  const SettingAboutCard: typeof import('../ui/setting-about-card').SettingAboutCard
+  const SettingOtherConfig: typeof import('../ui/setting-other-config').SettingOtherConfig
+  const SettingUserInterfaceCard: typeof import('../ui/setting-user-interface-card').SettingUserInterfaceCard
   const SlackIcon: typeof import('../components/icons').SlackIcon
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const Suspense: typeof import('react').Suspense
@@ -45,11 +48,15 @@ declare global {
   const getAllReports: typeof import('../utils/mock-db').getAllReports
   const getDatabaseItemById: typeof import('../utils/mock-db').getDatabaseItemById
   const getReportById: typeof import('../utils/mock-db').getReportById
+  const getSetting: typeof import('../utils/settings-store').getSetting
+  const getSettings: typeof import('../utils/settings-store').getSettings
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
   const memo: typeof import('react').memo
+  const saveSettings: typeof import('../utils/settings-store').saveSettings
   const searchDatabaseItems: typeof import('../utils/mock-db').searchDatabaseItems
   const searchReports: typeof import('../utils/mock-db').searchReports
+  const setSetting: typeof import('../utils/settings-store').setSetting
   const siteConfig: typeof import('../config/site').siteConfig
   const startTransition: typeof import('react').startTransition
   const store: typeof import('../store/index').store
@@ -103,4 +110,7 @@ declare global {
   // @ts-ignore
   export type { Report, DatabaseItem } from '../utils/mock-db'
   import('../utils/mock-db')
+  // @ts-ignore
+  export type { ThemeMode, Language, AppSettings } from '../utils/settings-store'
+  import('../utils/settings-store')
 }

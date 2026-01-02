@@ -1,12 +1,14 @@
-import { Card, CardBody } from '@heroui/react'
+import { SettingAboutCard } from '@/ui/setting-about-card'
+import { SettingOtherConfig } from '@/ui/setting-other-config'
+import { SettingUserInterfaceCard } from '@/ui/setting-user-interface-card'
 
 function Page() {
   return (
-    <Card>
-      <CardBody>
-        This is the settings page
-      </CardBody>
-    </Card>
+    <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+      <SettingUserInterfaceCard />
+      <SettingOtherConfig />
+      <SettingAboutCard />
+    </div>
   )
 }
 
