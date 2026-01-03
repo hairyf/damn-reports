@@ -8,7 +8,10 @@ export {}
 declare global {
   const Activity: typeof import('react').Activity
   const Alimail: typeof import('../components/icons').Alimail
+  const AlimailIcon: typeof import('../components/icons').AlimailIcon
   const ClickupIcon: typeof import('../components/icons').ClickupIcon
+  const DEFAULT_N8N_LOGIN_DATA: typeof import('../config/constants').DEFAULT_N8N_LOGIN_DATA
+  const DEFAULT_N8N_REGISTER_DATA: typeof import('../config/constants').DEFAULT_N8N_REGISTER_DATA
   const DiscordIcon: typeof import('../components/icons').DiscordIcon
   const Fragment: typeof import('react').Fragment
   const GitIcon: typeof import('../components/icons').GitIcon
@@ -19,6 +22,9 @@ declare global {
   const Link: typeof import('react-router-dom').Link
   const Logo: typeof import('../components/icons').Logo
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
+  const N8N_API_URL: typeof import('../config/constants').N8N_API_URL
+  const N8N_LOGIN_DATA: typeof import('../config/constants').N8N_LOGIN_DATA
+  const N8N_REGISTER_DATA: typeof import('../config/constants').N8N_REGISTER_DATA
   const NavLink: typeof import('react-router-dom').NavLink
   const Navbar: typeof import('../layouts/components/navbar').Navbar
   const Navigate: typeof import('react-router-dom').Navigate
@@ -52,7 +58,11 @@ declare global {
   const getSettings: typeof import('../utils/settings-store').getSettings
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
+  const loginN8nUser: typeof import('../apis/index').loginN8nUser
   const memo: typeof import('react').memo
+  const registerN8N: typeof import('../apis/index').registerN8N
+  const registerN8n: typeof import('../apis/index').registerN8n
+  const registerN8nUser: typeof import('../apis/index').registerN8nUser
   const saveSettings: typeof import('../utils/settings-store').saveSettings
   const searchDatabaseItems: typeof import('../utils/mock-db').searchDatabaseItems
   const searchReports: typeof import('../utils/mock-db').searchReports

@@ -1,5 +1,5 @@
 import type { Report } from '@/utils/mock-db'
-import { useAsyncCallback } from '@hairy/react-lib'
+import { useAsyncCallback, useDebounce } from '@hairy/react-lib'
 import {
   Button,
   Card,
@@ -25,7 +25,7 @@ import { Icon } from '@iconify/react'
 import { save } from '@tauri-apps/plugin-dialog'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { sendNotification } from '@tauri-apps/plugin-notification'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { useMount } from 'react-use'
 import { deleteReport, getAllReports, searchReports } from '@/utils/mock-db'
@@ -36,6 +36,7 @@ function Page() {
   const navigate = useNavigate()
   const [reports, setReports] = useState<Report[]>([])
   const [searchQuery, setSearchQuery] = useState('')
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [typeFilter, setTypeFilter] = useState<string>('')
   const [currentPage, setCurrentPage] = useState(1)
   const { isOpen, onOpen, onClose } = useDisclosure()
@@ -51,7 +52,7 @@ function Page() {
   const [loading, loadReports] = useAsyncCallback(async () => {
     let data: Report[]
     if (searchQuery || typeFilter) {
-      data = await searchReports(searchQuery, typeFilter || undefined)
+      data = await searchReports(debouncedSearchQuery, typeFilter || undefined)
     }
     else {
       data = await getAllReports()
@@ -126,6 +127,13 @@ function Page() {
   const paginatedReports = reports.slice(startIndex, endIndex)
 
   useMount(loadReports)
+
+  // 当搜索词或筛选条件改变时自动搜索
+  useEffect(() => {
+    loadReports()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [debouncedSearchQuery, typeFilter])
+
   return (
     <>
       <Card className="mb-4 flex-shrink-0">

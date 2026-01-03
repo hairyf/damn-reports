@@ -369,7 +369,7 @@ export async function searchReports(query: string, type?: string): Promise<Repor
 // 数据库条目类型
 export interface DatabaseItem {
   id?: number
-  source: 'git' | 'clickup' | 'slack'
+  source: 'git' | 'clickup' | 'slack' | 'gmail' | 'alimail'
   date: string
   content: string
   created_at?: string
@@ -481,6 +481,86 @@ const mockDatabaseItems: DatabaseItem[] = [
     content: '协调了跨部门合作，解决了资源分配问题',
     created_at: `${getDateString(6)}T10:20:00`,
     updated_at: `${getDateString(6)}T10:20:00`,
+  },
+  {
+    id: 20,
+    source: 'gmail',
+    date: getDateString(0),
+    content: '收到客户关于产品功能的咨询邮件，已回复并提供详细说明',
+    created_at: `${getDateString(0)}T08:15:00`,
+    updated_at: `${getDateString(0)}T08:15:00`,
+  },
+  {
+    id: 21,
+    source: 'gmail',
+    date: getDateString(1),
+    content: '收到供应商的合作提案邮件，需要进一步评估和讨论',
+    created_at: `${getDateString(1)}T11:20:00`,
+    updated_at: `${getDateString(1)}T11:20:00`,
+  },
+  {
+    id: 22,
+    source: 'alimail',
+    date: getDateString(1),
+    content: '收到阿里云关于服务器维护的通知邮件，已安排相应准备工作',
+    created_at: `${getDateString(1)}T09:30:00`,
+    updated_at: `${getDateString(1)}T09:30:00`,
+  },
+  {
+    id: 23,
+    source: 'gmail',
+    date: getDateString(2),
+    content: '收到团队成员的工作汇报邮件，项目进展顺利',
+    created_at: `${getDateString(2)}T14:10:00`,
+    updated_at: `${getDateString(2)}T14:10:00`,
+  },
+  {
+    id: 24,
+    source: 'alimail',
+    date: getDateString(2),
+    content: '收到阿里云账单通知，本月云服务费用在预算范围内',
+    created_at: `${getDateString(2)}T16:45:00`,
+    updated_at: `${getDateString(2)}T16:45:00`,
+  },
+  {
+    id: 25,
+    source: 'gmail',
+    date: getDateString(3),
+    content: '收到会议邀请邮件，已确认参加下周的技术分享会',
+    created_at: `${getDateString(3)}T10:00:00`,
+    updated_at: `${getDateString(3)}T10:00:00`,
+  },
+  {
+    id: 26,
+    source: 'alimail',
+    date: getDateString(4),
+    content: '收到阿里云安全提醒邮件，已检查并更新了安全配置',
+    created_at: `${getDateString(4)}T13:20:00`,
+    updated_at: `${getDateString(4)}T13:20:00`,
+  },
+  {
+    id: 27,
+    source: 'gmail',
+    date: getDateString(5),
+    content: '收到客户反馈邮件，对产品新功能表示满意',
+    created_at: `${getDateString(5)}T15:30:00`,
+    updated_at: `${getDateString(5)}T15:30:00`,
+  },
+  {
+    id: 28,
+    source: 'alimail',
+    date: getDateString(5),
+    content: '收到阿里云产品更新通知，新功能已上线可用',
+    created_at: `${getDateString(5)}T11:15:00`,
+    updated_at: `${getDateString(5)}T11:15:00`,
+  },
+  {
+    id: 29,
+    source: 'gmail',
+    date: getDateString(7),
+    content: '收到合作伙伴的商务合作邮件，已安排会议进一步沟通',
+    created_at: `${getDateString(7)}T09:45:00`,
+    updated_at: `${getDateString(7)}T09:45:00`,
   },
 ]
 

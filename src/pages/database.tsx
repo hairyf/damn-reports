@@ -1,5 +1,5 @@
 import type { DatabaseItem } from '@/utils/mock-db'
-import { useAsyncCallback } from '@hairy/react-lib'
+import { useAsyncCallback, useDebounce } from '@hairy/react-lib'
 import {
   Button,
   Card,
@@ -21,15 +21,18 @@ import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { sendNotification } from '@tauri-apps/plugin-notification'
 import { useEffect, useState } from 'react'
 import { useMount } from 'react-use'
-import { ClickupIcon, GitIcon, SlackIcon } from '@/components/icons'
+
+import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
 import { getAllDatabaseItems, searchDatabaseItems } from '@/utils/mock-db'
 
 const ITEMS_PER_PAGE = 10
 
 const sourceOptions = [
   { label: 'Git', value: 'git', icon: GitIcon },
-  { label: 'ClickUp', value: 'clickup', icon: ClickupIcon },
+  { label: 'Clickup', value: 'clickup', icon: ClickupIcon },
   { label: 'Slack', value: 'slack', icon: SlackIcon },
+  { label: 'Gmail', value: 'gmail', icon: GmailIcon },
+  { label: 'Alimail', value: 'alimail', icon: AlimailIcon },
 ]
 
 function Page() {
@@ -106,17 +109,15 @@ function Page() {
 
   useMount(loadItems)
 
-  // 当搜索词或筛选条件改变时自动搜索
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      loadItems()
-    }, 300) // 防抖 300ms
+  // 防抖搜索词和筛选条件
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
+  const debouncedSourceFilter = useDebounce(sourceFilter, 300)
 
-    return () => {
-      clearTimeout(timer)
-    }
+  // 当防抖后的搜索词或筛选条件改变时自动搜索
+  useEffect(() => {
+    loadItems()
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [searchQuery, sourceFilter])
+  }, [debouncedSearchQuery, debouncedSourceFilter])
 
   return (
     <>

@@ -167,10 +167,10 @@ export function SlackIcon({ size = 24, width, height, ...props }: IconSvgProps) 
   )
 }
 
-export function Alimail({ size = 24, width, height, ...props }: IconSvgProps) {
+export function AlimailIcon({ size = 24, width, height, ...props }: IconSvgProps) {
   return (
     <svg
-      viewBox="0 0 48 48"
+      viewBox="0 0 1000 1000"
       height={size || height}
       width={size || width}
       {...props}
