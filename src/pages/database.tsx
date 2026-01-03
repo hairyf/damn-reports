@@ -1,5 +1,4 @@
-import type { DatabaseItem } from '@/utils/mock-db'
-import { useAsyncCallback, useDebounce } from '@hairy/react-lib'
+import { useDebounce, useWatch } from '@hairy/react-lib'
 import {
   Button,
   Card,
@@ -16,11 +15,11 @@ import {
   TableRow,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { useQuery } from '@tanstack/react-query'
 import { save } from '@tauri-apps/plugin-dialog'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { sendNotification } from '@tauri-apps/plugin-notification'
-import { useEffect, useState } from 'react'
-import { useMount } from 'react-use'
+import { useState } from 'react'
 
 import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
 import { getAllDatabaseItems, searchDatabaseItems } from '@/utils/mock-db'
@@ -36,21 +35,24 @@ const sourceOptions = [
 ]
 
 function Page() {
-  const [items, setItems] = useState<DatabaseItem[]>([])
   const [searchQuery, setSearchQuery] = useState('')
   const [sourceFilter, setSourceFilter] = useState<string>('')
   const [currentPage, setCurrentPage] = useState(1)
 
-  const [loading, loadItems] = useAsyncCallback(async () => {
-    let data: DatabaseItem[]
-    if (searchQuery || sourceFilter) {
-      data = await searchDatabaseItems(searchQuery, sourceFilter || undefined)
-    }
-    else {
-      data = await getAllDatabaseItems()
-    }
-    setItems(data)
-    setCurrentPage(1)
+  // 防抖搜索词和筛选条件
+  const debouncedSearchQuery = useDebounce(searchQuery, 300)
+  const debouncedSourceFilter = useDebounce(sourceFilter, 300)
+
+  const { data: items = [], isLoading } = useQuery({
+    queryKey: ['databaseItems', debouncedSearchQuery, debouncedSourceFilter],
+    queryFn: async () => {
+      if (debouncedSearchQuery || debouncedSourceFilter) {
+        return await searchDatabaseItems(debouncedSearchQuery, debouncedSourceFilter || undefined)
+      }
+      else {
+        return await getAllDatabaseItems()
+      }
+    },
   })
 
   async function handleExportCSV() {
@@ -107,18 +109,7 @@ function Page() {
   const endIndex = startIndex + ITEMS_PER_PAGE
   const paginatedItems = items.slice(startIndex, endIndex)
 
-  useMount(loadItems)
-
-  // 防抖搜索词和筛选条件
-  const debouncedSearchQuery = useDebounce(searchQuery, 300)
-  const debouncedSourceFilter = useDebounce(sourceFilter, 300)
-
-  // 当防抖后的搜索词或筛选条件改变时自动搜索
-  useEffect(() => {
-    loadItems()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearchQuery, debouncedSourceFilter])
-
+  useWatch([searchQuery, sourceFilter], () => setCurrentPage(1))
   return (
     <>
       <Card className="mb-4 flex-shrink-0">
@@ -174,8 +165,8 @@ function Page() {
         </TableHeader>
         <TableBody
           items={paginatedItems}
-          isLoading={loading}
-          emptyContent={loading ? '加载中...' : '暂无数据'}
+          isLoading={isLoading}
+          emptyContent={isLoading ? '加载中...' : '暂无数据'}
         >
           {(item) => {
             return (

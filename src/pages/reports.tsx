@@ -1,5 +1,4 @@
-import type { Report } from '@/utils/mock-db'
-import { useAsyncCallback, useDebounce } from '@hairy/react-lib'
+import { useDebounce, useWatch } from '@hairy/react-lib'
 import {
   Button,
   Card,
@@ -22,25 +21,25 @@ import {
   useDisclosure,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { save } from '@tauri-apps/plugin-dialog'
 import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { sendNotification } from '@tauri-apps/plugin-notification'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { useMount } from 'react-use'
 import { deleteReport, getAllReports, searchReports } from '@/utils/mock-db'
 
 const ITEMS_PER_PAGE = 7
 
 function Page() {
   const navigate = useNavigate()
-  const [reports, setReports] = useState<Report[]>([])
+  const queryClient = useQueryClient()
   const [searchQuery, setSearchQuery] = useState('')
   const debouncedSearchQuery = useDebounce(searchQuery, 300)
   const [typeFilter, setTypeFilter] = useState<string>('')
-  const [currentPage, setCurrentPage] = useState(1)
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null)
+  const [currentPage, setCurrentPage] = useState(1)
 
   const typeOptions = [
     { label: '日', value: 'daily' },
@@ -49,30 +48,34 @@ function Page() {
     { label: '年', value: 'yearly' },
   ]
 
-  const [loading, loadReports] = useAsyncCallback(async () => {
-    let data: Report[]
-    if (searchQuery || typeFilter) {
-      data = await searchReports(debouncedSearchQuery, typeFilter || undefined)
-    }
-    else {
-      data = await getAllReports()
-    }
-    setReports(data)
-    // 重置到第一页当数据改变时
-    setCurrentPage(1)
+  const { data: reports = [], isLoading } = useQuery({
+    queryKey: ['reports', debouncedSearchQuery, typeFilter],
+    queryFn: async () => {
+      if (debouncedSearchQuery || typeFilter) {
+        return await searchReports(debouncedSearchQuery, typeFilter || undefined)
+      }
+      else {
+        return await getAllReports()
+      }
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: deleteReport,
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      sendNotification({ title: '成功', body: '报告已删除' })
+      onClose()
+      setDeleteTarget(null)
+    },
+    onError: (error) => {
+      console.error('Failed to delete report:', error)
+      sendNotification({ title: '错误', body: '删除报告失败' })
+    },
   })
 
   async function handleDelete(id: number) {
-    try {
-      await deleteReport(id)
-      await loadReports()
-      sendNotification({ title: '成功', body: '报告已删除' })
-      onClose()
-    }
-    catch (error) {
-      console.error('Failed to delete report:', error)
-      sendNotification({ title: '错误', body: '删除报告失败' })
-    }
+    deleteMutation.mutate(id)
   }
 
   function handleDeleteClick(id: number) {
@@ -126,13 +129,7 @@ function Page() {
   const endIndex = startIndex + ITEMS_PER_PAGE
   const paginatedReports = reports.slice(startIndex, endIndex)
 
-  useMount(loadReports)
-
-  // 当搜索词或筛选条件改变时自动搜索
-  useEffect(() => {
-    loadReports()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [debouncedSearchQuery, typeFilter])
+  useWatch([searchQuery, typeFilter], () => setCurrentPage(1))
 
   return (
     <>
@@ -185,8 +182,8 @@ function Page() {
         </TableHeader>
         <TableBody
           items={paginatedReports}
-          isLoading={loading}
-          emptyContent={loading ? '加载中...' : '暂无报告'}
+          isLoading={isLoading}
+          emptyContent={isLoading ? '加载中...' : '暂无报告'}
         >
           {(item) => {
             return (

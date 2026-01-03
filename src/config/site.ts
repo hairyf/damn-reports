@@ -18,7 +18,7 @@ export const siteConfig = {
     },
     {
       label: 'Soruce',
-      href: '/source',
+      href: '/source/',
     },
     {
       label: 'Automation',

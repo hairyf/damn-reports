@@ -25,8 +25,8 @@ export function Sidebar() {
         </div>
         <nav className="space-y-1.5">
           {siteConfig.sideItems.map((item) => {
-            const isActive = location.pathname === item.href
-            const icon = iconMap[item.href] || 'lucide:circle'
+            const isActive = location.pathname.startsWith(item.href)
+            const icon = iconMap[`/${item.href.split('/')[1]}`] || 'lucide:circle'
             return (
               <Button
                 key={item.href}
