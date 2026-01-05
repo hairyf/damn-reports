@@ -73,6 +73,7 @@ declare global {
   const searchDatabaseItems: typeof import('../utils/mock-db').searchDatabaseItems
   const searchReports: typeof import('../utils/mock-db').searchReports
   const setSetting: typeof import('../utils/settings-store').setSetting
+  const settingsStore: typeof import('../config/store').settingsStore
   const siteConfig: typeof import('../config/site').siteConfig
   const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition

@@ -1,4 +1,3 @@
-import { useMounted } from '@hairy/react-lib'
 import {
   Card,
   CardBody,
@@ -8,62 +7,26 @@ import {
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { sendNotification } from '@tauri-apps/plugin-notification'
-import { useEffect, useState } from 'react'
-import {
-  getSettings,
-  saveSettings,
-} from '@/utils/settings-store'
+import { useStore } from 'valtio-define'
+import { store } from '@/store'
 
 export function SettingOtherConfig() {
-  const isMounted = useMounted()
-  const [autoSave, setAutoSave] = useState(true)
-  const [notifications, setNotifications] = useState(true)
-  const [loading, setLoading] = useState(true)
-
-  // 加载设置
-  useEffect(() => {
-    async function loadSettings() {
-      try {
-        const settings = await getSettings()
-        setAutoSave(settings.autoSave)
-        setNotifications(settings.notifications)
-      }
-      catch (error) {
-        console.error('Failed to load settings:', error)
-      }
-      finally {
-        setLoading(false)
-      }
-    }
-    loadSettings()
-  }, [])
+  const setting = useStore(store.setting)
 
   // 更新自动保存
-  const handleAutoSaveChange = async (value: boolean) => {
-    setAutoSave(value)
-    await saveSettings({ autoSave: value })
+  function handleAutoSaveChange(value: boolean) {
+    store.setting.$state.autoSave = value
   }
 
   // 更新通知
-  const handleNotificationsChange = async (value: boolean) => {
-    setNotifications(value)
-    await saveSettings({ notifications: value })
+  function handleNotificationsChange(value: boolean) {
+    store.setting.$state.notifications = value
     if (value) {
       sendNotification({
         title: '设置已更新',
         body: '通知功能已启用',
       })
     }
-  }
-
-  if (!isMounted || loading) {
-    return (
-      <Card>
-        <CardBody>
-          <div className="text-default-500 text-sm">加载中...</div>
-        </CardBody>
-      </Card>
-    )
   }
 
   return (
@@ -89,7 +52,7 @@ export function SettingOtherConfig() {
             </p>
           </div>
           <Switch
-            isSelected={autoSave}
+            isSelected={setting.autoSave}
             onValueChange={handleAutoSaveChange}
           />
         </div>
@@ -106,7 +69,7 @@ export function SettingOtherConfig() {
             </p>
           </div>
           <Switch
-            isSelected={notifications}
+            isSelected={setting.notifications}
             onValueChange={handleNotificationsChange}
           />
         </div>

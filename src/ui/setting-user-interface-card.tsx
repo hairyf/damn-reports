@@ -1,5 +1,4 @@
-import type { Language, ThemeMode } from '@/utils/settings-store'
-import { useMounted } from '@hairy/react-lib'
+import type { Language, ThemeMode } from '@/store/modules/setting'
 import {
   Card,
   CardBody,
@@ -10,11 +9,9 @@ import {
 } from '@heroui/react'
 import { useTheme } from '@heroui/use-theme'
 import { Icon } from '@iconify/react'
-import { useCallback, useEffect, useState } from 'react'
-import {
-  getSettings,
-  saveSettings,
-} from '@/utils/settings-store'
+import { useCallback, useEffect } from 'react'
+import { useStore } from 'valtio-define'
+import { store } from '@/store'
 
 const languageOptions: { label: string, value: Language }[] = [
   { label: '简体中文', value: 'zh-CN' },
@@ -28,14 +25,11 @@ const themeOptions: { label: string, value: ThemeMode, icon: string }[] = [
 ]
 
 export function SettingUserInterfaceCard() {
-  const isMounted = useMounted()
+  const setting = useStore(store.setting)
   const { setTheme } = useTheme()
-  const [language, setLanguage] = useState<Language>('zh-CN')
-  const [theme, setThemeState] = useState<ThemeMode>('system')
-  const [loading, setLoading] = useState(true)
 
   // 检测系统主题偏好
-  const getSystemTheme = () => {
+  function getSystemTheme() {
     if (typeof window !== 'undefined' && window.matchMedia) {
       return window.matchMedia('(prefers-color-scheme: dark)').matches
         ? 'dark'
@@ -57,59 +51,33 @@ export function SettingUserInterfaceCard() {
 
   // 监听系统主题变化
   useEffect(() => {
-    if (theme === 'system') {
+    if (setting.theme === 'system') {
       const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-      const handleChange = () => {
+      function handleChange() {
         const systemTheme = getSystemTheme()
         setTheme(systemTheme)
       }
       mediaQuery.addEventListener('change', handleChange)
-      return () => {
+      return function () {
         mediaQuery.removeEventListener('change', handleChange)
       }
     }
-  }, [theme, setTheme])
+  }, [setting.theme, setTheme])
 
-  // 加载设置
+  // 应用初始主题
   useEffect(() => {
-    async function loadSettings() {
-      try {
-        const settings = await getSettings()
-        setLanguage(settings.language)
-        setThemeState(settings.theme)
-        applyTheme(settings.theme)
-      }
-      catch (error) {
-        console.error('Failed to load settings:', error)
-      }
-      finally {
-        setLoading(false)
-      }
-    }
-    loadSettings()
-  }, [applyTheme])
+    applyTheme(setting.theme)
+  }, [applyTheme, setting.theme])
 
   // 更新语言
-  const handleLanguageChange = async (value: Language) => {
-    setLanguage(value)
-    await saveSettings({ language: value })
+  function handleLanguageChange(value: Language) {
+    store.setting.$state.language = value
   }
 
   // 更新主题
-  const handleThemeChange = async (value: ThemeMode) => {
-    setThemeState(value)
-    await saveSettings({ theme: value })
+  function handleThemeChange(value: ThemeMode) {
+    store.setting.$state.theme = value
     applyTheme(value)
-  }
-
-  if (!isMounted || loading) {
-    return (
-      <Card>
-        <CardBody>
-          <div className="text-default-500 text-sm">加载中...</div>
-        </CardBody>
-      </Card>
-    )
   }
 
   return (
@@ -130,8 +98,8 @@ export function SettingUserInterfaceCard() {
             <label className="text-sm font-medium">语言</label>
           </div>
           <Select
-            selectedKeys={[language]}
-            onSelectionChange={(keys) => {
+            selectedKeys={[setting.language]}
+            onSelectionChange={function (keys) {
               const selected = Array.from(keys)[0] as Language
               if (selected) {
                 handleLanguageChange(selected)
@@ -140,11 +108,13 @@ export function SettingUserInterfaceCard() {
             className="max-w-xs"
             startContent={<Icon icon="lucide:globe" className="w-4 h-4" />}
           >
-            {languageOptions.map(option => (
-              <SelectItem key={option.value}>
-                {option.label}
-              </SelectItem>
-            ))}
+            {languageOptions.map((option) => {
+              return (
+                <SelectItem key={option.value}>
+                  {option.label}
+                </SelectItem>
+              )
+            })}
           </Select>
         </div>
 
@@ -155,8 +125,8 @@ export function SettingUserInterfaceCard() {
             <label className="text-sm font-medium">主题模式</label>
           </div>
           <Select
-            selectedKeys={[theme]}
-            onSelectionChange={(keys) => {
+            selectedKeys={[setting.theme]}
+            onSelectionChange={function (keys) {
               const selected = Array.from(keys)[0] as ThemeMode
               if (selected) {
                 handleThemeChange(selected)
@@ -166,21 +136,23 @@ export function SettingUserInterfaceCard() {
             startContent={(
               <Icon
                 icon={
-                  themeOptions.find(opt => opt.value === theme)?.icon
+                  themeOptions.find((opt) => { return opt.value === setting.theme })?.icon
                   || 'lucide:palette'
                 }
                 className="w-4 h-4"
               />
             )}
           >
-            {themeOptions.map(option => (
-              <SelectItem
-                key={option.value}
-                startContent={<Icon icon={option.icon} className="w-4 h-4" />}
-              >
-                {option.label}
-              </SelectItem>
-            ))}
+            {themeOptions.map((option) => {
+              return (
+                <SelectItem
+                  key={option.value}
+                  startContent={<Icon icon={option.icon} className="w-4 h-4" />}
+                >
+                  {option.label}
+                </SelectItem>
+              )
+            })}
           </Select>
         </div>
       </CardBody>

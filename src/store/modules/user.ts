@@ -1,4 +1,4 @@
-import { defineStore } from '@hairy/react-lib'
+import { defineStore } from 'valtio-define'
 
 export const user = defineStore({
   state: () => ({

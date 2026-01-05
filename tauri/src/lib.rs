@@ -18,7 +18,7 @@ fn greet(name: &str) -> String {
         // HTTP plugin
         .plugin(tauri_plugin_http::init())
         // Sql store plugin
-        .plugin(tauri_plugin_sql::Builder::new().build())
+        .plugin(tauri_plugin_sql::Builder::default().build())
         // Simple Store plugin
         .plugin(tauri_plugin_store::Builder::new().build())
         // Notification plugin
