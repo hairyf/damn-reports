@@ -18,7 +18,7 @@ export interface DataSource {
 
 export interface SourceItemProps {
   item: DataSource
-  onDeleted: (id: string) => void
+  onDeleted?: (id: string) => void
 }
 
 export function SourceItem(props: SourceItemProps) {

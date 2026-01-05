@@ -40,6 +40,7 @@ declare global {
   const SourceIcon: typeof import('../components/source-icon').SourceIcon
   const SourceItem: typeof import('../components/source-item').SourceItem
   const SourceItemCard: typeof import('../components/source-item').SourceItemCard
+  const SourceSelect: typeof import('../components/source-select').SourceSelect
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const Suspense: typeof import('react').Suspense
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
@@ -73,6 +74,7 @@ declare global {
   const searchReports: typeof import('../utils/mock-db').searchReports
   const setSetting: typeof import('../utils/settings-store').setSetting
   const siteConfig: typeof import('../config/site').siteConfig
+  const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition
   const store: typeof import('../store/index').store
   const subtitle: typeof import('../components/primitives').subtitle

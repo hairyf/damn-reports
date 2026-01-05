@@ -23,11 +23,6 @@ export function ReportEditor() {
       setIsUnsaved(true)
       setIsAutoSaved(false)
     },
-    editorProps: {
-      attributes: {
-        class: 'prose prose-sm max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-sm',
-      },
-    },
   })
 
   const handleGenerateReport = () => {
@@ -61,11 +56,10 @@ export function ReportEditor() {
     { event: 'keydown' },
   )
 
-  const [hoverable] = useHover((hover) => {
+  const [hoverable] = useHover(() => {
     return (
       <div
-        className={input({ isMultiline: true }).inputWrapper({ class: 'flex-1 items-start px-0 hover:' })}
-        {...{ 'data-hover': hover }}
+        className={input({ isMultiline: true }).inputWrapper({ class: 'flex-1 items-start px-0' })}
       >
         <EditorContent editor={editor} className="size-full [&_>_div]:min-h-full" />
       </div>
