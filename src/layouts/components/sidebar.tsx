@@ -5,7 +5,7 @@ import { siteConfig } from '@/config/site'
 
 const iconMap: Record<string, string> = {
   '/': 'lucide:layout-dashboard',
-  '/reports': 'lucide:bar-chart-3',
+  '/report': 'lucide:bar-chart-3',
   '/database': 'lucide:database',
   '/source': 'lucide:file-text',
   '/n8n': 'lucide:workflow',
@@ -25,7 +25,9 @@ export function Sidebar() {
         </div>
         <nav className="space-y-1.5">
           {siteConfig.sideItems.map((item) => {
-            const isActive = location.pathname.startsWith(item.href)
+            const isActive = item.href !== '/'
+              ? location.pathname.startsWith(item.href)
+              : location.pathname === item.href
             const icon = iconMap[`/${item.href.split('/')[1]}`] || 'lucide:circle'
             return (
               <Button

@@ -10,7 +10,7 @@ export const siteConfig = {
     },
     {
       label: 'Reports',
-      href: '/reports',
+      href: '/report',
     },
     {
       label: 'Database',

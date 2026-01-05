@@ -18,7 +18,7 @@ export function DefaultLayout(props: DefaultLayoutProps) {
       <div className="flex flex-col flex-1">
         <Navbar />
         <main className="flex-grow relative">
-          <div className={clsx('px-6 pb-6 absolute top-0 left-0 w-full h-full flex flex-col overflow-y-auto', props.classNames?.main)}>
+          <div className={clsx('px-6 pb-6 pt-3 absolute top-0 left-0 w-full h-full flex flex-col overflow-y-auto', props.classNames?.main)}>
             {props.title && (
               <div className="mb-4">
                 <span className={title({ size: 'sm' })}>{props.title}</span>

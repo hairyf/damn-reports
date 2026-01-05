@@ -37,6 +37,9 @@ declare global {
   const SettingOtherConfig: typeof import('../ui/setting-other-config').SettingOtherConfig
   const SettingUserInterfaceCard: typeof import('../ui/setting-user-interface-card').SettingUserInterfaceCard
   const SlackIcon: typeof import('../components/icons').SlackIcon
+  const SourceIcon: typeof import('../components/source-icon').SourceIcon
+  const SourceItem: typeof import('../components/source-item').SourceItem
+  const SourceItemCard: typeof import('../components/source-item').SourceItemCard
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const Suspense: typeof import('react').Suspense
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
@@ -56,10 +59,12 @@ declare global {
   const getReportById: typeof import('../utils/mock-db').getReportById
   const getSetting: typeof import('../utils/settings-store').getSetting
   const getSettings: typeof import('../utils/settings-store').getSettings
+  const iconMap: typeof import('../components/source-icon').iconMap
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
   const loginN8nUser: typeof import('../apis/index').loginN8nUser
   const memo: typeof import('react').memo
+  const queryClient: typeof import('../config/client').queryClient
   const registerN8N: typeof import('../apis/index').registerN8N
   const registerN8n: typeof import('../apis/index').registerN8n
   const registerN8nUser: typeof import('../apis/index').registerN8nUser
@@ -114,6 +119,12 @@ declare global {
   // @ts-ignore
   export type { IconSvgProps } from '../components/icons'
   import('../components/icons')
+  // @ts-ignore
+  export type { IconMap, SourceIconProps } from '../components/source-icon'
+  import('../components/source-icon')
+  // @ts-ignore
+  export type { DataSource, SourceItemProps } from '../components/source-item'
+  import('../components/source-item')
   // @ts-ignore
   export type { ThemeSwitchProps } from '../components/theme-switch'
   import('../components/theme-switch')

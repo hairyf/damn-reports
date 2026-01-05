@@ -200,7 +200,7 @@ function Page() {
                       size="sm"
                       variant="light"
                       onPress={function () {
-                        navigate(`/report?id=${item.id}`)
+                        navigate(`/report/detail?id=${item.id}`)
                       }}
                     >
                       <Icon icon="lucide:edit" className="w-4 h-4" />
