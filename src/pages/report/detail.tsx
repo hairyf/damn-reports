@@ -214,47 +214,47 @@ function Page() {
           <div className="flex flex-col sm:flex-row gap-4">
             {isEditMode
               ? (
-                <>
-                  <Input
-                    label="日期"
-                    value={date}
-                    className="flex-1"
-                    isReadOnly
-                  />
-                  <Input
-                    label="类型"
-                    value={getTypeLabel(type)}
-                    className="w-full sm:w-40"
-                    isReadOnly
-                  />
-                </>
-              )
+                  <>
+                    <Input
+                      label="日期"
+                      value={date}
+                      className="flex-1"
+                      isReadOnly
+                    />
+                    <Input
+                      label="类型"
+                      value={getTypeLabel(type)}
+                      className="w-full sm:w-40"
+                      isReadOnly
+                    />
+                  </>
+                )
               : (
-                <>
-                  <Input
-                    type="date"
-                    label="日期"
-                    value={date}
-                    onValueChange={setDate}
-                    className="flex-1"
-                    isRequired
-                  />
-                  <Select
-                    label="类型"
-                    selectedKeys={[type]}
-                    onSelectionChange={function (keys) {
-                      const selected = Array.from(keys)[0] as string
-                      setType(selected as typeof type)
-                    }}
-                    className="w-full sm:w-40"
-                  >
-                    <SelectItem key="daily">日</SelectItem>
-                    <SelectItem key="weekly">周</SelectItem>
-                    <SelectItem key="monthly">月</SelectItem>
-                    <SelectItem key="yearly">年</SelectItem>
-                  </Select>
-                </>
-              )}
+                  <>
+                    <Input
+                      type="date"
+                      label="日期"
+                      value={date}
+                      onValueChange={setDate}
+                      className="flex-1"
+                      isRequired
+                    />
+                    <Select
+                      label="类型"
+                      selectedKeys={[type]}
+                      onSelectionChange={function (keys) {
+                        const selected = Array.from(keys)[0] as string
+                        setType(selected as typeof type)
+                      }}
+                      className="w-full sm:w-40"
+                    >
+                      <SelectItem key="daily">日</SelectItem>
+                      <SelectItem key="weekly">周</SelectItem>
+                      <SelectItem key="monthly">月</SelectItem>
+                      <SelectItem key="yearly">年</SelectItem>
+                    </Select>
+                  </>
+                )}
           </div>
 
           <div className="flex flex-col flex-1 gap-4 min-h-[500px]">

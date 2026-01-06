@@ -588,7 +588,6 @@ export async function searchDatabaseItems(query: string, source?: string): Promi
     return text.includes(query.toLowerCase())
   })
 
-
   if (source) {
     results = results.filter(item => item.source === source)
   }

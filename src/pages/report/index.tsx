@@ -1,4 +1,4 @@
-import { useDebounce, useWatch } from '@hairy/react-lib'
+import { useDebounce, useOffsetPagination, useWatch } from '@hairy/react-lib'
 import {
   Button,
   Card,
@@ -27,9 +27,8 @@ import { writeTextFile } from '@tauri-apps/plugin-fs'
 import { sendNotification } from '@tauri-apps/plugin-notification'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { deleteReport, getAllReports, searchReports } from '@/utils/mock-db'
-
-const ITEMS_PER_PAGE = 7
+import { sql_queryReports } from '@/services/sql-report-query'
+import { deleteReport } from '@/utils/mock-db'
 
 function Page() {
   const navigate = useNavigate()
@@ -39,7 +38,9 @@ function Page() {
   const [typeFilter, setTypeFilter] = useState<string>('')
   const { isOpen, onOpen, onClose } = useDisclosure()
   const [deleteTarget, setDeleteTarget] = useState<number | null>(null)
-  const [currentPage, setCurrentPage] = useState(1)
+  const pagination = useOffsetPagination({
+    pageSize: 7,
+  })
 
   const typeOptions = [
     { label: '日', value: 'daily' },
@@ -49,15 +50,13 @@ function Page() {
   ]
 
   const { data: reports = [], isLoading } = useQuery({
-    queryKey: ['reports', debouncedSearchQuery, typeFilter],
-    queryFn: async () => {
-      if (debouncedSearchQuery || typeFilter) {
-        return await searchReports(debouncedSearchQuery, typeFilter || undefined)
-      }
-      else {
-        return await getAllReports()
-      }
-    },
+    queryKey: ['reports', debouncedSearchQuery, typeFilter, pagination.page, pagination.pageSize],
+    queryFn: async () => sql_queryReports({
+      search: debouncedSearchQuery,
+      type: typeFilter,
+      page: pagination.page,
+      pageSize: pagination.pageSize,
+    }),
   })
 
   const deleteMutation = useMutation({
@@ -251,10 +250,8 @@ function Page() {
                   </Button>
                   <Button
                     color="danger"
-                    onPress={function () {
-                      if (deleteTarget) {
-                        handleDelete(deleteTarget)
-                      }
+                    onPress={() => {
+                      deleteTarget && handleDelete(deleteTarget)
                     }}
                   >
                     删除

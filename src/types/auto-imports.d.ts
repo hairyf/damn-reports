@@ -55,6 +55,9 @@ declare global {
   const createRef: typeof import('react').createRef
   const createReport: typeof import('../utils/mock-db').createReport
   const createSource: typeof import('../utils/mock-db').createSource
+  const db: typeof import('../config/db').db
+  const db_p: typeof import('../config/db').db_p
+  const db_promise: typeof import('../config/db').db_promise
   const deleteReport: typeof import('../utils/mock-db').deleteReport
   const forwardRef: typeof import('react').forwardRef
   const getAllDatabaseItems: typeof import('../utils/mock-db').getAllDatabaseItems
@@ -65,6 +68,8 @@ declare global {
   const getSettings: typeof import('../utils/settings-store').getSettings
   const getSources: typeof import('../utils/mock-db').getSources
   const iconMap: typeof import('../components/source-icon').iconMap
+  const isExistsIndex: typeof import('../utils/db').isExistsIndex
+  const isExistsTable: typeof import('../utils/db').isExistsTable
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
   const loginN8nUser: typeof import('../apis/index').loginN8nUser
@@ -80,6 +85,17 @@ declare global {
   const settingsStore: typeof import('../config/store').settingsStore
   const siteConfig: typeof import('../config/site').siteConfig
   const sourceOptions: typeof import('../config/options').sourceOptions
+  const sql_createReport: typeof import('../services/sql-report-create').sql_createReport
+  const sql_createSource: typeof import('../services/sql-source-create').sql_createSource
+  const sql_deleteReport: typeof import('../services/sql-report-delete').sql_deleteReport
+  const sql_deleteSource: typeof import('../services/sql-source-delete').sql_deleteSource
+  const sql_isExistsIndex: typeof import('../services/sql-is-exists-index').sql_isExistsIndex
+  const sql_isExistsTable: typeof import('../services/sql-is-exists-tables').sql_isExistsTable
+  const sql_queryReportById: typeof import('../services/sql-report-query_id').sql_queryReportById
+  const sql_queryReports: typeof import('../services/sql-report-query').sql_queryReports
+  const sql_querySourceById: typeof import('../services/sql-source-query_id').sql_querySourceById
+  const sql_querySources: typeof import('../services/sql-source-query').sql_querySources
+  const sql_searchReports: typeof import('../services/sql-search-reports').sql_searchReports
   const startTransition: typeof import('react').startTransition
   const store: typeof import('../store/index').store
   const subtitle: typeof import('../components/primitives').subtitle
@@ -121,6 +137,9 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
+  export type { ReportCreateInput, SourceCreateInput, Source } from '../config/db.schema'
+  import('../config/db.schema')
+  // @ts-ignore
   export type { SiteConfig } from '../config/site'
   import('../config/site')
   // @ts-ignore
@@ -135,6 +154,12 @@ declare global {
   // @ts-ignore
   export type { ThemeSwitchProps } from '../components/theme-switch'
   import('../components/theme-switch')
+  // @ts-ignore
+  export type { ReportSearchInput } from '../services/sql-report-query'
+  import('../services/sql-report-query')
+  // @ts-ignore
+  export type { SourceQueryInput } from '../services/sql-source-query'
+  import('../services/sql-source-query')
   // @ts-ignore
   export type { Report, DatabaseItem, SourceType, SourceConfig } from '../utils/mock-db'
   import('../utils/mock-db')

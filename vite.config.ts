@@ -24,6 +24,7 @@ export default defineConfig(async () => ({
         'src/config',
         'src/components',
         'src/layouts/index.ts',
+        'src/services',
         'src/store/index.ts',
         'src/utils',
         'src/hooks',
