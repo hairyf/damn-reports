@@ -134,7 +134,4 @@ declare global {
   // @ts-ignore
   export type { Report, DatabaseItem } from '../utils/mock-db'
   import('../utils/mock-db')
-  // @ts-ignore
-  export type { ThemeMode, Language, AppSettings } from '../utils/settings-store'
-  import('../utils/settings-store')
 }

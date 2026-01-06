@@ -15,8 +15,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
-    "@hairy/react-lib": "^1.38.0",
-    "@hairy/utils": "^1.38.0",
+    "@hairy/react-lib": "^1.45.0",
+    "@hairy/utils": "^1.45.0",
     "@heroui/react": "^2.8.5",
     "@heroui/theme": "2.4.23",
     "@heroui/use-theme": "2.1.10",
