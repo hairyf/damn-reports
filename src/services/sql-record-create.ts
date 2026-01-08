@@ -1,19 +1,34 @@
-import type { Record, RecordCreateInput } from '../config/db.schema'
+import type { Selectable } from 'kysely'
+import type { Record } from '../config/db.schema'
 import { db } from '../config/db'
 
-export async function sql_createRecord(input: RecordCreateInput): Promise<Record> {
+export interface RecordCreateInput {
+  summary: string
+  source: string
+  data: string
+}
+
+export async function sql_createRecord(input: RecordCreateInput): Promise<Selectable<Record>> {
   const id = crypto.randomUUID()
   const now = new Date().toISOString()
 
-  await db.execute(
-    'INSERT INTO Record (id, summary, source, data, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)',
-    [id, input.summary, input.source, input.data, now, now],
-  )
+  await db
+    .insertInto('Record')
+    .values({
+      id,
+      summary: input.summary,
+      source: input.source,
+      data: input.data,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .execute()
 
-  const result = await db.select<Record[]>(
-    'SELECT * FROM Record WHERE id = ?',
-    [id],
-  )
+  const result = await db
+    .selectFrom('Record')
+    .selectAll()
+    .where('id', '=', id)
+    .execute()
 
   return result[0]
 }

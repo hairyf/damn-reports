@@ -156,11 +156,8 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { Generated, Timestamp, User } from '../config/db.schema'
+  export type { Generated, Timestamp, Record, Source, SqliteMaster, DB } from '../config/db.schema'
   import('../config/db.schema')
-  // @ts-ignore
-  export type { Source, Record, DB } from '../config/db'
-  import('../config/db')
   // @ts-ignore
   export type { SiteConfig } from '../config/site'
   import('../config/site')
@@ -195,17 +192,26 @@ declare global {
   export type { N8nNodeParameters, N8nNode, N8nConnectionItem, N8nConnections, N8nWorkflowSettings, N8nHomeProject, PostN8nWorkflowParams, PostN8nWorkflowResult } from '../services/post-n8n-workflow'
   import('../services/post-n8n-workflow')
   // @ts-ignore
+  export type { RecordCreateInput } from '../services/sql-record-create'
+  import('../services/sql-record-create')
+  // @ts-ignore
   export type { RecordQueryInput } from '../services/sql-record-query'
   import('../services/sql-record-query')
   // @ts-ignore
   export type { RecordUpdateInput } from '../services/sql-record-update'
   import('../services/sql-record-update')
   // @ts-ignore
+  export type { ReportCreateInput } from '../services/sql-report-create'
+  import('../services/sql-report-create')
+  // @ts-ignore
   export type { ReportSearchInput } from '../services/sql-report-query'
   import('../services/sql-report-query')
   // @ts-ignore
   export type { ReportUpdateInput } from '../services/sql-report-update'
   import('../services/sql-report-update')
+  // @ts-ignore
+  export type { SourceCreateInput } from '../services/sql-source-create'
+  import('../services/sql-source-create')
   // @ts-ignore
   export type { SourceQueryInput } from '../services/sql-source-query'
   import('../services/sql-source-query')

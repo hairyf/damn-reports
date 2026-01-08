@@ -1,7 +1,11 @@
+import { db } from '../config/db'
+
 export async function sql_isExistsIndex(indexName: string) {
-  const result = await db.select<{ name: string }[]>(
-    'SELECT name FROM sqlite_master WHERE type=\'index\' AND name = ?',
-    [indexName],
-  )
+  const result = await db
+    .selectFrom('sqlite_master')
+    .select('name')
+    .where('type', '=', 'index')
+    .where('name', '=', indexName)
+    .execute()
   return result.length > 0
 }

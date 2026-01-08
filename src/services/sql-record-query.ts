@@ -1,3 +1,4 @@
+import type { Selectable } from 'kysely'
 import type { Record } from '../config/db.schema'
 import { db } from '../config/db'
 
@@ -8,42 +9,35 @@ export interface RecordQueryInput {
   pageSize?: number
 }
 
-export async function sql_queryRecords(input: RecordQueryInput = {}): Promise<Record[]> {
+export async function sql_queryRecords(input: RecordQueryInput = {}): Promise<Selectable<Record>[]> {
   const { search, source, page = 1, pageSize = 10 } = input
 
-  const conditions: string[] = []
-  const params: any[] = []
+  let query = db.selectFrom('Record').selectAll()
 
   // 如果search不为空，添加搜索条件
   if (search) {
-    conditions.push('(summary LIKE ? OR data LIKE ?)')
     const searchPattern = `%${search}%`
-    params.push(searchPattern, searchPattern)
+    query = query.where(eb =>
+      eb.or([
+        eb('summary', 'like', searchPattern),
+        eb('data', 'like', searchPattern),
+      ]),
+    )
   }
 
   // 如果source不为空，添加来源过滤
   if (source) {
-    conditions.push('source = ?')
-    params.push(source)
+    query = query.where('source', '=', source)
   }
 
-  // 构建WHERE子句
-  const whereClause = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : ''
+  // 排序
+  query = query.orderBy('createdAt', 'desc')
 
-  // 构建分页
-  let limitClause = ''
+  // 分页
   if (pageSize) {
     const offset = page && page > 0 ? (page - 1) * pageSize : 0
-    limitClause = `LIMIT ${pageSize} OFFSET ${offset}`
+    query = query.limit(pageSize).offset(offset)
   }
 
-  // 构建完整查询
-  const query = `
-    SELECT * FROM Record
-    ${whereClause}
-    ORDER BY createdAt DESC
-    ${limitClause}
-  `.trim()
-
-  return db.select<Record[]>(query, params)
+  return query.execute()
 }

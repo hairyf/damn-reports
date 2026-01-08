@@ -1,3 +1,4 @@
+import type { Selectable } from 'kysely'
 import type { Report } from '../config/db.schema'
 import { db } from '../config/db'
 
@@ -8,51 +9,49 @@ export interface ReportUpdateInput {
   content?: string
 }
 
-export async function sql_updateReport(input: ReportUpdateInput): Promise<Report> {
+export async function sql_updateReport(input: ReportUpdateInput): Promise<Selectable<Report>> {
   const now = new Date().toISOString()
-  const updates: string[] = []
-  const params: any[] = []
 
+  const updateValues: {
+    name?: string
+    type?: string
+    content?: string
+    updatedAt?: string
+  } = {}
   if (input.name !== undefined) {
-    updates.push('name = ?')
-    params.push(input.name)
+    updateValues.name = input.name
   }
-
   if (input.type !== undefined) {
-    updates.push('type = ?')
-    params.push(input.type)
+    updateValues.type = input.type
   }
-
   if (input.content !== undefined) {
-    updates.push('content = ?')
-    params.push(input.content)
+    updateValues.content = input.content
   }
 
-  if (updates.length === 0) {
+  if (Object.keys(updateValues).length === 0) {
     // 如果没有要更新的字段，直接返回现有记录
-    const result = await db.select<Report[]>(
-      'SELECT * FROM Report WHERE id = ?',
-      [input.id],
-    )
+    const result = await db
+      .selectFrom('Report')
+      .selectAll()
+      .where('id', '=', input.id)
+      .execute()
     return result[0]
   }
 
   // 添加 updatedAt
-  updates.push('updatedAt = ?')
-  params.push(now)
+  updateValues.updatedAt = now
 
-  // 添加 id 作为 WHERE 条件
-  params.push(input.id)
+  await db
+    .updateTable('Report')
+    .set(updateValues)
+    .where('id', '=', input.id)
+    .execute()
 
-  await db.execute(
-    `UPDATE Report SET ${updates.join(', ')} WHERE id = ?`,
-    params,
-  )
-
-  const result = await db.select<Report[]>(
-    'SELECT * FROM Report WHERE id = ?',
-    [input.id],
-  )
+  const result = await db
+    .selectFrom('Report')
+    .selectAll()
+    .where('id', '=', input.id)
+    .execute()
 
   return result[0]
 }

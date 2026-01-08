@@ -1,19 +1,34 @@
-import type { Report, ReportCreateInput } from '../config/db.schema'
+import type { Selectable } from 'kysely'
+import type { Report } from '../config/db.schema'
 import { db } from '../config/db'
 
-export async function sql_createReport(input: ReportCreateInput): Promise<Report> {
+export interface ReportCreateInput {
+  name: string
+  type: string
+  content: string
+}
+
+export async function sql_createReport(input: ReportCreateInput): Promise<Selectable<Report>> {
   const id = crypto.randomUUID()
   const now = new Date().toISOString()
 
-  await db.execute(
-    'INSERT INTO Report (id, name, type, content, createdAt, updatedAt) VALUES (?, ?, ?, ?, ?, ?)',
-    [id, input.name, input.type, input.content, now, now],
-  )
+  await db
+    .insertInto('Report')
+    .values({
+      id,
+      name: input.name,
+      type: input.type,
+      content: input.content,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .execute()
 
-  const result = await db.select<Report[]>(
-    'SELECT * FROM Report WHERE id = ?',
-    [id],
-  )
+  const result = await db
+    .selectFrom('Report')
+    .selectAll()
+    .where('id', '=', id)
+    .execute()
 
   return result[0]
 }

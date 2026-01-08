@@ -14,10 +14,30 @@ datasource db {
   url      = env("DB_URL")
 }
 
-model User {
+model Source {
   id          String @id
   name        String
+  type        String
+  description String
+  config      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
 
-  /// @kyselyType('member' | 'admin')
-  role        String
+model Report {
+  id          String @id
+  name        String
+  type        String
+  content     String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Record {
+  id          String @id
+  summary     String
+  data        String
+  source      String
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
