@@ -13,6 +13,7 @@ declare global {
   const DEFAULT_N8N_LOGIN_DATA: typeof import('../config/constants').DEFAULT_N8N_LOGIN_DATA
   const DEFAULT_N8N_REGISTER_DATA: typeof import('../config/constants').DEFAULT_N8N_REGISTER_DATA
   const DeleteReportModal: typeof import('../components/delete-report-modal').DeleteReportModal
+  const Dialog: typeof import('../components/dialog').Dialog
   const DiscordIcon: typeof import('../components/icons').DiscordIcon
   const Fragment: typeof import('react').Fragment
   const GitIcon: typeof import('../components/icons').GitIcon
@@ -108,8 +109,10 @@ declare global {
   const sql_isExistsIndex: typeof import('../services/sql-is-exists-index').sql_isExistsIndex
   const sql_isExistsTable: typeof import('../services/sql-is-exists-tables').sql_isExistsTable
   const sql_queryRecordById: typeof import('../services/sql-record-query_id').sql_queryRecordById
+  const sql_queryRecordCount: typeof import('../services/sql-record-query_count').sql_queryRecordCount
   const sql_queryRecords: typeof import('../services/sql-record-query').sql_queryRecords
   const sql_queryReportById: typeof import('../services/sql-report-query_id').sql_queryReportById
+  const sql_queryReportCount: typeof import('../services/sql-report-query_count').sql_queryReportCount
   const sql_queryReports: typeof import('../services/sql-report-query').sql_queryReports
   const sql_querySourceById: typeof import('../services/sql-source-query_id').sql_querySourceById
   const sql_querySources: typeof import('../services/sql-source-query').sql_querySources
@@ -164,6 +167,9 @@ declare global {
   export type { SiteConfig } from '../config/site'
   import('../config/site')
   // @ts-ignore
+  export type { DialogProps } from '../components/dialog'
+  import('../components/dialog')
+  // @ts-ignore
   export type { IconSvgProps } from '../components/icons'
   import('../components/icons')
   // @ts-ignore
@@ -197,8 +203,8 @@ declare global {
   export type { RecordCreateInput } from '../services/sql-record-create'
   import('../services/sql-record-create')
   // @ts-ignore
-  export type { RecordQueryInput } from '../services/sql-record-query'
-  import('../services/sql-record-query')
+  export type { RecordQueryInput } from '../services/sql-record-query_count'
+  import('../services/sql-record-query_count')
   // @ts-ignore
   export type { RecordUpdateInput } from '../services/sql-record-update'
   import('../services/sql-record-update')
@@ -206,8 +212,8 @@ declare global {
   export type { ReportCreateInput } from '../services/sql-report-create'
   import('../services/sql-report-create')
   // @ts-ignore
-  export type { ReportSearchInput } from '../services/sql-report-query'
-  import('../services/sql-report-query')
+  export type { ReportSearchInput } from '../services/sql-report-query_count'
+  import('../services/sql-report-query_count')
   // @ts-ignore
   export type { ReportUpdateInput } from '../services/sql-report-update'
   import('../services/sql-report-update')

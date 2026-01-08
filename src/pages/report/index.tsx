@@ -17,15 +17,16 @@ import {
 import { Icon } from '@iconify/react'
 import { useOverlay } from '@overlastic/react'
 import { useQuery } from '@tanstack/react-query'
+import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { sql_queryReports } from '@/services/sql-report-query'
 
 function Page() {
   const navigate = useNavigate()
-  const [searchQuery, setSearchQuery] = useState('')
-  const debouncedSearchQuery = useDebounce(searchQuery, 300)
-  const [typeFilter, setTypeFilter] = useState<string>('')
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 300)
+  const [type, setType] = useState<string>('')
   const openDeleteReportModal = useOverlay(DeleteReportModal)
   const pagination = useOffsetPagination({
     pageSize: 7,
@@ -39,10 +40,10 @@ function Page() {
   ]
 
   const { data: reports = [], isLoading } = useQuery({
-    queryKey: ['reports', debouncedSearchQuery, typeFilter, pagination.page, pagination.pageSize],
+    queryKey: ['reports', debouncedSearch, type, pagination.page, pagination.pageSize],
     queryFn: async () => sql_queryReports({
-      search: debouncedSearchQuery,
-      type: typeFilter,
+      search: debouncedSearch,
+      type,
       page: pagination.page,
       pageSize: pagination.pageSize,
     }),
@@ -65,7 +66,7 @@ function Page() {
     return text.length > 50 ? `${text.substring(0, 50)}...` : text
   }
 
-  useWatch([searchQuery, typeFilter], () => pagination.pageChange(1))
+  useWatch([search, type], () => pagination.pageChange(1))
 
   return (
     <>
@@ -74,17 +75,17 @@ function Page() {
           <div className="flex flex-col sm:flex-row gap-4">
             <Input
               placeholder="搜索报告内容..."
-              value={searchQuery}
-              onValueChange={setSearchQuery}
+              value={search}
+              onValueChange={setSearch}
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
             />
             <Select
               placeholder="全部类型"
-              selectedKeys={typeFilter ? [typeFilter] : []}
+              selectedKeys={type ? [type] : []}
               onSelectionChange={function (keys) {
                 const selected = Array.from(keys)[0] as string
-                setTypeFilter(selected || '')
+                setType(selected || '')
               }}
               isClearable
               className="w-full sm:w-40"
@@ -124,7 +125,7 @@ function Page() {
           {(item) => {
             return (
               <TableRow key={item.id}>
-                <TableCell>{item.createdAt}</TableCell>
+                <TableCell>{dayjs(item.createdAt).format('YYYY-MM-DD')}</TableCell>
                 <TableCell>{getTypeLabel(item.type)}</TableCell>
                 <TableCell>
                   {getContentPreview(item.content)}
