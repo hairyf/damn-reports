@@ -8,9 +8,9 @@ export const db = new Kysely<DB>({
 })
 
 async function main() {
-  await db.schema.dropTable('Source').execute()
-  await db.schema.dropTable('Report').execute()
-  await db.schema.dropTable('Record').execute()
+  // await db.schema.dropTable('Source').execute()
+  // await db.schema.dropTable('Report').execute()
+  // await db.schema.dropTable('Record').execute()
 
   if (!(await sql_isExistsTable('Source'))) {
     await db.schema.createTable('Source')

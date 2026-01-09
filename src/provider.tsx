@@ -1,6 +1,6 @@
 import type { NavigateOptions } from 'react-router-dom'
 
-import { HeroUIProvider } from '@heroui/react'
+import { HeroUIProvider, ToastProvider } from '@heroui/react'
 import { OverlaysProvider } from '@overlastic/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useHref, useNavigate } from 'react-router-dom'
@@ -20,6 +20,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
         <OverlaysProvider>
           {children}
         </OverlaysProvider>
+        <ToastProvider placement="top-center" />
       </HeroUIProvider>
     </QueryClientProvider>
   )

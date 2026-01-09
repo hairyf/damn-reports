@@ -4,7 +4,8 @@ export interface SourceCreateInput {
   name: string
   type: string
   description: string
-  config: string
+  enabled: boolean
+  config: Record<string, any>
 }
 
 export async function sql_createSource(input: SourceCreateInput): Promise<Selectable<Source>> {
@@ -19,6 +20,7 @@ export async function sql_createSource(input: SourceCreateInput): Promise<Select
       type: input.type,
       description: input.description,
       config: input.config,
+      enabled: input.enabled,
       createdAt: now,
       updatedAt: now,
     })

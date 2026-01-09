@@ -1,5 +1,5 @@
 import { If, useWatch, useWhenever } from '@hairy/react-lib'
-import { Button, Input, Textarea } from '@heroui/react'
+import { addToast, Button, Input, Textarea } from '@heroui/react'
 import { useForm } from 'react-hook-form'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
 import { SourceFormGit } from '@/components/souce-form-git'
@@ -23,28 +23,46 @@ function Page() {
   const config = form.watch('config')
 
   useWatch(source, (source, oldSource) => {
+    if (!oldSource)
+      return
     setConfigs(prev => ({ ...prev, [oldSource]: config }))
     form.setValue('config', configs[source] || {})
   })
 
-  useWhenever(sourceId, async () => {
+  async function reset() {
     const source = await sql_querySourceById(sourceId)
     if (!source)
       return
     form.setValue('name', source.name)
     form.setValue('description', source.description)
+
     form.setValue('config', source.config)
     form.setValue('type', source.type)
     setConfigs(prev => ({ ...prev, [source.type]: source.config }))
-  }, { immediate: true })
+  }
+  useWhenever(sourceId, reset, { immediate: true })
 
   const onSubmit = async (data: any) => {
-    if (sourceId)
-      await sql_updateSource(data)
-    else
-      await sql_createSource(data)
+    if (sourceId) {
+      await sql_updateSource({ ...data, id: sourceId })
+      addToast({
+        title: 'Success',
+        description: 'Source updated successfully',
+        color: 'success',
+      })
+    }
+    else {
+      await sql_createSource({ ...data, enabled: true })
+      addToast({
+        title: 'Success',
+        description: 'Source created successfully',
+        color: 'success',
+      })
+    }
+    // navigate('/source')
+    reset()
+    queryClient.invalidateQueries({ queryKey: ['sources'] })
   }
-
   return (
     <Form {...form}>
       <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
