@@ -88,6 +88,7 @@ declare global {
   const getSettings: typeof import('../utils/settings-store').getSettings
   const getSources: typeof import('../utils/mock-db').getSources
   const iconMap: typeof import('../components/source-icon').iconMap
+  const invokeCollectAll: typeof import('../services/invoke-collect-all').invokeCollectAll
   const invokeCollectClickup: typeof import('../services/invoke-collect-clickup').invokeCollectClickup
   const invokeCollectGit: typeof import('../services/invoke-collect-git').invokeCollectGit
   const invokeGenerateDaily: typeof import('../services/invoke-generate-daily').invokeGenerateDaily

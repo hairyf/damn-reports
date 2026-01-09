@@ -3,7 +3,7 @@ import { Icon } from '@iconify/react'
 
 export function ReportGenerator() {
   function onGenerate() {
-    invokeGenerateDaily()
+    invokeCollectAll()
   }
   return (
     <Card className="flex-1">
