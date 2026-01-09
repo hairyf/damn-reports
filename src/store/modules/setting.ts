@@ -6,7 +6,6 @@ export type Language = 'zh-CN' | 'en-US'
 
 export const setting = defineStore({
   state: () => ({
-    theme: 'system' as ThemeMode,
     language: 'zh-CN' as Language,
     autoSave: true,
     notifications: true,

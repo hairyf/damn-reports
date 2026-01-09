@@ -17,8 +17,9 @@ async function main() {
       .addColumn('id', 'text', col => col.primaryKey())
       .addColumn('name', 'text', col => col.notNull())
       .addColumn('type', 'text', col => col.notNull())
+      .addColumn('enabled', 'boolean', col => col.notNull().defaultTo(true))
       .addColumn('description', 'text', col => col.notNull())
-      .addColumn('config', 'text', col => col.notNull())
+      .addColumn('config', 'json', col => col.notNull())
       .addColumn('createdAt', 'date', col => col.defaultTo(sql`CURRENT_TIMESTAMP`))
       .addColumn('updatedAt', 'date', col => col.defaultTo(sql`CURRENT_TIMESTAMP`))
       .execute()
@@ -39,7 +40,7 @@ async function main() {
     await db.schema.createTable('Record')
       .addColumn('id', 'text', col => col.primaryKey())
       .addColumn('summary', 'text', col => col.notNull())
-      .addColumn('data', 'text', col => col.notNull())
+      .addColumn('data', 'json', col => col.notNull())
       .addColumn('source', 'text', col => col.notNull())
       .addColumn('createdAt', 'date', col => col.defaultTo(sql`CURRENT_TIMESTAMP`))
       .addColumn('updatedAt', 'date', col => col.defaultTo(sql`CURRENT_TIMESTAMP`))
@@ -63,7 +64,8 @@ async function insertTestData() {
         name: 'GitHub 仓库',
         type: 'git',
         description: '测试用的 GitHub 数据源',
-        config: JSON.stringify({ url: 'https://github.com/test/repo', branch: 'main' }),
+        config: { url: 'https://github.com/test/repo', branch: 'main' },
+        enabled: true,
         createdAt: now,
         updatedAt: now,
       },
@@ -72,7 +74,8 @@ async function insertTestData() {
         name: 'ClickUp 工作区',
         type: 'clickup',
         description: '测试用的 ClickUp 数据源',
-        config: JSON.stringify({ workspaceId: 'test-workspace', apiKey: 'test-key' }),
+        config: { workspaceId: 'test-workspace', apiKey: 'test-key' },
+        enabled: true,
         createdAt: now,
         updatedAt: now,
       },
@@ -112,7 +115,7 @@ async function insertTestData() {
         {
           id: crypto.randomUUID(),
           summary: '完成了用户登录功能开发',
-          data: JSON.stringify({ type: 'feature', status: 'completed', priority: 'high' }),
+          data: { type: 'feature', status: 'completed', priority: 'high' },
           source: 'git',
           createdAt: now,
           updatedAt: now,
@@ -120,7 +123,7 @@ async function insertTestData() {
         {
           id: crypto.randomUUID(),
           summary: '修复了数据导出 bug',
-          data: JSON.stringify({ type: 'bugfix', status: 'completed', priority: 'medium' }),
+          data: { type: 'bugfix', status: 'completed', priority: 'medium' },
           source: 'clickup',
           createdAt: now,
           updatedAt: now,
@@ -128,7 +131,7 @@ async function insertTestData() {
         {
           id: crypto.randomUUID(),
           summary: '优化了页面加载性能',
-          data: JSON.stringify({ type: 'optimization', status: 'in-progress', priority: 'low' }),
+          data: { type: 'optimization', status: 'in-progress', priority: 'low' },
           source: 'slack',
           createdAt: now,
           updatedAt: now,

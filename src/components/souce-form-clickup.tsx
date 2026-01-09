@@ -1,45 +1,64 @@
 import { Input } from '@heroui/react'
-import { Controller, useFormContext } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
 
 export function SourceFormClickup() {
   const { control } = useFormContext()
 
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-foreground">API Token</label>
-      <Controller
+    <div className="flex flex-col gap-4">
+      <FormField
+        rules={{ required: 'Please enter your API Token' }}
+        control={control}
         name="config.apiToken"
-        control={control}
         render={({ field }) => (
-          <Input
-            {...field}
-            labelPlacement="outside"
-            placeholder="Enter your API Token"
-          />
+          <FormItem>
+            <FormLabel>API Token</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                labelPlacement="outside"
+                placeholder="Enter your API Token"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         )}
       />
-      <label className="text-sm font-medium text-foreground">Team ID</label>
-      <Controller
+      <FormField
+        rules={{ required: 'Please enter your Team ID' }}
+        control={control}
         name="config.teamId"
-        control={control}
         render={({ field }) => (
-          <Input
-            {...field}
-            labelPlacement="outside"
-            placeholder="Enter your Team ID"
-          />
+          <FormItem>
+            <FormLabel>Team ID</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                labelPlacement="outside"
+                placeholder="Enter your Team ID"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         )}
       />
-      <label className="text-sm font-medium text-foreground">User ID</label>
-      <Controller
-        name="config.userId"
+      <FormField
+        rules={{ required: 'Please enter your User ID' }}
         control={control}
+        name="config.userId"
         render={({ field }) => (
-          <Input
-            {...field}
-            labelPlacement="outside"
-            placeholder="Enter your User ID"
-          />
+          <FormItem>
+            <FormLabel>User ID</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                labelPlacement="outside"
+                placeholder="Enter your User ID"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         )}
       />
     </div>

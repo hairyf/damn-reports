@@ -10,7 +10,7 @@ generator kysely {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "sqlite"
   url      = env("DB_URL")
 }
 
@@ -19,7 +19,8 @@ model Source {
   name        String
   type        String
   description String
-  config      String
+  enabled     Boolean
+  config      Json
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 }
@@ -36,8 +37,16 @@ model Report {
 model Record {
   id          String @id
   summary     String
-  data        String
+  data        Json
   source      String
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+}
+
+model sqlite_master {
+  type  String
+  name  String
+  tbl_name String @id
+  rootpage Int
+  sql String?
 }

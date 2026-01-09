@@ -1,10 +1,10 @@
 import { Button, Input } from '@heroui/react'
 import { open } from '@tauri-apps/plugin-dialog'
-import { Controller, useFormContext } from 'react-hook-form'
+import { useFormContext } from 'react-hook-form'
+import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
 
 export function SourceFormGit() {
-  const { control, setValue, watch } = useFormContext()
-  const locationType = watch('locationType')
+  const { control, setValue } = useFormContext()
 
   const handleOpenDirectory = async () => {
     try {
@@ -13,7 +13,7 @@ export function SourceFormGit() {
         multiple: false,
       })
       if (selected && typeof selected === 'string') {
-        setValue('gitDir', selected)
+        setValue('config.dir', selected)
       }
     }
     catch (error) {
@@ -22,58 +22,73 @@ export function SourceFormGit() {
   }
 
   return (
-    <div className="flex flex-col gap-2">
-      <label className="text-sm font-medium text-foreground">Git Directory</label>
-      <Controller
+    <div className="flex flex-col gap-4">
+      <FormField
+        control={control}
         name="config.dir"
-        control={control}
-        rules={{
-          required: locationType === 'dir' ? '请选择 Git 目录' : false,
-        }}
+        rules={{ required: 'Please select Git directory' }}
         render={({ field }) => (
-          <div className="flex gap-2">
-            <Input
-              {...field}
-              labelPlacement="outside"
-              placeholder="Select directory"
-              isReadOnly
-              className="flex-1"
-            />
-            <Button
-              type="button"
-              onPress={handleOpenDirectory}
-              color="primary"
-              variant="bordered"
-            >
-              选择目录
-            </Button>
-          </div>
+          <FormItem>
+            <FormLabel>Git Directory</FormLabel>
+            <FormControl>
+              <div className="flex gap-2">
+                <Input
+                  {...field}
+                  labelPlacement="outside"
+                  placeholder="Select directory"
+                  isReadOnly
+                  className="flex-1"
+                />
+                <Button
+                  type="button"
+                  onPress={handleOpenDirectory}
+                  color="primary"
+                  variant="bordered"
+                >
+                  选择目录
+                </Button>
+              </div>
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         )}
       />
 
-      <label className="text-sm font-medium text-foreground">Git Branch</label>
-      <Controller
+      <FormField
+        control={control}
         name="config.branch"
-        control={control}
+        rules={{ required: 'Please enter your Git branch' }}
         render={({ field }) => (
-          <Input
-            {...field}
-            labelPlacement="outside"
-            placeholder="Enter your Git Branch"
-          />
+          <FormItem>
+            <FormLabel>Git Branch</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                labelPlacement="outside"
+                placeholder="Enter your Git Branch"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         )}
       />
 
-      <label className="text-sm font-medium text-foreground">Git Username</label>
-      <Controller
-        name="config.username"
+      <FormField
         control={control}
+        name="config.username"
+        rules={{ required: 'Please enter your Git username' }}
         render={({ field }) => (
-          <Input
-            {...field}
-            labelPlacement="outside"
-            placeholder="Enter your Git Username"
-          />
+          <FormItem>
+            <FormLabel>Git Username</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                labelPlacement="outside"
+                placeholder="Enter your Git Username"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
         )}
       />
     </div>

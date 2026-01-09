@@ -1,11 +1,11 @@
 import { If, useWatch, useWhenever } from '@hairy/react-lib'
 import { Button, Input, Textarea } from '@heroui/react'
-import { Controller, FormProvider, useForm } from 'react-hook-form'
-import { useNavigate } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
 import { SourceFormGit } from '@/components/souce-form-git'
 
 function Page() {
-  const _navigate = useNavigate()
+  const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const sourceId = searchParams.get('id') || ''
   const [configs, setConfigs] = useState<Record<string, any>>({})
@@ -14,12 +14,12 @@ function Page() {
       id: '',
       name: '',
       description: '',
-      source: '',
+      type: '',
       config: {},
     },
   })
 
-  const source = form.watch('source')
+  const source = form.watch('type')
   const config = form.watch('config')
 
   useWatch(source, (source, oldSource) => {
@@ -34,8 +34,9 @@ function Page() {
     form.setValue('name', source.name)
     form.setValue('description', source.description)
     form.setValue('config', source.config)
+    form.setValue('type', source.type)
     setConfigs(prev => ({ ...prev, [source.type]: source.config }))
-  })
+  }, { immediate: true })
 
   const onSubmit = async (data: any) => {
     if (sourceId)
@@ -45,36 +46,58 @@ function Page() {
   }
 
   return (
-    <FormProvider {...form}>
-      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4 max-w-lg mx-auto w-full">
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-foreground">Name</label>
-          <Input
-            {...form.register('name')}
-            labelPlacement="outside"
-            placeholder="Enter source name"
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-foreground">Description(optional)</label>
-          <Textarea
-            {...form.register('description')}
-            labelPlacement="outside"
-            placeholder="Enter source description"
-          />
-        </div>
+    <Form {...form}>
+      <form onSubmit={form.handleSubmit(onSubmit)} className="flex flex-col gap-4">
+        <FormField
+          control={form.control}
+          name="name"
+          rules={{ required: 'Please enter source name' }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Name</FormLabel>
+              <FormControl>
+                <Input
+                  {...field}
+                  labelPlacement="outside"
+                  placeholder="Enter source name"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="description"
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Description(optional)</FormLabel>
+              <FormControl>
+                <Textarea
+                  {...field}
+                  labelPlacement="outside"
+                  placeholder="Enter source description"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
-        <div className="flex flex-col gap-2">
-          <label className="text-sm font-medium text-foreground">Source</label>
-          <Controller
-            name="source"
-            control={form.control}
-            rules={{ required: '请选择数据源类型' }}
-            render={({ field }) => (
-              <SourceSelect onChange={field.onChange} value={field.value} />
-            )}
-          />
-        </div>
+        <FormField
+          control={form.control}
+          name="type"
+          rules={{ required: 'Please select a source' }}
+          render={({ field }) => (
+            <FormItem>
+              <FormLabel>Source</FormLabel>
+              <FormControl>
+                <SourceSelect onChange={field.onChange} value={field.value} />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
 
         <If cond={source === 'git'}>
           <SourceFormGit />
@@ -83,11 +106,16 @@ function Page() {
           <SourceFormClickup />
         </If>
 
-        <Button type="submit" className="mt-4" color="primary">
-          Create
-        </Button>
+        <div className="flex gap-4 mt-4">
+          <Button type="button" color="default" onPress={() => navigate('/source')}>
+            Cancel
+          </Button>
+          <Button type="submit" color="primary" className="flex-1">
+            {sourceId ? 'Update' : 'Create'}
+          </Button>
+        </div>
       </form>
-    </FormProvider>
+    </Form>
   )
 }
 

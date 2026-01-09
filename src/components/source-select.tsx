@@ -12,17 +12,22 @@ const sourceOptions = [
 export interface SourceSelectProps {
   onChange?: (value: string) => void
   value?: string
+  className?: string
+  placeholder?: string
+  isClearable?: boolean
 }
 export function SourceSelect(props: SourceSelectProps) {
   return (
     <Select
+      className={props.className}
       labelPlacement="outside"
-      placeholder="Select source type"
+      placeholder={props.placeholder || 'Select source type'}
       selectedKeys={props.value ? [props.value] : []}
       onSelectionChange={(keys) => {
         const selected = Array.from(keys)[0] as string
         props.onChange?.(selected || '')
       }}
+      isClearable={props.isClearable}
       renderValue={([item]) => {
         return (
           <div className="flex items-center gap-2">

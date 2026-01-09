@@ -1,4 +1,4 @@
-import type { IconMap } from './source-icon'
+import type { Selectable } from 'kysely'
 import {
   Button,
   Card,
@@ -6,39 +6,41 @@ import {
   Switch,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { useOverlay } from '@overlastic/react'
 import { SourceIcon } from './source-icon'
 
-export interface DataSource {
-  id: string
-  name: string
-  type: 'local' | 'third-party'
-  typeId: keyof IconMap
-  enabled: boolean
-}
-
 export interface SourceItemProps {
-  item: DataSource
+  item: Selectable<Source>
   onDeleted?: (id: string) => void
 }
 
 export function SourceItem(props: SourceItemProps) {
+  const navigate = useNavigate()
+  const openDialog = useOverlay(Dialog)
   const { item } = props
 
-  function onToggleEnabled() {
-    // TODO: 实现启用/禁用逻辑
+  async function onToggleEnabled() {
+    await sql_updateSource({
+      enabled: !item.enabled,
+      id: item.id,
+    })
+    queryClient.invalidateQueries({ queryKey: ['sources'] })
   }
-  function onDelete() {
-    // TODO: 实现删除逻辑
-  }
-  function onEdit() {
-    // TODO: 实现编辑逻辑
+  async function onDelete() {
+    await openDialog({
+      title: '删除数据源',
+      message: '确定要删除这个数据源吗？此操作无法撤销。',
+      confirmText: '删除',
+    })
+    await sql_deleteSource(item.id)
+    queryClient.invalidateQueries({ queryKey: ['sources'] })
   }
   return (
     <Card>
       <CardBody>
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
-            <SourceIcon id={item.typeId} size={24} />
+            <SourceIcon type={item.type} size={24} />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
@@ -47,18 +49,18 @@ export function SourceItem(props: SourceItemProps) {
                 <div className="bg-success size-2 rounded-full" />
               )}
             </div>
-            <p className="text-small text-default-500">heroui.com</p>
+            <p className="text-small text-default-500">{item.description}</p>
           </div>
           <div className="flex items-center gap-2">
             <Switch
               size="sm"
-              checked={item.enabled}
-              onChange={onToggleEnabled}
+              isSelected={item.enabled}
+              onValueChange={onToggleEnabled}
             />
             <Button
               size="sm"
               variant="light"
-              onPress={onEdit}
+              onPress={() => navigate(`/source/detail?id=${item.id}`)}
               isIconOnly
             >
               <Icon icon="lucide:edit" className="w-4 h-4" />

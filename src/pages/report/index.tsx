@@ -101,14 +101,6 @@ function Page() {
                 )
               })}
             </Select>
-            {/* <Button
-              color="primary"
-              onPress={handleExportCSV}
-              startContent={<Icon icon="lucide:download" className="w-4 h-4" />}
-              isDisabled={reports.length === 0}
-            >
-              导出 CSV
-            </Button> */}
           </div>
         </CardBody>
       </Card>
@@ -139,9 +131,7 @@ function Page() {
                       isIconOnly
                       size="sm"
                       variant="light"
-                      onPress={function () {
-                        navigate(`/report/detail?id=${item.id}`)
-                      }}
+                      onPress={() => navigate(`/report/detail?id=${item.id}`)}
                     >
                       <Icon icon="lucide:edit" className="w-4 h-4" />
                     </Button>

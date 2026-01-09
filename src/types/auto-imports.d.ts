@@ -9,12 +9,20 @@ declare global {
   const Activity: typeof import('react').Activity
   const Alimail: typeof import('../components/icons').Alimail
   const AlimailIcon: typeof import('../components/icons').AlimailIcon
+  const Button: typeof import('../components/button').Button
   const ClickupIcon: typeof import('../components/icons').ClickupIcon
   const DEFAULT_N8N_LOGIN_DATA: typeof import('../config/constants').DEFAULT_N8N_LOGIN_DATA
   const DEFAULT_N8N_REGISTER_DATA: typeof import('../config/constants').DEFAULT_N8N_REGISTER_DATA
   const DeleteReportModal: typeof import('../components/delete-report-modal').DeleteReportModal
   const Dialog: typeof import('../components/dialog').Dialog
   const DiscordIcon: typeof import('../components/icons').DiscordIcon
+  const Form: typeof import('../components/form').Form
+  const FormControl: typeof import('../components/form').FormControl
+  const FormDescription: typeof import('../components/form').FormDescription
+  const FormField: typeof import('../components/form').FormField
+  const FormItem: typeof import('../components/form').FormItem
+  const FormLabel: typeof import('../components/form').FormLabel
+  const FormMessage: typeof import('../components/form').FormMessage
   const Fragment: typeof import('react').Fragment
   const GitIcon: typeof import('../components/icons').GitIcon
   const GitSourceForm: typeof import('../components/souce-git-form').GitSourceForm
@@ -22,6 +30,7 @@ declare global {
   const GmailIcon: typeof import('../components/icons').GmailIcon
   const HeartFilledIcon: typeof import('../components/icons').HeartFilledIcon
   const Initialize: typeof import('../components/initialize').Initialize
+  const Label: typeof import('../components/label').Label
   const Link: typeof import('react-router-dom').Link
   const Logo: typeof import('../components/icons').Logo
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
@@ -55,8 +64,10 @@ declare global {
   const Titlebar: typeof import('../components/titlebar').Titlebar
   const TrendCard: typeof import('../components/trend-card').TrendCard
   const TwitterIcon: typeof import('../components/icons').TwitterIcon
+  const buttonVariants: typeof import('../components/button').buttonVariants
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
+  const cn: typeof import('../utils/utility').cn
   const collectDailyClickup: typeof import('../services/collect-clickup').collectDailyClickup
   const collectDailyGit: typeof import('../services/collect-git').collectDailyGit
   const createContext: typeof import('react').createContext
@@ -140,6 +151,7 @@ declare global {
   const useDeferredValue: typeof import('react').useDeferredValue
   const useEffect: typeof import('react').useEffect
   const useEffectEvent: typeof import('react').useEffectEvent
+  const useFormField: typeof import('../components/form').useFormField
   const useHref: typeof import('react-router-dom').useHref
   const useId: typeof import('react').useId
   const useImperativeHandle: typeof import('react').useImperativeHandle
@@ -167,7 +179,7 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { Generated, Timestamp, Record, Report, Source, SqliteMaster, DB } from '../config/db.schema'
+  export type { Generated, Timestamp, Record, Report, Source, sqlite_master, DB } from '../config/db.schema'
   import('../config/db.schema')
   // @ts-ignore
   export type { SiteConfig } from '../config/site'
@@ -185,7 +197,7 @@ declare global {
   export type { IconMap, SourceIconProps } from '../components/source-icon'
   import('../components/source-icon')
   // @ts-ignore
-  export type { DataSource, SourceItemProps } from '../components/source-item'
+  export type { SourceItemProps } from '../components/source-item'
   import('../components/source-item')
   // @ts-ignore
   export type { SourceSelectProps } from '../components/source-select'
@@ -241,7 +253,4 @@ declare global {
   // @ts-ignore
   export type { SourceUpdateInput } from '../services/sql-source-update'
   import('../services/sql-source-update')
-  // @ts-ignore
-  export type { DatabaseItem, SourceType, SourceConfig } from '../utils/mock-db'
-  import('../utils/mock-db')
 }

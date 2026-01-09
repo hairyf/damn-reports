@@ -4,8 +4,9 @@ export interface SourceUpdateInput {
   id: string
   name?: string
   type?: string
+  enabled?: boolean
   description?: string
-  config?: string
+  config?: Record<string, any>
 }
 
 export async function sql_updateSource(input: SourceUpdateInput): Promise<Selectable<Source>> {
@@ -14,8 +15,9 @@ export async function sql_updateSource(input: SourceUpdateInput): Promise<Select
   const updateValues: {
     name?: string
     type?: string
+    enabled?: boolean
     description?: string
-    config?: string
+    config?: Record<string, any>
     updatedAt?: string
   } = {}
   if (input.name !== undefined) {
@@ -23,6 +25,9 @@ export async function sql_updateSource(input: SourceUpdateInput): Promise<Select
   }
   if (input.type !== undefined) {
     updateValues.type = input.type
+  }
+  if (input.enabled !== undefined) {
+    updateValues.enabled = input.enabled
   }
   if (input.description !== undefined) {
     updateValues.description = input.description

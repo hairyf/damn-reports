@@ -18,7 +18,7 @@ export async function sql_querySources(input: SourceQueryInput = {}): Promise<Se
     query = query.where(eb =>
       eb.or([
         eb('name', 'like', searchPattern),
-        eb('config', 'like', searchPattern),
+        eb('description', 'like', searchPattern),
       ]),
     )
   }
@@ -37,5 +37,10 @@ export async function sql_querySources(input: SourceQueryInput = {}): Promise<Se
     query = query.limit(pageSize).offset(offset)
   }
 
-  return query.execute()
+  const result = await query.execute()
+  for (const item of result) {
+    item.enabled = JSON.parse(item.enabled as any)
+    item.config = JSON.parse(item.config as any)
+  }
+  return result
 }

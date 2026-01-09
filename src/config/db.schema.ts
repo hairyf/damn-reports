@@ -8,39 +8,39 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>
 export interface Record {
   id: string
   summary: string
-  data: string
+  data: { [key: string]: any }
   source: string
-  createdAt: Generated<Timestamp>
-  updatedAt: Timestamp
+  createdAt: Generated<string>
+  updatedAt: string
 }
 export interface Report {
   id: string
   name: string
   type: string
   content: string
-  createdAt: Generated<Timestamp>
-  updatedAt: Timestamp
+  createdAt: Generated<string>
+  updatedAt: string
 }
 export interface Source {
   id: string
   name: string
   type: string
   description: string
-  config: string
-  createdAt: Generated<Timestamp>
-  updatedAt: Timestamp
+  enabled: boolean
+  config: { [key: string]: any }
+  createdAt: Generated<string>
+  updatedAt: string
 }
-export interface SqliteMaster {
+export interface sqlite_master {
   type: string
   name: string
   tbl_name: string
   rootpage: number
   sql: string | null
 }
-
 export interface DB {
   Record: Record
   Report: Report
   Source: Source
-  sqlite_master: SqliteMaster
+  sqlite_master: sqlite_master
 }

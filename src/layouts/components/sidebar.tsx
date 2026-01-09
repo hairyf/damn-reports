@@ -17,7 +17,7 @@ export function Sidebar() {
   const navigate = useNavigate()
 
   return (
-    <aside className="w-64 h-screen border-r border-divider">
+    <aside className="w-56 h-screen border-r border-divider">
       <div className="p-4">
         <div className="flex items-center gap-2 p-4 mb-4">
           <Icon icon="lucide:file-bar-chart" className="w-6 h-6" />

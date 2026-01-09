@@ -1,97 +1,90 @@
-import type { DataSource } from '@/components/source-item'
+import { Else, If, Then, useDebounce } from '@hairy/react-lib'
 import {
   Button,
-  Tab,
-  Tabs,
+  Card,
+  CardBody,
+  Input,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useState } from 'react'
+import { useQuery } from '@tanstack/react-query'
 import { useNavigate } from 'react-router-dom'
-
-const mockLocalDataSources: DataSource[] = [
-  {
-    id: '1',
-    name: 'Git Dir',
-    type: 'local',
-    typeId: 'git',
-    enabled: true,
-  },
-  {
-    id: '2',
-    name: 'Process',
-    type: 'local',
-    typeId: 'process',
-    enabled: false,
-  },
-]
-
-const mockThirdPartyDataSources: DataSource[] = [
-  {
-    id: '3',
-    name: 'Email',
-    type: 'third-party',
-    typeId: 'email',
-    enabled: true,
-  },
-  {
-    id: '4',
-    name: 'Clickup',
-    type: 'third-party',
-    typeId: 'clickup',
-    enabled: false,
-  },
-]
 
 function Page() {
   const navigate = useNavigate()
-  const [selectedTab, setSelectedTab] = useState<'local' | 'third-party'>('local')
 
-  function handleAdd() {
-    navigate('/source/detail?id=')
-  }
+  const [search, setSearch] = useState('')
+  const debouncedSearch = useDebounce(search, 300)
+  const [type, setType] = useState<string>('')
 
-  const currentSources = selectedTab === 'local' ? mockLocalDataSources : mockThirdPartyDataSources
+  const { data: sources } = useQuery({
+    queryKey: ['sources', debouncedSearch, type],
+    queryFn: () => sql_querySources({ search: debouncedSearch, type }),
+  })
 
   return (
-    <div className="flex flex-col gap-4">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-semibold">数据源</h2>
-        <Button
-          color="primary"
-          onPress={handleAdd}
-          startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
-        >
-          添加数据源+
-        </Button>
-      </div>
-      <Tabs
-        selectedKey={selectedTab}
-        onSelectionChange={key => setSelectedTab(key as 'local' | 'third-party')}
-        aria-label="数据源类型"
-        variant="underlined"
-      >
-        <Tab key="local" title="本地数据" />
-        <Tab key="third-party" title="第三方" />
-      </Tabs>
+    <>
+      <Card className="mb-4 flex-shrink-0">
+        <CardBody className="gap-4">
+          <div className="flex flex-col sm:flex-row gap-4">
+            <Input
+              placeholder="搜索数据源..."
+              value={search}
+              onValueChange={setSearch}
+              startContent={<Icon icon="lucide:search" className="text-default-400" />}
+              className="flex-1"
+            />
+            <SourceSelect
+              className="w-full sm:w-40"
+              placeholder="全部来源"
+              isClearable
+              value={type}
+              onChange={setType}
+            />
+            <If cond={sources?.length !== 0}>
+              <Button
+                color="primary"
+                onPress={() => navigate('/source/detail')}
+                startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+              >
+                添加数据源
+              </Button>
+            </If>
+          </div>
+        </CardBody>
+      </Card>
       <div className="space-y-4">
-        {currentSources.length === 0
-          ? (
-              <div className="text-center py-8 text-default-500">
-                暂无数据源
+        <If cond={(sources?.length || 0) > 0}>
+          <Then>
+            {sources?.map((source) => {
+              return (
+                <SourceItem
+                  key={source.id}
+                  item={source}
+                />
+              )
+            })}
+          </Then>
+          <Else>
+            <div className="py-20 flex flex-col items-center justify-center gap-4">
+              <div className="flex flex-col items-center justify-center gap-2">
+                <Icon icon="lucide:file-text" className="w-18 h-18 text-default-400" />
+                <p className="text-default-500 text-center">
+                  暂无数据，点击按钮进行生成
+                </p>
               </div>
-            )
-          : (
-              currentSources.map((source) => {
-                return (
-                  <SourceItem
-                    key={source.id}
-                    item={source}
-                  />
-                )
-              })
-            )}
+              <Button
+                color="primary"
+                radius="full"
+                onPress={() => navigate('/source/detail')}
+                startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+              >
+                添加数据源
+              </Button>
+            </div>
+          </Else>
+        </If>
       </div>
-    </div>
+    </>
   )
 }
 

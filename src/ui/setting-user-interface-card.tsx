@@ -1,4 +1,4 @@
-import type { Language, ThemeMode } from '@/store/modules/setting'
+import type { Language } from '@/store/modules/setting'
 import {
   Card,
   CardBody,
@@ -9,7 +9,6 @@ import {
 } from '@heroui/react'
 import { useTheme } from '@heroui/use-theme'
 import { Icon } from '@iconify/react'
-import { useCallback, useEffect } from 'react'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
@@ -18,66 +17,13 @@ const languageOptions: { label: string, value: Language }[] = [
   { label: 'English', value: 'en-US' },
 ]
 
-const themeOptions: { label: string, value: ThemeMode, icon: string }[] = [
-  { label: '浅色', value: 'light', icon: 'lucide:sun' },
-  { label: '深色', value: 'dark', icon: 'lucide:moon' },
-  { label: '跟随系统', value: 'system', icon: 'lucide:monitor' },
-]
-
 export function SettingUserInterfaceCard() {
   const setting = useStore(store.setting)
-  const { setTheme } = useTheme()
-
-  // 检测系统主题偏好
-  function getSystemTheme() {
-    if (typeof window !== 'undefined' && window.matchMedia) {
-      return window.matchMedia('(prefers-color-scheme: dark)').matches
-        ? 'dark'
-        : 'light'
-    }
-    return 'light'
-  }
-
-  // 应用主题
-  const applyTheme = useCallback((themeMode: ThemeMode) => {
-    if (themeMode === 'system') {
-      const systemTheme = getSystemTheme()
-      setTheme(systemTheme)
-    }
-    else {
-      setTheme(themeMode)
-    }
-  }, [setTheme])
-
-  // 监听系统主题变化
-  useEffect(() => {
-    if (setting.theme === 'system') {
-      const mediaQuery = window.matchMedia('(prefers-color-scheme: dark)')
-      function handleChange() {
-        const systemTheme = getSystemTheme()
-        setTheme(systemTheme)
-      }
-      mediaQuery.addEventListener('change', handleChange)
-      return function () {
-        mediaQuery.removeEventListener('change', handleChange)
-      }
-    }
-  }, [setting.theme, setTheme])
-
-  // 应用初始主题
-  useEffect(() => {
-    applyTheme(setting.theme)
-  }, [applyTheme, setting.theme])
+  const { setTheme, theme } = useTheme()
 
   // 更新语言
   function handleLanguageChange(value: Language) {
     store.setting.$state.language = value
-  }
-
-  // 更新主题
-  function handleThemeChange(value: ThemeMode) {
-    store.setting.$state.theme = value
-    applyTheme(value)
   }
 
   return (
@@ -99,12 +45,7 @@ export function SettingUserInterfaceCard() {
           </div>
           <Select
             selectedKeys={[setting.language]}
-            onSelectionChange={function (keys) {
-              const selected = Array.from(keys)[0] as Language
-              if (selected) {
-                handleLanguageChange(selected)
-              }
-            }}
+            onSelectionChange={keys => handleLanguageChange(Array.from(keys)[0] as Language)}
             className="max-w-xs"
             startContent={<Icon icon="lucide:globe" className="w-4 h-4" />}
           >
@@ -125,25 +66,23 @@ export function SettingUserInterfaceCard() {
             <label className="text-sm font-medium">主题模式</label>
           </div>
           <Select
-            selectedKeys={[setting.theme]}
-            onSelectionChange={function (keys) {
-              const selected = Array.from(keys)[0] as ThemeMode
-              if (selected) {
-                handleThemeChange(selected)
-              }
-            }}
+            selectedKeys={[theme]}
+            onSelectionChange={keys => setTheme(Array.from(keys)[0] as string)}
             className="max-w-xs"
-            startContent={(
-              <Icon
-                icon={
-                  themeOptions.find((opt) => { return opt.value === setting.theme })?.icon
-                  || 'lucide:palette'
-                }
-                className="w-4 h-4"
-              />
-            )}
+            renderValue={([item]) => {
+              return (
+                <div className="flex items-center gap-2">
+                  {item?.props?.startContent}
+                  {item?.props?.children}
+                </div>
+              )
+            }}
           >
-            {themeOptions.map((option) => {
+            {[
+              { label: '浅色', value: 'light', icon: 'lucide:sun' },
+              { label: '深色', value: 'dark', icon: 'lucide:moon' },
+              { label: '跟随系统', value: 'system', icon: 'lucide:monitor' },
+            ].map((option) => {
               return (
                 <SelectItem
                   key={option.value}

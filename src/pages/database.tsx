@@ -4,8 +4,6 @@ import {
   CardBody,
   Input,
   Pagination,
-  Select,
-  SelectItem,
   Table,
   TableBody,
   TableCell,
@@ -19,14 +17,6 @@ import dayjs from 'dayjs'
 
 import { createElement, useState } from 'react'
 import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
-
-const options = [
-  { label: 'Git', value: 'git', icon: GitIcon },
-  { label: 'Clickup', value: 'clickup', icon: ClickupIcon },
-  { label: 'Slack', value: 'slack', icon: SlackIcon },
-  { label: 'Gmail', value: 'gmail', icon: GmailIcon },
-  { label: 'Alimail', value: 'alimail', icon: AlimailIcon },
-]
 
 const mapping = {
   git: { icon: GitIcon, label: 'Git' },
@@ -72,28 +62,13 @@ function Page() {
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
             />
-            <Select
-              placeholder="全部来源"
-              selectedKeys={sourceFilter ? [sourceFilter] : []}
-              onSelectionChange={function (keys) {
-                const selected = Array.from(keys)[0] as string
-                setSourceFilter(selected || '')
-              }}
+            <SourceSelect
+              value={sourceFilter}
+              onChange={setSourceFilter}
               isClearable
+              placeholder="全部来源"
               className="w-full sm:w-40"
-            >
-              {options.map((option) => {
-                const IconComponent = option.icon
-                return (
-                  <SelectItem
-                    key={option.value}
-                    startContent={IconComponent ? <IconComponent size={16} /> : null}
-                  >
-                    {option.label}
-                  </SelectItem>
-                )
-              })}
-            </Select>
+            />
           </div>
         </CardBody>
       </Card>
