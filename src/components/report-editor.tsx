@@ -153,14 +153,12 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
               </Chip>
             </div>
           </div>
-          {report?.updatedAt !== report?.createdAt && (
-            <div className="flex mt-1 gap-1 text-xs text-default-500">
-              <Icon icon="lucide:edit" className="w-4 h-4" />
-              <span>
-                {dayjs(report?.updatedAt).format('YYYY-MM-DD HH:mm')}
-              </span>
-            </div>
-          )}
+          <div className="flex mt-1 gap-1 text-xs text-default-500">
+            <Icon icon="lucide:edit" className="w-4 h-4" />
+            <span>
+              {dayjs(report?.updatedAt).format('YYYY-MM-DD HH:mm')}
+            </span>
+          </div>
         </div>
         <div className="flex flex-col flex-1 gap-4">
           <div className={input({ isMultiline: true }).inputWrapper({ class: 'flex-1 items-start px-0' })}>
