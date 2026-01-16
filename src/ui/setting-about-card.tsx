@@ -76,7 +76,7 @@ export function SettingAboutCard() {
         </div>
       </CardHeader>
       <Divider />
-      <CardBody className="gap-4">
+      <CardBody className="gap-4 p-5">
         <div className="flex flex-col gap-2 text-sm">
           <div className="flex items-center gap-2">
             <Icon icon="lucide:package" className="w-4 h-4 text-default-500" />

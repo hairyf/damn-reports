@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, Input } from '@heroui/react'
+import { addToast, Button, Card, CardBody, Input } from '@heroui/react'
 import {
   ArrowRight,
   BrainCircuit,
@@ -6,16 +6,20 @@ import {
 
 export function StepDeepSeekApiKey() {
   const [apiKey, setApiKey] = useState('')
-  function onDeepSeekSubmit(_apiKey: string) {
-
+  function onDeepSeekSubmit(apiKey: string) {
+    if (!apiKey.startsWith('sk-')) {
+      addToast({ description: 'API Key 格式不正确' })
+      return
+    }
+    store.user.$patch({ deepseekKey: apiKey })
   }
 
   function onSkip() {
-
+    store.user.$patch({ deepseekSkip: true })
   }
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full">
       <CardBody className="p-8">
         <div className="flex items-center space-x-4 mb-6">
           <div className="bg-indigo-50 dark:bg-indigo-500/20 p-3 rounded-xl">

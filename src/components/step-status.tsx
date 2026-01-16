@@ -11,7 +11,7 @@ interface StepStatusProps {
 
 export function StepStatus({ icon, title, description, progress, loading }: StepStatusProps) {
   return (
-    <div className="p-10 rounded-3xl text-center flex flex-col items-center w-full max-w-xl">
+    <div className="p-8 text-center flex flex-col items-center w-full">
       <div className="mb-6">
         <div className="p-5 rounded-full dark:bg-foreground/10 bg-foreground/5">
           {icon}

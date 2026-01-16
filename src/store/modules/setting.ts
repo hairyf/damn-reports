@@ -10,15 +10,14 @@ export const setting = defineStore({
     autoSave: true,
     notifications: true,
     autoCheckUpdate: true,
-    deepseekApiKey: '',
+    collectTime: '05:45', // 数据收集时间，格式 HH:mm
+    generateTime: '05:50', // 报告生成时间，格式 HH:mm
   }),
 })
 
-Store.load('.setting.dat').then((store) => {
-  store.get('setting').then((value: any) => {
-    value && Object.assign(setting.$state, value)
-  })
-  setting.$subscribe((state) => {
-    store.set('setting', state)
-  })
+Store.load('.store.dat').then((store) => {
+  store.get('setting').then((value: any) => value
+    ? Object.assign(setting.$state, value)
+    : store.set('setting', setting.$state))
+  setting.$subscribe(state => store.set('setting', state))
 })

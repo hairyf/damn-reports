@@ -13,7 +13,7 @@ export function StepN8nManualLogin() {
   }
 
   return (
-    <Card className="w-full max-w-lg">
+    <Card className="w-full">
       <CardBody className="p-8">
         <div className="flex items-center space-x-4 mb-6">
           <div className="bg-red-50 dark:bg-red-500/20 p-3 rounded-xl">

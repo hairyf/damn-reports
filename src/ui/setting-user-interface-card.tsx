@@ -36,18 +36,22 @@ export function SettingUserInterfaceCard() {
         </div>
       </CardHeader>
       <Divider />
-      <CardBody className="gap-4">
+      <CardBody className="gap-4 p-5">
         {/* 语言设置 */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Icon icon="lucide:languages" className="w-4 h-4 text-default-500" />
-            <label className="text-sm font-medium">语言</label>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Icon icon="lucide:languages" className="w-4 h-4 text-default-500" />
+              <label className="text-sm font-medium">语言</label>
+            </div>
+            <p className="text-xs text-default-400">
+              选择应用的显示语言
+            </p>
           </div>
           <Select
             selectedKeys={[setting.language]}
             onSelectionChange={keys => handleLanguageChange(Array.from(keys)[0] as Language)}
-            className="max-w-xs"
-            startContent={<Icon icon="lucide:globe" className="w-4 h-4" />}
+            className="max-w-32 w-full"
           >
             {languageOptions.map((option) => {
               return (
@@ -60,15 +64,20 @@ export function SettingUserInterfaceCard() {
         </div>
 
         {/* 主题模式设置 */}
-        <div className="flex flex-col gap-2">
-          <div className="flex items-center gap-2">
-            <Icon icon="lucide:palette" className="w-4 h-4 text-default-500" />
-            <label className="text-sm font-medium">主题模式</label>
+        <div className="flex items-center justify-between">
+          <div className="flex flex-col gap-1">
+            <div className="flex items-center gap-2">
+              <Icon icon="lucide:palette" className="w-4 h-4 text-default-500" />
+              <label className="text-sm font-medium">主题模式</label>
+            </div>
+            <p className="text-xs text-default-400">
+              选择浅色、深色或跟随系统主题
+            </p>
           </div>
           <Select
             selectedKeys={[theme]}
             onSelectionChange={keys => setTheme(Array.from(keys)[0] as string)}
-            className="max-w-xs"
+            className="max-w-32 w-full"
             renderValue={([item]) => {
               return (
                 <div className="flex items-center gap-2">
@@ -81,7 +90,7 @@ export function SettingUserInterfaceCard() {
             {[
               { label: '浅色', value: 'light', icon: 'lucide:sun' },
               { label: '深色', value: 'dark', icon: 'lucide:moon' },
-              { label: '跟随系统', value: 'system', icon: 'lucide:monitor' },
+              { label: '系统', value: 'system', icon: 'lucide:monitor' },
             ].map((option) => {
               return (
                 <SelectItem

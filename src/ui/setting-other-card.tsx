@@ -10,7 +10,7 @@ import { sendNotification } from '@tauri-apps/plugin-notification'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
-export function SettingOtherConfig() {
+export function SettingOtherCard() {
   const setting = useStore(store.setting)
 
   // 更新自动保存
@@ -39,7 +39,7 @@ export function SettingOtherConfig() {
         </div>
       </CardHeader>
       <Divider />
-      <CardBody className="gap-4">
+      <CardBody className="gap-4 p-5">
         {/* 自动保存 */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">

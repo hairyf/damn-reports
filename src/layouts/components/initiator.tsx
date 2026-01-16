@@ -13,14 +13,51 @@ export interface RetryOptions {
 }
 
 export function Initiator() {
-  const { status } = useStore(store.user)
+  const { status, n8nEmail, n8nPassword } = useStore(store.user)
 
-  useWhenever(status === StartupState.INITIALIZING_ACCOUNT, () => {
-    retry(async () => {})
-  })
-  useWhenever(status === StartupState.TEMPLATE_INIT, () => {
-    retry(async () => {})
-  })
+  async function registerN8nAccount() {
+    return postN8nRegister({
+      ...N8N_REGISTER_DATA,
+      email: n8nEmail || N8N_REGISTER_DATA.email,
+      password: n8nPassword || N8N_REGISTER_DATA.password,
+    })
+  }
+
+  async function loginN8nAccount() {
+    const login_data = {
+      emailOrLdapLoginId: n8nEmail || N8N_REGISTER_DATA.email,
+      password: n8nPassword || N8N_REGISTER_DATA.password,
+    }
+    return postN8nLogin(login_data)
+  }
+
+  async function initializeN8nAccount() {
+    const register_data = await registerN8nAccount()
+    if (typeof register_data.code !== 'number') {
+      store.user.$patch({ n8nLoggedIn: true, n8nUser: register_data.data })
+      return
+    }
+
+    const login_data = await loginN8nAccount()
+    if (typeof login_data.code === 'number') {
+      store.user.$patch({ n8nDefaultAccountLoginEnabled: false })
+      throw new Error(login_data.message)
+    }
+
+    store.user.$patch({ n8nLoggedIn: true, n8nUser: login_data.data })
+  }
+
+  useWhenever(
+    status === StartupState.INITIALIZING_ACCOUNT,
+    () => retry(initializeN8nAccount),
+    { immediate: true },
+  )
+  useWhenever(
+    status === StartupState.TEMPLATE_INIT,
+    () => retry(async () => {
+    }),
+    { immediate: true },
+  )
 
   function renderStatus() {
     switch (status) {

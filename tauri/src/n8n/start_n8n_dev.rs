@@ -12,8 +12,8 @@ pub fn start_n8n_dev() {
             Ok(_) => {
                 // 启动新线程轮询 5678 端口
                 thread::spawn(move || {
-                    const MAX_RETRIES: u32 = 60; // 最多轮询 60 次
-                    const POLL_INTERVAL_MS: u64 = 500; // 每 500ms 轮询一次
+                    const MAX_RETRIES: u32 = 1000; // 最多轮询 1000 次
+                    const POLL_INTERVAL_MS: u64 = 1000; // 每 500ms 轮询一次
                     
                     for _ in 0..MAX_RETRIES {
                         if utils::is_port_in_use(5678) {
@@ -26,7 +26,6 @@ pub fn start_n8n_dev() {
                     
                     // 超时后仍未检测到端口被占用，保持 Starting 状态或设置为 Initial
                     eprintln!("Timeout waiting for n8n to start on port 5678");
-                    status::set_status(status::N8nStatus::Initial);
                 });
             }
             Err(e) => {

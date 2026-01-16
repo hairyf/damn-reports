@@ -22,6 +22,7 @@
     "@heroui/use-theme": "2.1.10",
     "@hookform/resolvers": "^5.2.2",
     "@iconify/react": "^6.0.2",
+    "@internationalized/date": "^3.10.1",
     "@overlastic/react": "^0.8.7",
     "@prisma/client": "^7.2.0",
     "@prisma/driver-adapter-utils": "^7.2.0",

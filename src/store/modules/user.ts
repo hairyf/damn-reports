@@ -12,6 +12,26 @@ export enum StartupState {
   COMPLETED = 'completed',
 }
 
+export interface N8nUser {
+  createdAt: string
+  disabled: boolean
+  email: string
+  featureFlags: Record<string, boolean>
+  firstName: string
+  globalScopes: string[]
+  id: string
+  isOwner: boolean
+  isPending: boolean
+  lastActiveAt: string
+  lastName: string
+  mfaAuthenticated: boolean
+  mfaEnabled: boolean
+  personalizationAnswers: Record<string, unknown> | null
+  role: string
+  settings: { userActivated: boolean }
+  signInType: 'email'
+}
+
 export const user = defineStore({
   state: () => ({
     n8nDefaultTemplateEnabled: false,
@@ -22,18 +42,13 @@ export const user = defineStore({
     // manual login
     n8nEmail: '',
     n8nPassword: '',
+    n8nUser: null as N8nUser | null,
 
     deepseekKey: '',
     deepseekSkip: false,
+
+    credentialsId: '' as string | null,
   }),
-  actions: {
-    setN8nEmail(email: string) {
-      this.n8nEmail = email
-    },
-    setN8nPassword(password: string) {
-      this.n8nPassword = password
-    },
-  },
   getters: {
     initialized() {
       return (

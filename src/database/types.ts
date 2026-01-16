@@ -8,7 +8,7 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>
 export interface Record {
   id: string
   summary: string
-  data: unknown
+  data: any
   source: string
   createdAt: Generated<string>
   updatedAt: string
@@ -27,7 +27,7 @@ export interface Source {
   type: string
   description: string
   enabled: boolean
-  config: unknown
+  config: any
   createdAt: Generated<string>
   updatedAt: string
 }

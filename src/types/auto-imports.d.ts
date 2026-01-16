@@ -50,7 +50,7 @@ declare global {
   const Routes: typeof import('react-router-dom').Routes
   const SearchIcon: typeof import('../components/icons').SearchIcon
   const SettingAboutCard: typeof import('../ui/setting-about-card').SettingAboutCard
-  const SettingOtherConfig: typeof import('../ui/setting-other-config').SettingOtherConfig
+  const SettingOtherConfig: typeof import('../ui/setting-other-card').SettingOtherConfig
   const SettingUserInterfaceCard: typeof import('../ui/setting-user-interface-card').SettingUserInterfaceCard
   const SlackIcon: typeof import('../components/icons').SlackIcon
   const SourceFormClickup: typeof import('../components/souce-form-clickup').SourceFormClickup
@@ -109,6 +109,7 @@ declare global {
   const memo: typeof import('react').memo
   const params: typeof import('../services/post-n8n-workflow.params.mock').params
   const postN8nApiKey: typeof import('../services/post-n8n-api-key').postN8nApiKey
+  const postN8nCredentials: typeof import('../services/post-n8n-credentials').postN8nCredentials
   const postN8nLogin: typeof import('../services/post-n8n-login').postN8nLogin
   const postN8nRegister: typeof import('../services/post-n8n-register').postN8nRegister
   const postN8nWorkflow: typeof import('../services/post-n8n-workflow').postN8nWorkflow
@@ -187,6 +188,7 @@ declare global {
   const useState: typeof import('react').useState
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
   const useTransition: typeof import('react').useTransition
+  const workflow: typeof import('../config/workflow').workflow
 }
 // for type re-export
 declare global {
@@ -227,10 +229,13 @@ declare global {
   export type { PostN8nApiKeyParams, PostN8nApiKeyResult } from '../services/post-n8n-api-key'
   import('../services/post-n8n-api-key')
   // @ts-ignore
-  export type { PostN8nLoginParams } from '../services/post-n8n-login'
+  export type { PostN8nCredentialsBody, PostN8nCredentialsResult } from '../services/post-n8n-credentials'
+  import('../services/post-n8n-credentials')
+  // @ts-ignore
+  export type { PostN8nLoginBody, PostN8nLoginResult } from '../services/post-n8n-login'
   import('../services/post-n8n-login')
   // @ts-ignore
-  export type { PostN8nRegisterParams } from '../services/post-n8n-register'
+  export type { PostN8nRegisterBody, PostN8nRegisterResult } from '../services/post-n8n-register'
   import('../services/post-n8n-register')
   // @ts-ignore
   export type { N8nNodeParameters, N8nNode, N8nConnectionItem, N8nConnections, N8nWorkflowSettings, N8nHomeProject, PostN8nWorkflowParams, PostN8nWorkflowResult } from '../services/post-n8n-workflow'

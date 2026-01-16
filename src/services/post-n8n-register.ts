@@ -1,6 +1,6 @@
 import { fetch } from '@tauri-apps/plugin-http'
 
-export interface PostN8nRegisterParams {
+export interface PostN8nRegisterBody {
   agree: boolean
   email: string
   firstName: string
@@ -8,9 +8,17 @@ export interface PostN8nRegisterParams {
   password: string
 }
 
-export function postN8nRegister(params: PostN8nRegisterParams) {
-  return fetch(`${N8N_API_URL}/rest/owner/setup`, {
+export interface PostN8nRegisterResult {
+  code?: number
+  data: any
+  message?: string
+}
+
+export async function postN8nRegister(body: PostN8nRegisterBody) {
+  const response = await fetch(`${N8N_API_URL}/rest/owner/setup`, {
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
     method: 'POST',
-    body: JSON.stringify(params),
   })
+  return response.json() as Promise<PostN8nRegisterResult>
 }

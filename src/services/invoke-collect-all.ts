@@ -32,7 +32,7 @@ export async function invokeCollectAll(): Promise<void> {
 
   // 查询数据库中已存在的记录 ID
   const existingIds = await db
-    .selectFrom('Record')
+    .selectFrom('record')
     .select('id')
     .where('id', 'in', records.map(r => r.id))
     .execute()
@@ -40,5 +40,5 @@ export async function invokeCollectAll(): Promise<void> {
 
   // 过滤掉已存在的记录，只插入新记录
   const uniqueRecords = records.filter(record => !existingIds.has(record.id))
-  await db.insertInto('Record').values(uniqueRecords).execute()
+  await db.insertInto('record').values(uniqueRecords).execute()
 }
