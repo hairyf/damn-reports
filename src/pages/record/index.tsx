@@ -40,7 +40,7 @@ function Page() {
   const { data: records = [], isLoading } = useQuery({
     queryKey: ['records', debouncedSearch, debouncedSourceFilter, pagination.page, pagination.pageSize],
     queryFn: () => {
-      return sql_queryRecords({
+      return db.record.findMany({
         search: debouncedSearch,
         source: debouncedSourceFilter,
         page: pagination.page,
@@ -49,8 +49,8 @@ function Page() {
     },
   })
 
-  async function onDelete(id: string) {
-    await sql_deleteRecord(id)
+  async function onDelete(id: number) {
+    await db.record.delete(id)
     queryClient.invalidateQueries({ queryKey: ['records'] })
   }
 

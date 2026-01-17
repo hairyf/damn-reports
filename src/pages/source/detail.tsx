@@ -30,7 +30,7 @@ function Page() {
   })
 
   async function reset() {
-    const source = await sql_querySourceById(sourceId)
+    const source = await db.source.findUnique(sourceId)
     if (!source)
       return
     form.setValue('name', source.name)
@@ -44,7 +44,7 @@ function Page() {
 
   const onSubmit = async (data: any) => {
     if (sourceId) {
-      await sql_updateSource({ ...data, id: sourceId })
+      await db.source.update(sourceId, { ...data })
       addToast({
         title: 'Success',
         description: 'Source updated successfully',
@@ -52,7 +52,7 @@ function Page() {
       })
     }
     else {
-      await sql_createSource({ ...data, enabled: true })
+      await db.source.create({ ...data, enabled: true })
       addToast({
         title: 'Success',
         description: 'Source created successfully',

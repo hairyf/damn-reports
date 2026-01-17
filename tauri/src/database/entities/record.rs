@@ -18,6 +18,8 @@ pub struct Model {
     pub updated_at: String,
     #[sea_orm(column_name = "sourceId", column_type = "Text")]
     pub source_id: String,
+    #[sea_orm(column_name = "workflowId", column_type = "Text")]
+    pub workflow_id: String,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -30,11 +32,25 @@ pub enum Relation {
         on_delete = "Restrict"
     )]
     Source,
+    #[sea_orm(
+        belongs_to = "super::workflow::Entity",
+        from = "Column::WorkflowId",
+        to = "super::workflow::Column::Id",
+        on_update = "Cascade",
+        on_delete = "Restrict"
+    )]
+    Workflow,
 }
 
 impl Related<super::source::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::Source.def()
+    }
+}
+
+impl Related<super::workflow::Entity> for Entity {
+    fn to() -> RelationDef {
+        Relation::Workflow.def()
     }
 }
 

@@ -18,7 +18,7 @@ function Page() {
 
   const { data: sources } = useQuery({
     queryKey: ['sources', debouncedSearch, type],
-    queryFn: () => sql_querySources({ search: debouncedSearch, type }),
+    queryFn: () => db.source.findMany({ search: debouncedSearch, type }),
   })
 
   return (

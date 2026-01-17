@@ -3,19 +3,19 @@ import { useQuery } from '@tanstack/react-query'
 
 function Page() {
   const { data: generatedReportsCount = 0 } = useQuery({
-    queryKey: [sql_queryReportCount.name],
-    queryFn: () => sql_queryReportCount(),
+    queryKey: ['reports'],
+    queryFn: () => db.report.count(),
     refetchInterval: 5000,
   })
 
   const { data: collectedItemsCount = 0 } = useQuery({
-    queryKey: [sql_queryRecordCount.name],
-    queryFn: () => sql_queryRecordCount(),
+    queryKey: ['records'],
+    queryFn: () => db.record.count(),
     refetchInterval: 5000,
   })
   const { data: detail, refetch } = useQuery({
-    queryKey: [sql_queryReportType.name],
-    queryFn: () => sql_queryReportType({ type: 'daily' }),
+    queryKey: ['reports', 'daily'],
+    queryFn: () => db.report.findFirstByType('daily'),
   })
 
   return (
@@ -32,7 +32,7 @@ function Page() {
       <If cond={detail}>
         <Then>
           <ReportEditor
-            reportId={detail?.id || ''}
+            reportId={detail?.id ?? 0}
             showCancel={false}
             onDeleted={refetch}
           />

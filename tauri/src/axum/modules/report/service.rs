@@ -31,6 +31,7 @@ pub async fn create_report(
     content: Set(input.content.clone()),
     created_at: Set(now.clone()),
     updated_at: Set(now.clone()),
+    workflow_id: Set(input.workflow_id.clone()),
   };
 
   new_report.insert(&*db).await?;

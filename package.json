@@ -13,6 +13,7 @@
     "preview": "vite preview",
     "tauri": "tauri",
     "lint": "eslint .",
+    "prisma:generate": "prisma generate",
     "sea:generate": "cd tauri && sea-orm-cli generate entity -u sqlite://./prisma/database/main.db -o src/database/entities"
   },
   "dependencies": {
@@ -50,6 +51,7 @@
     "framer-motion": "^12.23.24",
     "kysely": "^0.28.9",
     "kysely-dialect-tauri": "^1.2.1",
+    "kysely-orm": "^0.9.7",
     "lucide-react": "^0.562.0",
     "react": "^19.2.3",
     "react-dom": "^19.2.3",

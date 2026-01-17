@@ -29,6 +29,7 @@ pub async fn post(
           content: String::new(),
           created_at: String::new(),
           updated_at: String::new(),
+          workflow_id: String::new()
         }),
       )
     }

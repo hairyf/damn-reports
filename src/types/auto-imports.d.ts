@@ -35,6 +35,7 @@ declare global {
   const Link: typeof import('react-router-dom').Link
   const Logo: typeof import('../components/icons').Logo
   const ManualLoginN8n: typeof import('../components/step-manual-login').ManualLoginN8n
+  const Model: typeof import('../database/model').Model
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
   const N8N_API_URL: typeof import('../config/constants').N8N_API_URL
   const N8N_LOGIN_DATA: typeof import('../config/constants').N8N_LOGIN_DATA
@@ -133,29 +134,6 @@ declare global {
   const settingsStore: typeof import('../config/store').settingsStore
   const siteConfig: typeof import('../config/site').siteConfig
   const sourceOptions: typeof import('../config/options').sourceOptions
-  const sql_createRecord: typeof import('../services/sql-record-create').sql_createRecord
-  const sql_createReport: typeof import('../services/sql-report-create').sql_createReport
-  const sql_createSource: typeof import('../services/sql-source-create').sql_createSource
-  const sql_deleteRecord: typeof import('../services/sql-record-delete').sql_deleteRecord
-  const sql_deleteReport: typeof import('../services/sql-report-delete').sql_deleteReport
-  const sql_deleteSource: typeof import('../services/sql-source-delete').sql_deleteSource
-  const sql_isExistsIndex: typeof import('../services/sql-is-exists-index').sql_isExistsIndex
-  const sql_isExistsTable: typeof import('../services/sql-is-exists-tables').sql_isExistsTable
-  const sql_queryRecordById: typeof import('../services/sql-record-query_id').sql_queryRecordById
-  const sql_queryRecordCount: typeof import('../services/sql-record-query_count').sql_queryRecordCount
-  const sql_queryRecordType: typeof import('../services/sql-record-query_type_source_group').sql_queryRecordType
-  const sql_queryRecords: typeof import('../services/sql-record-query').sql_queryRecords
-  const sql_queryReportById: typeof import('../services/sql-report-query_id').sql_queryReportById
-  const sql_queryReportCount: typeof import('../services/sql-report-query_count').sql_queryReportCount
-  const sql_queryReportDetail: typeof import('../services/sql-report-query_detail').sql_queryReportDetail
-  const sql_queryReportType: typeof import('../services/sql-report-query_type').sql_queryReportType
-  const sql_queryReports: typeof import('../services/sql-report-query').sql_queryReports
-  const sql_querySourceById: typeof import('../services/sql-source-query_id').sql_querySourceById
-  const sql_querySources: typeof import('../services/sql-source-query').sql_querySources
-  const sql_searchReports: typeof import('../services/sql-search-reports').sql_searchReports
-  const sql_updateRecord: typeof import('../services/sql-record-update').sql_updateRecord
-  const sql_updateReport: typeof import('../services/sql-report-update').sql_updateReport
-  const sql_updateSource: typeof import('../services/sql-source-update').sql_updateSource
   const startTransition: typeof import('react').startTransition
   const store: typeof import('../store/index').store
   const subtitle: typeof import('../components/primitives').subtitle
@@ -201,7 +179,10 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { Generated, Timestamp, Record, Report, Source, DB } from '../database/types'
+  export type { Model } from '../database/model'
+  import('../database/model')
+  // @ts-ignore
+  export type { Timestamp, Record, Report, Source, Workspace, DB } from '../database/types'
   import('../database/types')
   // @ts-ignore
   export type { SiteConfig } from '../config/site'
@@ -236,36 +217,6 @@ declare global {
   // @ts-ignore
   export type { InvokeCollectGitParams, GitCommit, FileDiff, InvokeCollectGitResult } from '../services/invoke-collect-git'
   import('../services/invoke-collect-git')
-  // @ts-ignore
-  export type { RecordCreateInput } from '../services/sql-record-create'
-  import('../services/sql-record-create')
-  // @ts-ignore
-  export type { RecordQueryInput } from '../services/sql-record-query'
-  import('../services/sql-record-query')
-  // @ts-ignore
-  export type { RecordUpdateInput } from '../services/sql-record-update'
-  import('../services/sql-record-update')
-  // @ts-ignore
-  export type { ReportCreateInput } from '../services/sql-report-create'
-  import('../services/sql-report-create')
-  // @ts-ignore
-  export type { ReportSearchInput } from '../services/sql-report-query'
-  import('../services/sql-report-query')
-  // @ts-ignore
-  export type { ReportTypeSearchInput } from '../services/sql-report-query_type'
-  import('../services/sql-report-query_type')
-  // @ts-ignore
-  export type { ReportUpdateInput } from '../services/sql-report-update'
-  import('../services/sql-report-update')
-  // @ts-ignore
-  export type { SourceCreateInput } from '../services/sql-source-create'
-  import('../services/sql-source-create')
-  // @ts-ignore
-  export type { SourceQueryInput } from '../services/sql-source-query'
-  import('../services/sql-source-query')
-  // @ts-ignore
-  export type { SourceUpdateInput } from '../services/sql-source-update'
-  import('../services/sql-source-update')
   // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')

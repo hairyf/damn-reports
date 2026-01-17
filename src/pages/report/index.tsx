@@ -20,7 +20,6 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { sql_queryReports } from '@/services/sql-report-query'
 
 function Page() {
   const navigate = useNavigate()
@@ -41,7 +40,7 @@ function Page() {
 
   const { data: reports = [], isLoading, refetch } = useQuery({
     queryKey: ['reports', debouncedSearch, type, pagination.page, pagination.pageSize],
-    queryFn: async () => sql_queryReports({
+    queryFn: async () => db.report.findMany({
       search: debouncedSearch,
       type,
       page: pagination.page,
@@ -49,14 +48,14 @@ function Page() {
     }),
   })
 
-  async function onDelete(id: string) {
+  async function onDelete(id: number) {
     await openDialog({
       title: '确认删除',
       message: '确定要删除这条报告吗？此操作无法撤销。',
       confirmText: '删除',
       cancelText: '取消',
     })
-    await sql_deleteReport(id)
+    await db.report.delete(id)
     refetch()
   }
 

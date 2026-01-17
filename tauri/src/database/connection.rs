@@ -3,14 +3,12 @@ use sea_orm::{Database, DatabaseConnection};
 
 /// 初始化数据库连接池并存储到应用状态
 /// 返回连接池以便传递给其他服务（如 Axum 服务器）
-pub fn connect(app: &tauri::App) -> Result<DatabaseConnection, Box<dyn std::error::Error>> {
-    let app_handle = app.handle().clone();
+pub fn connect(app_handle: &tauri::AppHandle) -> Result<DatabaseConnection, Box<dyn std::error::Error>> {
 
     println!("Initializing Database Connection...");
 
     // 在同步上下文中使用 block_on 来初始化数据库
     tauri::async_runtime::block_on(async move {
-        // 获取数据库路径
         let db_path = app_handle
             .path()
             .app_config_dir()
@@ -20,7 +18,7 @@ pub fn connect(app: &tauri::App) -> Result<DatabaseConnection, Box<dyn std::erro
 
         let db_url = format!("sqlite:{}", db_path);
     
-        println!("Database URL: {}", db_url);
+        println!("{}", db_url);
         // 创建连接池
         let db: DatabaseConnection = Database::connect(db_url).await?;
 

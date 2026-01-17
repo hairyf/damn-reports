@@ -3,12 +3,12 @@ datasource db {
 }
 
 generator kysely {
-  provider  = "prisma-kysely"
-  output    = "../../src/database"
+  provider = "prisma-kysely"
+  output   = "../../src/database"
 }
 
 model Source {
-  id          String @id
+  id          Int      @id @default(autoincrement())
   name        String
   type        String
   description String
@@ -17,8 +17,8 @@ model Source {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
-  workflow    Workflow @relation(fields: [workflowId], references: [id])
-  workflowId  String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
 
   records Record[]
 
@@ -26,44 +26,45 @@ model Source {
 }
 
 model Report {
-  id          String @id
-  name        String
-  type        String
-  content     String
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        Int      @id @default(autoincrement())
+  name      String
+  type      String
+  content   String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  workflow    Workflow @relation(fields: [workflowId], references: [id])
-  workflowId  String
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
 
   @@map("report")
 }
 
 model Record {
-  id          String @id
-  summary     String
-  data        Json
-  
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id      Int    @id @default(autoincrement())
+  summary String
+  data    Json
 
-  source      Source @relation(fields: [sourceId], references: [id])
-  sourceId    String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
 
-  workflow    Workflow @relation(fields: [workflowId], references: [id])
-  workflowId  String
-  
+  source   Source @relation(fields: [sourceId], references: [id])
+  sourceId Int
+
+  workspace   Workspace @relation(fields: [workspaceId], references: [id])
+  workspaceId Int
+
   @@map("record")
 }
 
-model Workflow {
-  id          String @id
-  name        String
-  sourceId    String
+model Workspace {
+  id       Int      @id @default(autoincrement())
 
-  reports     Report[]
-  records     Record[]
-  sources     Source[]
+  workflow String  @unique
+  name     String
 
-  @@map("workflow")
+  reports Report[]
+  records Record[]
+  sources Source[]
+
+  @@map("workspace")
 }

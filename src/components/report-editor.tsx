@@ -17,12 +17,9 @@ import { useMemo, useState } from 'react'
 import { useKey } from 'react-use'
 import { Markdown } from 'tiptap-markdown'
 import { Dialog } from '@/components/dialog'
-import { sql_deleteReport } from '@/services/sql-report-delete'
-import { sql_queryReportById } from '@/services/sql-report-query_id'
-import { sql_updateReport } from '@/services/sql-report-update'
 
 export interface ReportEditorProps {
-  reportId: string
+  reportId: number | string
   onCancel?: () => void
   onDeleted?: () => void
   showCancel?: boolean
@@ -41,6 +38,8 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
         placeholder: '输入报告内容...',
       }),
     ],
+    // eslint-disable-next-line ts/ban-ts-comment
+    // @ts-expect-error
     onUpdate: ({ editor }) => setText(editor.storage.markdown.getMarkdown()),
     editorProps: {
       attributes: {
@@ -50,7 +49,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
   })
   const { data: report } = useQuery({
     queryKey: ['report', reportId],
-    queryFn: () => sql_queryReportById(reportId),
+    queryFn: () => db.report.findUnique(reportId),
     enabled: !!reportId,
   })
 
@@ -69,8 +68,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
     mutationFn: async () => {
       if (!isUnsaved || !reportId)
         return
-      await sql_updateReport({
-        id: reportId,
+      await db.report.update(reportId, {
         content: text,
       })
     },
@@ -91,7 +89,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
         confirmText: '删除',
         cancelText: '取消',
       })
-      return await sql_deleteReport(reportId)
+      return await db.report.delete(reportId)
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reports'] })
