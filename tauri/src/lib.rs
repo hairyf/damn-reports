@@ -10,9 +10,9 @@ use database::migration;
 
 fn start_with_database(app: &tauri::App) {
     match connection::connect(app) {
-        Ok(pool) => {
+        Ok(db) => {
             println!("✓ Database Connection Successful");
-            axum::start(pool);
+            axum::start(db);
         }
         Err(e) => {
             eprintln!("✗ Database Connection Failed: {}", e);

@@ -17,6 +17,9 @@ model Source {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  workflow    Workflow @relation(fields: [workflowId], references: [id])
+  workflowId  String
+
   records Record[]
 
   @@map("source")
@@ -30,6 +33,8 @@ model Report {
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
 
+  workflow    Workflow @relation(fields: [workflowId], references: [id])
+  workflowId  String
 
   @@map("report")
 }
@@ -44,6 +49,21 @@ model Record {
 
   source      Source @relation(fields: [sourceId], references: [id])
   sourceId    String
+
+  workflow    Workflow @relation(fields: [workflowId], references: [id])
+  workflowId  String
   
   @@map("record")
+}
+
+model Workflow {
+  id          String @id
+  name        String
+  sourceId    String
+
+  reports     Report[]
+  records     Record[]
+  sources     Source[]
+
+  @@map("workflow")
 }

@@ -3,18 +3,18 @@ use axum::{
   Json,
   extract::State,
 };
-use sqlx::sqlite::SqlitePool;
+use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
 use crate::axum::modules::report::dtos::ReportCreateInput;
 use crate::axum::modules::report::service::create_report;
-use crate::axum::modules::report::entities::Report;
+use crate::database::entities::report;
 
 pub async fn post(
-  State(pool): State<Arc<SqlitePool>>,
+  State(db): State<Arc<DatabaseConnection>>,
   Json(input): Json<ReportCreateInput>
-) -> (StatusCode, Json<Report>) {
-  match create_report(pool, input).await {
+) -> (StatusCode, Json<report::Model>) {
+  match create_report(db, input).await {
     Ok(report) => {
       (StatusCode::OK, Json(report))
     }
@@ -22,7 +22,7 @@ pub async fn post(
       eprintln!("Insert report failed: {}", e);
       (
         StatusCode::INTERNAL_SERVER_ERROR,
-        Json(Report {
+        Json(report::Model {
           id: String::new(),
           name: String::new(),
           r#type: String::new(),

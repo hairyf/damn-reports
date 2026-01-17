@@ -1,9 +1,9 @@
 use chrono::{DateTime, Utc, Local, Datelike};
-use sqlx::{Row, sqlite::SqlitePool};
+use sea_orm::{DatabaseConnection, EntityTrait, QueryFilter, ColumnTrait, QueryOrder};
 use std::sync::Arc;
 
 use crate::axum::modules::record::dtos::RecordType;
-use crate::axum::modules::record::entities::Record;
+use crate::database::entities::{prelude, record};
 
 pub fn get_time_range(r#type: &RecordType) -> (DateTime<Utc>, DateTime<Utc>) {
   let now = Local::now();
@@ -49,48 +49,21 @@ pub fn get_time_range(r#type: &RecordType) -> (DateTime<Utc>, DateTime<Utc>) {
 }
 
 pub async fn get_records(
-  pool: Arc<SqlitePool>,
+  db: Arc<DatabaseConnection>,
   r#type: &RecordType,
-) -> Result<Vec<Record>, sqlx::Error> {
+) -> Result<Vec<record::Model>, sea_orm::DbErr> {
   // 计算时间范围
   let (start_time, end_time) = get_time_range(r#type);
   let start_iso = start_time.to_rfc3339();
   let end_iso = end_time.to_rfc3339();
 
-  // 查询记录，JOIN source 表获取 source 名称
-  let rows = sqlx::query(
-    r#"
-    SELECT 
-      record.id, 
-      record.summary, 
-      record.data, 
-      source.name as source,
-      record.createdAt, 
-      record.updatedAt
-    FROM record
-    INNER JOIN source ON record.sourceId = source.id
-    WHERE record.createdAt >= ? AND record.createdAt <= ?
-    ORDER BY record.createdAt DESC
-    "#,
-  )
-  .bind(&start_iso)
-  .bind(&end_iso)
-  .fetch_all(&*pool)
-  .await?;
-
-  let records: Vec<Record> = rows
-    .into_iter()
-    .map(|row| Record {
-      id: row.get::<String, _>("id"),
-      summary: row.get::<String, _>("summary"),
-      data: serde_json::from_str(
-        &row.get::<String, _>("data")
-      ).unwrap_or(serde_json::json!(null)),
-      source: row.get::<String, _>("source"),
-      created_at: row.get::<String, _>("createdAt"),
-      updated_at: row.get::<String, _>("updatedAt"),
-    })
-    .collect();
+  // 查询记录
+  let records = prelude::Record::find()
+    .filter(record::Column::CreatedAt.gte(start_iso.clone()))
+    .filter(record::Column::CreatedAt.lte(end_iso.clone()))
+    .order_by_desc(record::Column::CreatedAt)
+    .all(&*db)
+    .await?;
 
   Ok(records)
 }

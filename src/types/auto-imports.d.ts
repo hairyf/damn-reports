@@ -93,7 +93,7 @@ declare global {
   const getAllReports: typeof import('../utils/mock-db').getAllReports
   const getDatabaseItemById: typeof import('../utils/mock-db').getDatabaseItemById
   const getKysely: typeof import('../database').getKysely
-  const getN8nCredentials: typeof import('../services/get-n8n-credentials').getN8nCredentials
+  const getN8nCredentials: typeof import('../apis/index').getN8nCredentials
   const getReportById: typeof import('../utils/mock-db').getReportById
   const getSetting: typeof import('../utils/settings-store').getSetting
   const getSettings: typeof import('../utils/settings-store').getSettings
@@ -113,12 +113,12 @@ declare global {
   const memo: typeof import('react').memo
   const params: typeof import('../services/post-n8n-workflow.params.mock').params
   const postN8nApiKey: typeof import('../services/post-n8n-api-key').postN8nApiKey
-  const postN8nCredentials: typeof import('../services/post-n8n-credentials').postN8nCredentials
-  const postN8nLogin: typeof import('../services/post-n8n-login').postN8nLogin
-  const postN8nMeSurvey: typeof import('../services/post-n8n-my-survey').postN8nMeSurvey
+  const postN8nCredentials: typeof import('../apis/index').postN8nCredentials
+  const postN8nLogin: typeof import('../apis/index').postN8nLogin
+  const postN8nMeSurvey: typeof import('../apis/index').postN8nMeSurvey
   const postN8nMySurvey: typeof import('../services/post-n8n-my-survey').postN8nMySurvey
-  const postN8nRegister: typeof import('../services/post-n8n-register').postN8nRegister
-  const postN8nWorkflow: typeof import('../services/post-n8n-workflow').postN8nWorkflow
+  const postN8nRegister: typeof import('../apis/index').postN8nRegister
+  const postN8nWorkflow: typeof import('../apis/index').postN8nWorkflow
   const postN8nWorkflowParamsMock: typeof import('../services/post-n8n-workflow.mock').postN8nWorkflowParamsMock
   const postN8nWorkflowResultMock: typeof import('../services/post-n8n-workflow.mock').postN8nWorkflowResultMock
   const queryClient: typeof import('../config/client').queryClient
@@ -237,24 +237,6 @@ declare global {
   export type { InvokeCollectGitParams, GitCommit, FileDiff, InvokeCollectGitResult } from '../services/invoke-collect-git'
   import('../services/invoke-collect-git')
   // @ts-ignore
-  export type { PostN8nApiKeyParams, PostN8nApiKeyResult } from '../services/post-n8n-api-key'
-  import('../services/post-n8n-api-key')
-  // @ts-ignore
-  export type { PostN8nCredentialsBody, PostN8nCredentialsResult } from '../services/post-n8n-credentials'
-  import('../services/post-n8n-credentials')
-  // @ts-ignore
-  export type { PostN8nLoginBody, PostN8nLoginResult } from '../services/post-n8n-login'
-  import('../services/post-n8n-login')
-  // @ts-ignore
-  export type { PostN8nMeSurveyParams } from '../services/post-n8n-my-survey'
-  import('../services/post-n8n-my-survey')
-  // @ts-ignore
-  export type { PostN8nRegisterBody, PostN8nRegisterResult } from '../services/post-n8n-register'
-  import('../services/post-n8n-register')
-  // @ts-ignore
-  export type { PostN8nWorkflowResult } from '../services/post-n8n-workflow'
-  import('../services/post-n8n-workflow')
-  // @ts-ignore
   export type { RecordCreateInput } from '../services/sql-record-create'
   import('../services/sql-record-create')
   // @ts-ignore
@@ -287,4 +269,7 @@ declare global {
   // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
+  // @ts-ignore
+  export type { PostN8nCredentialsBody, PostN8nCredentialsResult, PostN8nLoginBody, PostN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nRegisterResult, PostN8nWorkflowResult } from '../apis/index.types'
+  import('../apis/index.types')
 }

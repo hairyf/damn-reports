@@ -5,23 +5,23 @@ use axum::{
   response::Json,
 };
 use tokio::net::TcpListener;
-use sqlx::sqlite::SqlitePool;
+use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 use serde_json::json;
 use crate::axum::modules;
 
-pub fn start(pool: SqlitePool) {
-  tauri::async_runtime::spawn(create_server(pool));
+pub fn start(db: DatabaseConnection) {
+  tauri::async_runtime::spawn(create_server(db));
 }
 
 /// 启动 Axum 服务器
-pub async fn create_server(pool: SqlitePool) {
+pub async fn create_server(db: DatabaseConnection) {
   let app = Router::new()
     .route("/", get(root))
     .route("/health", get(health))
     .route("/record", get(modules::record::get))
     .route("/report", post(modules::report::post))
-    .with_state(Arc::new(pool));
+    .with_state(Arc::new(db));
   
   match TcpListener::bind("0.0.0.0:6789").await {
     Ok(listener) => {

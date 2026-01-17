@@ -1,11 +1,12 @@
 use clokwerk::{Job, Scheduler, TimeUnits};
+use super::service;
 use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc, Mutex,
 };
 use std::thread;
 use std::time::Duration;
-use tauri::{AppHandle, Emitter, Manager};
+use tauri::{AppHandle, Manager};
 use tauri_plugin_store::StoreExt; // 注意: v1 使用 Window, v2 使用 Emitter
 
 // --- 状态管理结构体 ---
@@ -66,18 +67,12 @@ fn spawn_scheduler_thread(app_handle: AppHandle) -> Arc<AtomicBool> {
         );
 
         // 任务 1: Collect
-        let app = app_handle.clone();
         scheduler.every(1.day()).at(&collect_time).run(move || {
-            println!("Trigger Collect Task");
-            // 发送事件到前端
-            let _ = app.emit("schedule:collect", {});
+            service::collect_records_of_source::trigger();
         });
 
-        // 任务 2: Generate
-        let app = app_handle.clone();
         scheduler.every(1.day()).at(&generate_time).run(move || {
-            println!("Triggering Generate Task");
-            let _ = app.emit("schedule:generate", {});
+            service::call_n8n_workflow_webhook::trigger();
         });
 
         // 循环检查

@@ -12,7 +12,8 @@
     "build": "tsc && vite build",
     "preview": "vite preview",
     "tauri": "tauri",
-    "lint": "eslint ."
+    "lint": "eslint .",
+    "sea:generate": "cd tauri && sea-orm-cli generate entity -u sqlite://./prisma/database/main.db -o src/database/entities"
   },
   "dependencies": {
     "@hairy/react-lib": "^1.46.0",

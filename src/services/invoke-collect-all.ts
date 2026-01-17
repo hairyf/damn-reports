@@ -41,7 +41,6 @@ export async function invokeCollectAll(): Promise<void> {
   // 过滤掉已存在的记录，只插入新记录
   const uniqueRecords = records.filter(record => !existingIds.has(record.id))
 
-  console.log(uniqueRecords)
   if (uniqueRecords.length > 0) {
     await db.insertInto('record').values(uniqueRecords).execute()
   }

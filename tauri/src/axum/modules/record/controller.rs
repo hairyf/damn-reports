@@ -3,18 +3,18 @@ use axum::{
   Json,
   extract::{Query, State},
 };
-use sqlx::sqlite::SqlitePool;
+use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
 use crate::axum::modules::record::dtos::GetRecordsParams;
 use crate::axum::modules::record::service::get_records;
-use crate::axum::modules::record::entities::Record;
+use crate::database::entities::record;
 
 pub async fn get(
-  State(pool): State<Arc<SqlitePool>>,
+  State(db): State<Arc<DatabaseConnection>>,
   params: Query<GetRecordsParams>
-) -> (StatusCode, Json<Vec<Record>>) {
-  match get_records(pool, &params.r#type).await {
+) -> (StatusCode, Json<Vec<record::Model>>) {
+  match get_records(db, &params.r#type).await {
     Ok(records) => {
       (StatusCode::OK, Json(records))
     }
