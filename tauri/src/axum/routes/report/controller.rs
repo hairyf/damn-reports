@@ -6,8 +6,8 @@ use axum::{
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
-use crate::axum::modules::report::dtos::ReportCreateInput;
-use crate::axum::modules::report::service::create_report;
+use crate::axum::routes::report::dtos::ReportCreateInput;
+use crate::axum::routes::report::service::create_report;
 use crate::database::entities::report;
 
 pub async fn post(

@@ -3,7 +3,7 @@ use uuid::Uuid;
 use chrono::Utc;
 use std::sync::Arc;
 
-use crate::axum::modules::report::dtos::{ReportCreateInput, ReportType};
+use crate::axum::routes::report::dtos::{ReportCreateInput, ReportType};
 use crate::database::entities::{prelude, report};
 
 pub async fn create_report(

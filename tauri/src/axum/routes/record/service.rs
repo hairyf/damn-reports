@@ -2,7 +2,7 @@ use chrono::{DateTime, Utc, Local, Datelike};
 use sea_orm::{DatabaseConnection, EntityTrait, QueryFilter, ColumnTrait, QueryOrder};
 use std::sync::Arc;
 
-use crate::axum::modules::record::dtos::RecordType;
+use crate::axum::routes::record::dtos::RecordType;
 use crate::database::entities::{prelude, record};
 
 pub fn get_time_range(r#type: &RecordType) -> (DateTime<Utc>, DateTime<Utc>) {

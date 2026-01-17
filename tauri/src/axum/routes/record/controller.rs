@@ -6,8 +6,8 @@ use axum::{
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
-use crate::axum::modules::record::dtos::GetRecordsParams;
-use crate::axum::modules::record::service::get_records;
+use crate::axum::routes::record::dtos::GetRecordsParams;
+use crate::axum::routes::record::service::get_records;
 use crate::database::entities::record;
 
 pub async fn get(
@@ -19,7 +19,7 @@ pub async fn get(
       (StatusCode::OK, Json(records))
     }
     Err(e) => {
-      eprintln!("查询失败: {}", e);
+      eprintln!("Get Records Error: {}", e);
       (StatusCode::INTERNAL_SERVER_ERROR, Json(vec![]))
     }
   }
