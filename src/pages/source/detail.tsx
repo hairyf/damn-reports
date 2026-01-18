@@ -1,6 +1,7 @@
 import { If, useWatch, useWhenever } from '@hairy/react-lib'
 import { addToast, Button, Input, Textarea } from '@heroui/react'
 import { useForm } from 'react-hook-form'
+import { useStore } from 'valtio-define'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
 import { SourceFormGit } from '@/components/souce-form-git'
 
@@ -18,6 +19,7 @@ function Page() {
       config: {},
     },
   })
+  const user = useStore(store.user)
 
   const source = form.watch('type')
   const config = form.watch('config')
@@ -54,8 +56,8 @@ function Page() {
     else {
       await db.source.create({
         updatedAt: new Date().toISOString(),
+        workspaceId: user.workspaceId!,
         enabled: true,
-        workspaceId: 0,
         ...data,
       })
       addToast({
