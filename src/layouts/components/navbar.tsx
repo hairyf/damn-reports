@@ -1,3 +1,4 @@
+import { If } from '@hairy/react-lib'
 import {
   Button,
   Navbar as HeroUINavbar,
@@ -6,13 +7,23 @@ import {
   NavbarItem,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { useQuery } from '@tanstack/react-query'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { useStore } from 'valtio-define'
 
 export function Navbar() {
+  const user = useStore(store.user)
+
   const handleMinimize = async () => {
     const appWindow = getCurrentWindow()
     await appWindow.minimize()
   }
+
+  const { data: workspace } = useQuery({
+    queryKey: ['workspace', user.workspaceId],
+    queryFn: () => db.workspace.findUnique(user.workspaceId!.toString()),
+    enabled: !!user.workspaceId,
+  })
 
   const handleMaximize = async () => {
     const appWindow = getCurrentWindow()
@@ -34,6 +45,15 @@ export function Navbar() {
     <div>
       <HeroUINavbar maxWidth="full" position="sticky" className="relative bg-transparent backdrop-filter-none">
         <div className="absolute inset-0 w-full" data-tauri-drag-region />
+        <NavbarContent justify="start">
+          <If cond={!!workspace}>
+            <NavbarItem className="flex items-center gap-1">
+              <Icon icon="lucide:layout-dashboard" className="w-4 h-4" />
+              <span className="text-sm text-default-500">Workspace / </span>
+              <span className="text-sm text-default-500">{workspace?.name}</span>
+            </NavbarItem>
+          </If>
+        </NavbarContent>
         <NavbarContent justify="end">
           <NavbarItem className="hidden sm:flex gap-2">
             <Link isExternal href={siteConfig.links.github} title="GitHub">

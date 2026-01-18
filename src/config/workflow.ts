@@ -1,5 +1,6 @@
 export interface ReportWorkflowOptions {
   workflowId: string | number
+  name: string
   credentials: {
     deepSeekApi?: {
       id: string
@@ -10,7 +11,7 @@ export interface ReportWorkflowOptions {
 
 export function get_report_workflow_params(options: ReportWorkflowOptions) {
   return {
-    name: 'Automation Report Workflow',
+    name: options.name,
     nodes: [
       {
         parameters: {
@@ -77,6 +78,10 @@ export function get_report_workflow_params(options: ReportWorkflowOptions) {
               {
                 name: 'content',
                 value: '={{ $json.output }}',
+              },
+              {
+                name: 'workflowId',
+                value: options.workflowId,
               },
             ],
           },

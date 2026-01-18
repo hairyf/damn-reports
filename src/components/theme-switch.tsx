@@ -3,6 +3,7 @@ import type { FC } from 'react'
 import { useMounted } from '@hairy/react-lib'
 import { useSwitch } from '@heroui/react'
 import { useTheme } from '@heroui/use-theme'
+import { Icon } from '@iconify/react'
 import { VisuallyHidden } from '@react-aria/visually-hidden'
 import clsx from 'clsx'
 
@@ -83,10 +84,10 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
       >
         {isSelected
           ? (
-              <MoonFilledIcon size={22} />
+              <Icon icon="line-md:moon-rising-filled-loop" fontSize={22} />
             )
           : (
-              <SunFilledIcon size={22} />
+              <Icon icon="line-md:sun-rising-filled-loop" fontSize={22} />
             )}
       </div>
     </Component>

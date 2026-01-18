@@ -56,7 +56,7 @@ export function Initiator() {
 
   async function initializeN8nWorkflow() {
     const { insertId } = await db.workspace.create({
-      name: 'Automation Report Workflow',
+      name: 'Default Report Workflow',
       workflow: '__workflow__',
     })
     const workspaceId = insertId?.toString()
@@ -66,6 +66,7 @@ export function Initiator() {
 
     const data = await postN8nWorkflow(get_report_workflow_params({
       workflowId: Number(workspaceId),
+      name: 'Default Report Workflow',
       credentials: {
         deepSeekApi: credentialId
           ? {
