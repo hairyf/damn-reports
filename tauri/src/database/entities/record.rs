@@ -6,8 +6,8 @@ use serde::Serialize;
 #[derive(Clone, Debug, PartialEq, DeriveEntityModel, Eq, Serialize)]
 #[sea_orm(table_name = "record")]
 pub struct Model {
-    #[sea_orm(primary_key, auto_increment = false, column_type = "Text")]
-    pub id: String,
+    #[sea_orm(primary_key)]
+    pub id: i32,
     #[sea_orm(column_type = "Text")]
     pub summary: String,
     #[sea_orm(column_type = "custom(\"JSONB\")")]
@@ -16,10 +16,10 @@ pub struct Model {
     pub created_at: String,
     #[sea_orm(column_name = "updatedAt", column_type = "custom(\"DATETIME\")")]
     pub updated_at: String,
-    #[sea_orm(column_name = "sourceId", column_type = "Text")]
-    pub source_id: String,
-    #[sea_orm(column_name = "workflowId", column_type = "Text")]
-    pub workflow_id: String,
+    #[sea_orm(column_name = "sourceId")]
+    pub source_id: i32,
+    #[sea_orm(column_name = "workspaceId")]
+    pub workspace_id: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
@@ -33,13 +33,13 @@ pub enum Relation {
     )]
     Source,
     #[sea_orm(
-        belongs_to = "super::workflow::Entity",
-        from = "Column::WorkflowId",
-        to = "super::workflow::Column::Id",
+        belongs_to = "super::workspace::Entity",
+        from = "Column::WorkspaceId",
+        to = "super::workspace::Column::Id",
         on_update = "Cascade",
         on_delete = "Restrict"
     )]
-    Workflow,
+    Workspace,
 }
 
 impl Related<super::source::Entity> for Entity {
@@ -48,9 +48,9 @@ impl Related<super::source::Entity> for Entity {
     }
 }
 
-impl Related<super::workflow::Entity> for Entity {
+impl Related<super::workspace::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Workflow.def()
+        Relation::Workspace.def()
     }
 }
 

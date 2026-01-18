@@ -21,13 +21,13 @@ impl ReportType {
 
 #[derive(Debug, Deserialize)]
 pub struct ReportCreateInput {
-  #[serde(alias = "workflowId")]
-  pub workflow_id: String,
   #[serde(default)]
   pub name: Option<String>,
   #[serde(default)]
   pub r#type: Option<ReportType>,
   #[serde(alias = "text")]
   pub content: String,
+  #[serde(alias = "workspaceId")]
+  pub workspace_id: String,
 }
 

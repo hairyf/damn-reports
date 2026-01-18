@@ -23,13 +23,13 @@ pub async fn post(
       (
         StatusCode::INTERNAL_SERVER_ERROR,
         Json(report::Model {
-          id: String::new(),
+          id: 0,
           name: String::new(),
           r#type: String::new(),
           content: String::new(),
           created_at: String::new(),
           updated_at: String::new(),
-          workflow_id: String::new()
+          workspace_id: 0
         }),
       )
     }

@@ -14,7 +14,7 @@ pub async fn get(
   State(db): State<Arc<DatabaseConnection>>,
   params: Query<GetRecordsParams>
 ) -> (StatusCode, Json<Vec<record::Model>>) {
-  match get_records(db, &params.r#type, params.workflow_id.clone()).await {
+  match get_records(db, &params.r#type, params.workspace_id.clone()).await {
     Ok(records) => {
       (StatusCode::OK, Json(records))
     }
