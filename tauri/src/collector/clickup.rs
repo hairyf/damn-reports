@@ -25,8 +25,7 @@ pub struct CollectClickupResult {
     pub count: usize,
 }
 
-#[tauri::command]
-pub async fn collect_daily_clickup(
+pub async fn daily(
     token: String,
     team: String,
     user: String,

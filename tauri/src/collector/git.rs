@@ -29,8 +29,7 @@ pub struct CollectGitResult {
     pub count: usize,
 }
 
-#[tauri::command]
-pub async fn collect_daily_git(
+pub async fn daily(
     repository: String,
     branch: String,
     author: String,

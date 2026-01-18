@@ -20,5 +20,5 @@ export interface InvokeCollectClickupResult {
 }
 
 export function invokeCollectClickup(params: InvokeCollectClickupParams) {
-  return invoke<InvokeCollectClickupResult>('collect_daily_clickup', params as unknown as Record<string, unknown>)
+  return invoke<InvokeCollectClickupResult>('daily', params as unknown as Record<string, unknown>)
 }

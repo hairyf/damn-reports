@@ -3,13 +3,15 @@ use std::sync::{
     atomic::{AtomicBool, Ordering},
     Arc,
 };
+
 use sea_orm::DatabaseConnection;
 use std::time::Duration;
 use std::{thread};
 use tauri::{AppHandle, Manager, State};
 
-mod tasks;
 mod utils;
+
+use crate::task;
 
 use utils::get_time_from_setting;
 
@@ -22,13 +24,11 @@ pub fn start_schedule(app_handle: &AppHandle, db: DatabaseConnection) {
     // 初始化状态并注入 Tauri
     let running = Arc::new(AtomicBool::new(true));
     app_handle.manage(SchedulerHandle { running: running.clone() });
-    app_handle.manage(db.clone());
 
     scheduler_loop(app_handle.clone(), db, running);
 }
 
-#[tauri::command]
-pub async fn restart_schedule(
+pub async fn restart(
     app_handle: AppHandle,
     db: State<'_, DatabaseConnection>,
     handle: State<'_, SchedulerHandle>,
@@ -62,14 +62,14 @@ fn scheduler_loop(app_handle: AppHandle, db: DatabaseConnection, running: Arc<At
             println!("Collecting records of source at: {}", collect_time_clone);
             let db_clone = db.clone();
             tauri::async_runtime::spawn(async move {
-                tasks::collect_records_of_source::trigger(db_clone).await.unwrap();
+                task::collect_records_of_source::trigger(db_clone).await.unwrap();
             });
         });
 
         let generate_time_clone = generate_time.clone();
         scheduler.every(1.day()).at(&generate_time.as_str()).run(move || {
             println!("Generating report at: {}", generate_time_clone);
-            tasks::call_n8n_workflow_webhook::trigger();
+            task::call_n8n_workflow_webhook::trigger();
         });
 
         // 调度循环

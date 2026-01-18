@@ -1,7 +1,7 @@
 use std::sync::{Mutex, OnceLock};
 
 #[derive(Debug, Clone, serde::Serialize, PartialEq)]
-pub enum N8nStatus {
+pub enum Status {
     Initial,
     // only for production environment
     // Downloading,
@@ -11,17 +11,17 @@ pub enum N8nStatus {
 }
 
 // 使用静态变量在模块内部管理状态
-static N8N_STATUS: OnceLock<Mutex<N8nStatus>> = OnceLock::new();
+static N8N_STATUS: OnceLock<Mutex<Status>> = OnceLock::new();
 
-pub fn get_status() -> &'static Mutex<N8nStatus> {
-    N8N_STATUS.get_or_init(|| Mutex::new(N8nStatus::Initial))
+pub fn get_status_lock() -> &'static Mutex<Status> {
+    N8N_STATUS.get_or_init(|| Mutex::new(Status::Initial))
 }
 
-pub fn set_status(status: N8nStatus) {
-    *get_status().lock().unwrap() = status;
+pub fn set_status(status: Status) {
+    *get_status_lock().lock().unwrap() = status;
 }
 
-pub fn get_status_value() -> N8nStatus {
-    get_status().lock().unwrap().clone()
+pub fn get_status() -> Status {
+    get_status_lock().lock().unwrap().clone()
 }
 

@@ -30,5 +30,5 @@ export interface InvokeCollectGitResult {
 }
 
 export function invokeCollectGit(params: InvokeCollectGitParams) {
-  return invoke<InvokeCollectGitResult>('collect_daily_git', params as unknown as Record<string, unknown>)
+  return invoke<InvokeCollectGitResult>('daily', params as unknown as Record<string, unknown>)
 }

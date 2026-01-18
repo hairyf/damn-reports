@@ -5,7 +5,7 @@ use std::time::Duration;
 
 /// 开发环境启动 n8n 进程
 pub fn start_n8n_dev() {
-    status::set_status(status::N8nStatus::Starting);
+    status::set_status(status::Status::Starting);
 
     if let Some(dir) = utils::get_n8n_process_dir() {
         match utils::spawn_npx_command(&dir, "n8n") {
@@ -18,7 +18,7 @@ pub fn start_n8n_dev() {
                     for _ in 0..MAX_RETRIES {
                         if utils::is_port_in_use(5678) {
                             // 端口被占用，说明 n8n 已启动，设置为 Running
-                            status::set_status(status::N8nStatus::Running);
+                            status::set_status(status::Status::Running);
                             return;
                         }
                         thread::sleep(Duration::from_millis(POLL_INTERVAL_MS));
@@ -30,11 +30,11 @@ pub fn start_n8n_dev() {
             }
             Err(e) => {
                 eprintln!("Failed to spawn n8n process: {}", e);
-                status::set_status(status::N8nStatus::Initial);
+                status::set_status(status::Status::Initial);
             }
         }
     } else {
         eprintln!("Could not find n8n-process directory.");
-        status::set_status(status::N8nStatus::Initial);
+        status::set_status(status::Status::Initial);
     }
 }

@@ -22,12 +22,12 @@ pub async fn trigger(db: DatabaseConnection) -> Result<(), Box<dyn std::error::E
       let records = match source.r#type.to_lowercase().as_str() {
           "git" => {
               let cfg: config::GitConfig = serde_json::from_str(&source.config)?;
-              let res = collector::git::collect_daily_git(cfg.repository, cfg.branch, cfg.author).await?;
+              let res = collector::git::daily(cfg.repository, cfg.branch, cfg.author).await?;
               map_to_active_models(res.data, &source, &now)
           }
           "clickup" => {
               let cfg: config::ClickupConfig = serde_json::from_str(&source.config)?;
-              let res = collector::clickup::collect_daily_clickup(cfg.token, cfg.team, cfg.user).await?;
+              let res = collector::clickup::daily(cfg.token, cfg.team, cfg.user).await?;
               map_to_active_models(res.data, &source, &now)
           }
           _ => continue,
