@@ -9,32 +9,9 @@ use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 use serde_json::json;
 use crate::axum::routes;
-use std::sync::atomic::{AtomicBool, Ordering};
-use crate::database::connection;
-
-// 全局标志，确保 database_loaded 只运行一次
-static AXUM_STARTED_CALLED: AtomicBool = AtomicBool::new(false);
-
-pub fn start(app_handle: &tauri::AppHandle) -> Result<(), Box<dyn std::error::Error>> {
-  if AXUM_STARTED_CALLED.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst).is_err() {
-      return Ok(());
-  }
-  match connection::connect(app_handle) {
-      Ok(db) => {
-          println!("✓ Database Connection Successful");
-          tauri::async_runtime::spawn(create_server(db));
-          Ok(())
-      }
-      Err(e) => {
-          AXUM_STARTED_CALLED.store(false, Ordering::SeqCst);
-          eprintln!("✗ Database Connection Failed: {}", e);
-          Ok(())
-      }
-  }
-}
 
 /// 启动 Axum 服务器
-pub async fn create_server(db: DatabaseConnection) {
+pub async fn start(db: DatabaseConnection) {
   let app = Router::new()
     .route("/", get(root))
     .route("/health", get(health))

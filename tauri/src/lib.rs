@@ -3,13 +3,37 @@ mod collector;
 mod database;
 mod n8n;
 mod schedule;
+use std::sync::atomic::{AtomicBool, Ordering};
+use crate::database::connection;
 
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 use tauri_plugin_sql::{Migration, MigrationKind};
 
+// 全局标志，确保 database_loaded 只运行一次
+static AXUM_STARTED_CALLED: AtomicBool = AtomicBool::new(false);
+
+pub fn database_connect(app_handle: &tauri::AppHandle) -> Result<(), Box<dyn std::error::Error>> {
+  if AXUM_STARTED_CALLED.compare_exchange(false, true, Ordering::SeqCst, Ordering::SeqCst).is_err() {
+      return Ok(());
+  }
+  match connection::connect(app_handle) {
+      Ok(db) => {
+          println!("✓ Database Connection Successful");
+          tauri::async_runtime::spawn(axum::start(db.clone()));
+          schedule::start_schedule(app_handle, db.clone());
+          Ok(())
+      }
+      Err(e) => {
+          AXUM_STARTED_CALLED.store(false, Ordering::SeqCst);
+          eprintln!("✗ Database Connection Failed: {}", e);
+          Ok(())
+      }
+  }
+}
+
 #[tauri::command]
 fn database_loaded(app: tauri::AppHandle) -> Result<bool, String> {
-    axum::start(&app).map_err(|e| e.to_string())?;
+    database_connect(&app).map_err(|e| e.to_string())?;
     Ok(true)
 }
 
@@ -35,8 +59,7 @@ pub fn run() {
         )
         .setup(|app| {
             n8n::start_n8n();
-            schedule::start::start(app);
-            axum::start(&app.handle())?;
+            database_connect(&app.handle())?;
             Ok(())
         })
         // HTTP plugin
@@ -53,7 +76,7 @@ pub fn run() {
         .invoke_handler(tauri::generate_handler![
             database_loaded,
             n8n::get_n8n_status,
-            schedule::start::update_schedule_status,
+            schedule::restart_schedule,
             collector::clickup::collect_daily_clickup,
             collector::git::collect_daily_git
         ])

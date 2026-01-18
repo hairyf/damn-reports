@@ -1,5 +1,5 @@
 export async function invokeCollectAll(): Promise<void> {
-  const sources = await db.source.findMany({ enabled: true, page: 1, pageSize: 100 })
+  const sources = await db.source.findMany({ enabled: true })
 
   const promises = sources.map(async (source) => {
     const defaultData = {

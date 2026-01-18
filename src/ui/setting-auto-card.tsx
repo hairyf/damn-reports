@@ -97,7 +97,7 @@ export function SettingAutoCard() {
           <div className="flex flex-col gap-1">
             <div className="flex items-center gap-2">
               <Icon icon="lucide:database" className="w-4 h-4 text-default-500" />
-              <label className="text-sm font-medium">数据收集时间</label>
+              <label className="text-sm font-medium">报告生成时间</label>
             </div>
             <p className="text-xs text-default-400">
               每天自动收集数据的时间
