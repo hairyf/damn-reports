@@ -81,7 +81,9 @@ export function Sidebar() {
                 onPress={() => navigate(item.href)}
                 variant={isActive ? 'solid' : 'light'}
                 color={isActive ? 'primary' : 'default'}
-                className={`w-full rounded-xl ${isCompact ? 'justify-center px-0 py-3 min-w-0' : 'justify-start gap-3 px-4 py-3'}`}
+                size="lg"
+                radius="lg"
+                className={`w-full ${isCompact ? 'justify-center px-0 py-3 min-w-0' : 'justify-start gap-3 px-4 py-3 h-11'}`}
                 startContent={isCompact ? undefined : <Icon icon={icon} className="w-5 h-5" />}
               >
                 {isCompact
