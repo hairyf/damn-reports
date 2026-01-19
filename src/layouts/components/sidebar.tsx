@@ -15,7 +15,7 @@ const iconMap: Record<string, string> = {
 }
 
 const MIN_WIDTH = 80
-const MAX_WIDTH = 400
+const MAX_WIDTH = 224
 const DEFAULT_WIDTH = 224
 // 小于此宽度时进入紧凑模式
 const COMPACT_WIDTH = 175
@@ -61,8 +61,10 @@ export function Sidebar() {
       className="h-screen order-divider relative flex-shrink-0"
       style={{ width: `${width}px` }}
     >
-      <div className="pt-2 pb-4 h-full overflow-hidden px-4">
-        <div className={`flex items-center gap-2 py-4 mb-2 ${isCompact ? 'justify-center px-0' : 'px-2'}`}>
+      <div className="absolute h-[64px] w-full" data-tauri-drag-region />
+
+      <div className="pt-1 pb-4 h-full overflow-hidden px-4">
+        <div className={`flex items-center gap-2 py-4 mb-1 select-none ${isCompact ? 'justify-center px-0' : 'px-2'}`}>
           <Icon icon="lucide:file-bar-chart" className="w-8 h-8" />
           {!isCompact && (
             <h2 className="text-lg font-semibold flex-shrink-0">{siteConfig.name}</h2>
@@ -70,10 +72,9 @@ export function Sidebar() {
         </div>
         <nav className="space-y-2">
           {siteConfig.sideItems.map((item) => {
-            const isActive = item.href !== '/'
-              ? location.pathname.startsWith(item.href)
-              : location.pathname === item.href
-            const icon = iconMap[`/${item.href.split('/')[1]}`] || 'lucide:circle'
+            const href = `/${item.href.split('/')[1]}`
+            const isActive = item.href === '/' ? location.pathname === item.href : location.pathname.startsWith(href)
+            const icon = iconMap[href] || 'lucide:circle'
             return (
               <Button
                 key={item.href}
@@ -99,7 +100,7 @@ export function Sidebar() {
         onMouseDown={handleMouseDown}
         className="absolute right-0 top-0 w-1 h-full cursor-ew-resize flex items-center justify-center group"
       >
-        <div className="w-[1px] h-full bg-divider" />
+        <div className="w-[1px] h-full bg-foreground/10" />
       </div>
     </aside>
   )

@@ -52,7 +52,7 @@ export function ScheduleCountdown({ className }: { className?: string }) {
   }, [setting.collectTime, setting.generateTime])
 
   return (
-    <div className={cn('flex flex-col gap-1.5 text-xs text-default-600 bg-content1/80 backdrop-blur-sm rounded-lg p-3 border border-default-200', className)}>
+    <div className={cn('flex flex-col gap-1.5 text-xs text-default-600 bg-content1/80 backdrop-blur-sm rounded-lg p-2.5 border border-default-200', className)}>
       <div className="flex items-center gap-1.5 text-default-500 mb-1">
         <Icon icon="lucide:calendar-clock" className="-mt-[1.2px]" fontSize={14} />
         <span className="text-xs font-medium">定时任务</span>

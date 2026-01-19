@@ -36,7 +36,7 @@ export function ReportGenerator({ generating, onGeneratingChange }: ReportGenera
         </h3>
         <div className="flex flex-col items-center justify-center flex-1 gap-4 py-12">
           <div className="flex flex-col items-center justify-center gap-2">
-            <Icon icon="line-md:document-report" className="w-18 h-18 text-default-400" />
+            <Icon icon="line-md:document-report" className="w-18 h-18 text-default-400 dark:text-default-500" />
             <p className="text-default-500 text-center">
               暂无数据，点击按钮进行生成
             </p>

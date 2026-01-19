@@ -1,5 +1,7 @@
 import { If } from '@hairy/react-lib'
 import {
+  BreadcrumbItem,
+  Breadcrumbs,
   Button,
   Navbar as HeroUINavbar,
   Link,
@@ -62,14 +64,24 @@ export function Navbar() {
   return (
     <div>
       <HeroUINavbar maxWidth="full" position="sticky" className="relative bg-transparent backdrop-filter-none">
-        <div className="absolute inset-0 w-full" data-tauri-drag-region />
-        <NavbarContent justify="start">
+        <div className="absolute h-[64px] w-full" data-tauri-drag-region />
+        <NavbarContent justify="start" className="hidden min-[768px]:flex">
           <If cond={!!workspace}>
-            <NavbarItem className="text-default-500 flex items-center gap-1">
-              <Icon icon="lucide:layout-dashboard" className="w-4 h-4" />
-              <span className="text-sm">Workspace / </span>
-              <span className="text-sm">{workspace?.name}</span>
+            <NavbarItem>
+              <Breadcrumbs
+                itemClasses={{
+                  separator: 'px-2 text-default-500',
+                  item: 'text-sm text-default-500',
+                }}
+                separator="/"
+              >
+                <BreadcrumbItem>
+                  <Icon icon="lucide:layout-dashboard" className="w-4 h-4 mt-[1.5px]" />
+                  <span className="text-sm">默认工作区</span>
+                </BreadcrumbItem>
+              </Breadcrumbs>
             </NavbarItem>
+
           </If>
         </NavbarContent>
         <NavbarContent justify="end">
@@ -80,7 +92,7 @@ export function Navbar() {
             <ThemeSwitch />
           </NavbarItem>
 
-          <NavbarItem className="flex items-center gap-2">
+          <NavbarItem className="items-center gap-2 hidden min-[840px]:flex">
             <Icon icon="lucide:clock" className="w-4 h-4 text-default-500" />
             <span className="text-sm text-default-500 font-mono">{formatTime(currentTime)}</span>
           </NavbarItem>

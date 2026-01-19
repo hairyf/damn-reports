@@ -1,3 +1,4 @@
+import { Card } from '@heroui/react'
 import { useStore } from 'valtio-define'
 
 function Page() {
@@ -10,13 +11,14 @@ function Page() {
   const n8nUrl = `http://localhost:5678/workflow/${workflowId}?${params.toString()}`
 
   return (
-    <iframe
-      src={n8nUrl}
-      className="w-full h-full border-0"
-      title="n8n 工作流编辑器"
-      allow="clipboard-read; clipboard-write"
-      sandbox="allow-same-origin allow-scripts allow-forms allow-popups allow-modals"
-    />
+    <Card className="flex-1 relative opacity-80" shadow="none">
+      <iframe
+        src={n8nUrl}
+        className="w-full h-full border-0"
+        title="n8n 工作流编辑器"
+        allow="clipboard-read; clipboard-write"
+      />
+    </Card>
   )
 }
 

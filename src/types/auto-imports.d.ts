@@ -38,6 +38,7 @@ declare global {
   const ManualLoginN8n: typeof import('../components/step-manual-login').ManualLoginN8n
   const Model: typeof import('../database/model').Model
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
+  const N8NIcon: typeof import('../components/icons').N8NIcon
   const N8N_API_URL: typeof import('../config/constants').N8N_API_URL
   const N8N_LOGIN_DATA: typeof import('../config/constants').N8N_LOGIN_DATA
   const N8N_REGISTER_DATA: typeof import('../config/constants').N8N_REGISTER_DATA

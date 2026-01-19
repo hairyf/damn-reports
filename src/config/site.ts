@@ -1,7 +1,7 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: 'Daily Reports',
+  name: 'Damn Reports',
   description: 'Make beautiful websites regardless of your design experience.',
   sideItems: [
     {

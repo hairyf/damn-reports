@@ -74,13 +74,6 @@ export function SettingAutoCard() {
     }
   }
 
-  // 检查报告生成时间是否有效
-  const isGenerateTimeValid = (() => {
-    const collectMinutes = timeToMinutes(collectTime)
-    const generateMinutes = timeToMinutes(generateTime)
-    return generateMinutes >= collectMinutes + 5
-  })()
-
   return (
     <Card shadow="none">
       <CardHeader className="flex gap-3">
@@ -119,21 +112,11 @@ export function SettingAutoCard() {
               <label className="text-sm font-medium">报告生成时间</label>
             </div>
             <p className="text-xs text-default-400">
-              报告生成时间必须比数据收集时间晚至少 5 分钟
+              必须比数据收集时间晚至少 5 分钟
             </p>
           </div>
           <div>
-            <TimeInput
-              value={generateTime}
-              onChange={handleGenerateTimeChange}
-              color={isGenerateTimeValid ? 'default' : 'warning'}
-              errorMessage={
-                !isGenerateTimeValid
-                  ? '报告生成时间必须比数据收集时间晚至少 5 分钟'
-                  : undefined
-              }
-              isInvalid={!isGenerateTimeValid}
-            />
+            <TimeInput value={generateTime} onChange={handleGenerateTimeChange} />
           </div>
         </div>
       </CardBody>
