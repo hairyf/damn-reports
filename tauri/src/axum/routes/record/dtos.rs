@@ -18,19 +18,21 @@ pub struct GetRecordsParams {
 }
 
 #[derive(Debug, Serialize)]
-pub struct RecordWithSource {
-  pub id: String,
+pub struct SourceInfo {
+  pub name: String,
+  #[serde(rename = "type")]
+  pub r#type: String,
+  pub description: String,
+}
+
+#[derive(Debug, Serialize)]
+pub struct RecordItem {
   pub summary: String,
-  pub data: Value, // 解析后的 JSON 对象
-  #[serde(rename = "createdAt")]
-  pub created_at: String,
-  #[serde(rename = "updatedAt")]
-  pub updated_at: String,
-  #[serde(rename = "sourceId")]
-  pub source_id: i32,
-  #[serde(rename = "workspaceId")]
-  pub workspace_id: i32,
-  #[serde(rename = "sourceName")]
-  pub source_name: String,
-  pub source: String, // source type
+  pub data: Value,
+}
+
+#[derive(Debug, Serialize)]
+pub struct GroupedRecordsResponse {
+  pub source: SourceInfo,
+  pub records: Vec<RecordItem>,
 }

@@ -8,7 +8,7 @@ import { SourceFormGit } from '@/components/souce-form-git'
 function Page() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
-  const sourceId = Number(searchParams.get('id')) || 0
+  const sourceId = searchParams.get('id')
   const [configs, setConfigs] = useState<Record<string, any>>({})
   const form = useForm({
     defaultValues: {
@@ -44,11 +44,16 @@ function Page() {
     setConfigs(prev => ({ ...prev, [source.type]: source.config }))
   }
 
-  useWhenever(typeof sourceId === 'number', reset, { immediate: true })
+  useWhenever(sourceId, reset, { immediate: true })
 
   const onSubmit = form.handleSubmit(async (data) => {
     if (sourceId) {
-      await db.source.update(sourceId, { ...data })
+      await db.source.update(sourceId, {
+        name: data.name,
+        description: data.description,
+        type: data.type,
+        config: data.config,
+      })
       addToast({
         title: 'Success',
         description: 'Source updated successfully',
@@ -60,7 +65,10 @@ function Page() {
         updatedAt: new Date().toISOString(),
         workspaceId: user.workspaceId!,
         enabled: true,
-        ...data,
+        name: data.name,
+        description: data.description,
+        type: data.type,
+        config: data.config,
       })
       addToast({
         title: 'Success',

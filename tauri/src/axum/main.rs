@@ -28,6 +28,7 @@ pub async fn start(db: DatabaseConnection, app_handle: tauri::AppHandle) {
     .route("/", get(root))
     .route("/health", get(health))
     .route("/record", get(routes::record::get))
+    .route("/record/summary", get(routes::record::get_summary))
     .route("/report", post(routes::report::post))
     .with_state(app_state);
   
@@ -54,6 +55,7 @@ async fn root() -> Json<serde_json::Value> {
     "endpoints": {
       "health": "GET /health",
       "record": "GET /record?type=daily",
+      "recordSummary": "GET /record/summary?type=daily",
       "report": "POST /report"
     }
   }))

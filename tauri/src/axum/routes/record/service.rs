@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc, Local, Datelike};
 use sea_orm::{DatabaseConnection, EntityTrait, QueryFilter, ColumnTrait, QueryOrder};
 use std::sync::Arc;
+use std::collections::HashMap;
 use serde_json::Value;
 
-use crate::axum::routes::record::dtos::{RecordType, RecordWithSource};
+use crate::axum::routes::record::dtos::{RecordType, GroupedRecordsResponse, SourceInfo, RecordItem};
 use crate::database::entities::{prelude, record, source};
 
 pub fn get_time_range(r#type: &RecordType) -> (DateTime<Utc>, DateTime<Utc>) {
@@ -53,7 +54,7 @@ pub async fn get_records(
   db: Arc<DatabaseConnection>,
   r#type: &RecordType,
   workspace_id: Option<String>,
-) -> Result<Vec<RecordWithSource>, sea_orm::DbErr> {
+) -> Result<Vec<GroupedRecordsResponse>, sea_orm::DbErr> {
   // 计算时间范围
   let (start_time, end_time) = get_time_range(r#type);
   let start_iso = start_time.to_rfc3339();
@@ -79,30 +80,157 @@ pub async fn get_records(
     .all(&*db)
     .await?;
 
-  // 将查询结果转换为 RecordWithSource
-  let result: Vec<RecordWithSource> = records
-    .into_iter()
-    .filter_map(|(record, sources)| {
-      // 获取关联的 source（应该只有一个）
-      sources.first().and_then(|source| {
-        // 解析 JSON 字符串为对象
-        let parsed_data: Value = serde_json::from_str(&record.data)
-          .unwrap_or_else(|_| Value::Null); // 如果解析失败，使用 Null
-        
-        Some(RecordWithSource {
-          id: record.id,
-          summary: record.summary,
-          data: parsed_data,
-          created_at: record.created_at,
-          updated_at: record.updated_at,
-          source_id: record.source_id,
-          workspace_id: record.workspace_id,
-          source_name: source.name.clone(),
-          source: source.r#type.clone(),
+  // 使用 HashMap 按 source_id 分组
+  let mut grouped: HashMap<i32, (SourceInfo, Vec<RecordItem>)> = HashMap::new();
+
+  for (record, sources) in records {
+    if let Some(source) = sources.first() {
+      // 解析 JSON 字符串为对象
+      let parsed_data: Value = serde_json::from_str(&record.data)
+        .unwrap_or_else(|_| Value::Null);
+
+      // 创建 record 项
+      let record_item = RecordItem {
+        summary: record.summary,
+        data: parsed_data,
+      };
+
+      // 按 source_id 分组，如果不存在则创建 source 信息
+      grouped
+        .entry(source.id)
+        .or_insert_with(|| {
+          (
+            SourceInfo {
+              name: source.name.clone(),
+              r#type: source.r#type.clone(),
+              description: source.description.clone(),
+            },
+            Vec::new(),
+          )
         })
-      })
+        .1
+        .push(record_item);
+    }
+  }
+
+  // 转换为响应格式
+  let result: Vec<GroupedRecordsResponse> = grouped
+    .into_iter()
+    .map(|(_, (source, records))| GroupedRecordsResponse {
+      source,
+      records,
     })
     .collect();
 
   Ok(result)
+}
+
+pub async fn get_summary_prompt(
+  db: Arc<DatabaseConnection>,
+  r#type: &RecordType,
+  workspace_id: Option<String>,
+) -> Result<String, sea_orm::DbErr> {
+  let grouped_records = get_records(db, r#type, workspace_id).await?;
+  
+  if grouped_records.is_empty() {
+    return Ok(String::from("暂无记录数据。"));
+  }
+
+  let mut prompt = String::new();
+  
+  // 遍历每个 source 分组
+  for (index, group) in grouped_records.iter().enumerate() {
+    if index > 0 {
+      prompt.push_str("\n");
+    }
+    
+    prompt.push_str(&format!("{} ({})\n", 
+      group.source.name, 
+      group.source.r#type
+    ));
+    
+    if !group.source.description.is_empty() {
+      prompt.push_str(&format!("{}\n", group.source.description));
+    }
+    
+    if group.records.is_empty() {
+      continue;
+    }
+    
+    // 添加记录列表
+    for record in group.records.iter() {
+      prompt.push_str(&format!("- {}\n", record.summary));
+      
+      // 根据不同的 source type 提取关键数据
+      if let Value::Object(ref obj) = record.data {
+        let extracted_data = extract_relevant_data(&group.source.r#type, obj);
+        if !extracted_data.is_empty() {
+          prompt.push_str(&format!("  {}\n", extracted_data));
+        }
+      }
+    }
+  }
+  
+  Ok(prompt)
+}
+
+/// 根据不同的 source type 提取关键数据字段
+fn extract_relevant_data(source_type: &str, data: &serde_json::Map<String, Value>) -> String {
+  match source_type.to_lowercase().as_str() {
+    "git" => {
+      let mut parts = Vec::new();
+      
+      // 提取文件变更统计
+      if let Some(Value::Number(total_insertions)) = data.get("total_insertions") {
+        if let Some(Value::Number(total_deletions)) = data.get("total_deletions") {
+          parts.push(format!("变更: +{} -{}", total_insertions, total_deletions));
+        }
+      }
+      
+      // 提取文件列表（只显示路径和状态，不显示 patch）
+      if let Some(Value::Array(files)) = data.get("files") {
+        let file_info: Vec<String> = files
+          .iter()
+          .filter_map(|file| {
+            if let Value::Object(file_obj) = file {
+              let path = file_obj.get("path")?.as_str()?;
+              let status = file_obj.get("status")?.as_str()?;
+              Some(format!("{} ({})", path, status))
+            } else {
+              None
+            }
+          })
+          .collect();
+        
+        if !file_info.is_empty() {
+          parts.push(format!("文件: {}", file_info.join(", ")));
+        }
+      }
+      
+      parts.join(", ")
+    }
+    "clickup" => {
+      let mut parts = Vec::new();
+      
+      // 提取状态
+      if let Some(Value::Object(status_obj)) = data.get("status") {
+        if let Some(Value::String(status)) = status_obj.get("status") {
+          parts.push(format!("状态: {}", status));
+        }
+      }
+      
+      // 提取列表
+      if let Some(Value::Object(list_obj)) = data.get("list") {
+        if let Some(Value::String(list_name)) = list_obj.get("name") {
+          parts.push(format!("列表: {}", list_name));
+        }
+      }
+      
+      parts.join(", ")
+    }
+    _ => {
+      // 对于其他类型，返回空字符串（不显示 data）
+      String::new()
+    }
+  }
 }
