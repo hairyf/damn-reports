@@ -57,6 +57,8 @@ fn builder() -> tauri::Builder<tauri::Wry> {
     .plugin(tauri_plugin_dialog::init())
     // FS plugin
     .plugin(tauri_plugin_fs::init())
+    // Process plugin
+    .plugin(tauri_plugin_process::init())
 }
 
 // run app

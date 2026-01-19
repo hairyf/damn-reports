@@ -117,10 +117,12 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
   }
 
   async function onCopy() {
-    await navigator.clipboard.writeText(text)
+    const contentToCopy = text || report?.content || ''
+    await navigator.clipboard.writeText(contentToCopy)
     addToast({
       title: '复制成功',
       description: 'Markdown 内容已复制到剪贴板',
+      color: 'success',
     })
   }
 

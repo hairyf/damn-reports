@@ -38,7 +38,7 @@ export function Navbar() {
 
   const handleClose = async () => {
     const appWindow = getCurrentWindow()
-    await appWindow.close()
+    await appWindow.hide()
   }
 
   return (

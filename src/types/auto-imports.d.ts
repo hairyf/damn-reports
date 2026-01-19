@@ -144,6 +144,7 @@ declare global {
   const subtitle: typeof import('../components/primitives').subtitle
   const tauriStorageDriver: typeof import('../config/storage.driver').tauriStorageDriver
   const title: typeof import('../components/primitives').title
+  const tray: typeof import('../config/tary').tray
   const trendCard: typeof import('../components/trend-card').default
   const unstorage: typeof import('../config/storage').unstorage
   const updateReport: typeof import('../utils/mock-db').updateReport

@@ -15,15 +15,30 @@ pub async fn post(
 ) -> (StatusCode, Json<report::Model>) {
   match create_report(state.db.clone(), input).await {
     Ok(report) => {
+
+      // 发送通知
+      let app_handle = state.app_handle.clone();
+      let report_name = report.name.clone();
+      
+      println!("Attempting to send notification for report: {}", report_name);
+        
       // 发送通知
       use tauri_plugin_notification::NotificationExt;
-      if let Err(e) = state.app_handle.notification()
+      let notification_result = app_handle.notification()
         .builder()
-        .title("报告已生成完毕")
-        .body(&format!("报告 \"{}\" 已成功保存", report.name))
-        .show() {
-        eprintln!("发送通知失败: {}", e);
+        .title("Report Generated")
+        .body(&format!("Report \"{}\" generated successfully", report_name))
+        .show();
+      
+      match notification_result {
+        Ok(_) => {
+          println!("✓ Notification sent successfully for report: {}", report_name);
+        }
+        Err(e) => {
+          eprintln!("✗ Failed to send notification: {:?}", e);
+        }
       }
+      
       (StatusCode::OK, Json(report))
     }
     Err(e) => {
