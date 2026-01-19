@@ -14,29 +14,26 @@ import { useStore } from 'valtio-define'
 export function Navbar() {
   const user = useStore(store.user)
 
-  const handleMinimize = async () => {
-    const appWindow = getCurrentWindow()
-    await appWindow.minimize()
-  }
-
   const { data: workspace } = useQuery({
     queryKey: ['workspace', user.workspaceId],
     queryFn: () => db.workspace.findUnique(user.workspaceId!.toString()),
     enabled: !!user.workspaceId,
   })
 
-  const handleMaximize = async () => {
+  async function handleMinimize() {
     const appWindow = getCurrentWindow()
-    const isMaximized = await appWindow.isMaximized()
-    if (isMaximized) {
-      await appWindow.unmaximize()
-    }
-    else {
-      await appWindow.maximize()
-    }
+    await appWindow.minimize()
   }
 
-  const handleClose = async () => {
+  async function handleMaximize() {
+    const appWindow = getCurrentWindow()
+    if (await appWindow.isMaximized())
+      await appWindow.unmaximize()
+    else
+      await appWindow.maximize()
+  }
+
+  async function handleClose() {
     const appWindow = getCurrentWindow()
     await appWindow.hide()
   }

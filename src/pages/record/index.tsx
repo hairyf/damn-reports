@@ -103,7 +103,9 @@ function Page() {
                 <TableCell>{dayjs(record.createdAt).format('YYYY-MM-DD')}</TableCell>
                 <TableCell>
                   <div className="w-full relative h-5">
-                    <div className="truncate absolute inset-0">{record.summary}</div>
+                    <div className="absolute inset-0">
+                      <Ellipsis>{record.summary}</Ellipsis>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>

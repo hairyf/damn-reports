@@ -16,6 +16,7 @@ declare global {
   const DeleteReportModal: typeof import('../components/delete-report-modal').DeleteReportModal
   const Dialog: typeof import('../components/dialog').Dialog
   const DiscordIcon: typeof import('../components/icons').DiscordIcon
+  const Ellipsis: typeof import('../components/ellipsis').Ellipsis
   const Form: typeof import('../components/form').Form
   const FormControl: typeof import('../components/form').FormControl
   const FormDescription: typeof import('../components/form').FormDescription
@@ -206,6 +207,9 @@ declare global {
   // @ts-ignore
   export type { DialogProps } from '../components/dialog'
   import('../components/dialog')
+  // @ts-ignore
+  export type { EllipsisProps } from '../components/ellipsis'
+  import('../components/ellipsis')
   // @ts-ignore
   export type { IconSvgProps } from '../components/icons'
   import('../components/icons')

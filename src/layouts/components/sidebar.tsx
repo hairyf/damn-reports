@@ -8,7 +8,7 @@ const iconMap: Record<string, string> = {
   '/report': 'lucide:bar-chart-3',
   '/record': 'lucide:database',
   '/source': 'lucide:file-text',
-  '/n8n': 'lucide:workflow',
+  '/workflow': 'lucide:workflow',
   '/settings': 'lucide:settings',
 }
 
