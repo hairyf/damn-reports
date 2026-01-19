@@ -33,16 +33,18 @@ function Page() {
 
   async function reset() {
     const source = await db.source.findUnique(sourceId)
+
     if (!source)
       return
     form.setValue('name', source.name)
     form.setValue('description', source.description)
 
-    form.setValue('config', source.config)
+    form.setValue('config', JSON.parse(source.config))
     form.setValue('type', source.type)
     setConfigs(prev => ({ ...prev, [source.type]: source.config }))
   }
-  useWhenever(sourceId, reset, { immediate: true })
+
+  useWhenever(typeof sourceId === 'number', reset, { immediate: true })
 
   const onSubmit = form.handleSubmit(async (data) => {
     if (sourceId) {

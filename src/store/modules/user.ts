@@ -34,24 +34,29 @@ export interface N8nUser {
 
 export const user = defineStore({
   state: () => ({
+    // 状态分类：运行状态
     n8nprocessStatus: 'initial' as 'initial' | 'unzipping' | 'starting' | 'running',
-    n8nDefaultAccountLoginEnabled: true,
     n8nLoggedIn: false,
 
+    // 状态分类：业务配置
+    n8nDefaultAccountLoginEnabled: true,
     n8nUser: null as N8nUser | null,
-
-    // manual login
-    n8nEmail: '',
-    n8nPassword: '',
-
     credentialId: null as string | null,
     credentialName: null as string | null,
     deepseekSkip: false,
-
     workflowId: null as string | null,
-
     workspaceId: null as number | null,
+
+    // 敏感信息（建议不要持久化，或加密存储）
+    n8nEmail: '',
+    n8nPassword: '',
   }),
+  actions: {
+    async syncN8nStatus() {
+      const status = await invoke<any>('get_n8n_status')
+      this.n8nprocessStatus = status.toLowerCase()
+    },
+  },
   getters: {
     initialized() {
       return (
@@ -62,16 +67,12 @@ export const user = defineStore({
       )
     },
     status() {
-      const status = this.n8nprocessStatus
-      if (status === 'unzipping')
+      if (this.n8nprocessStatus === 'unzipping')
         return StartupState.UNZIPPING
-      if (status === 'starting')
+      if (this.n8nprocessStatus === 'starting')
         return StartupState.STARTING_SERVICE
       if (!this.n8nLoggedIn) {
-        if (this.n8nDefaultAccountLoginEnabled)
-          return StartupState.INITIALIZING_ACCOUNT
-        else
-          return StartupState.MANUAL_LOGIN
+        return this.n8nDefaultAccountLoginEnabled ? StartupState.INITIALIZING_ACCOUNT : StartupState.MANUAL_LOGIN
       }
       if (!this.credentialId && !this.deepseekSkip)
         return StartupState.DEEPSEEK_CONFIG
@@ -80,13 +81,23 @@ export const user = defineStore({
       return StartupState.COMPLETED
     },
   },
-  // persist: {
-  //   key: 'user',
-  //   paths: ['credentialId', 'credentialName', 'workflowId', 'deepseekSkip', 'n8nEmail', 'n8nPassword'],
-  // },
+  persist: {
+    key: 'user',
+    paths: [
+      'credentialId',
+      'credentialName',
+      'workflowId',
+      'deepseekSkip',
+      'n8nEmail',
+      'n8nPassword',
+      'n8nUser',
+      'workspaceId',
+      'workflowId',
+    ],
+  },
 })
 
 loop(async (next) => {
-  user.$state.n8nprocessStatus = await invoke('get_n8n_status').then((r: any) => r.toLowerCase())
+  await user.syncN8nStatus()
   await next(1000)
 })

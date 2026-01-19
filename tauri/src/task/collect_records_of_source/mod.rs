@@ -23,6 +23,7 @@ pub async fn trigger(db: DatabaseConnection) -> Result<usize, Box<dyn std::error
           "git" => {
               let cfg: config::GitConfig = serde_json::from_str(&source.config)?;
               let res = collector::git::daily(cfg.repository, cfg.branch, cfg.author).await?;
+              println!("Collected {} git records", res.data.len());
               map_to_active_models(res.data, &source, &now)
           }
           "clickup" => {
@@ -37,6 +38,8 @@ pub async fn trigger(db: DatabaseConnection) -> Result<usize, Box<dyn std::error
 
   let count = all_records.len();
   
+  println!("Collected {} records", count);
+
   if !all_records.is_empty() {
       // 2. 优化：直接尝试批量插入并忽略冲突 (需要底层数据库支持，如 SQLite/Postgres)
       // 如果数据库不支持，这里可以使用前面提到的 HashSet 过滤逻辑，但封装成辅助函数

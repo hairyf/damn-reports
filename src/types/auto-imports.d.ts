@@ -139,10 +139,13 @@ declare global {
   const siteConfig: typeof import('../config/site').siteConfig
   const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition
+  const storage: typeof import('../config/storage').storage
   const store: typeof import('../store/index').store
   const subtitle: typeof import('../components/primitives').subtitle
+  const tauriStorageDriver: typeof import('../config/storage.driver').tauriStorageDriver
   const title: typeof import('../components/primitives').title
   const trendCard: typeof import('../components/trend-card').default
+  const unstorage: typeof import('../config/storage').unstorage
   const updateReport: typeof import('../utils/mock-db').updateReport
   const use: typeof import('react').use
   const useActionState: typeof import('react').useActionState
@@ -192,6 +195,9 @@ declare global {
   export type { SiteConfig } from '../config/site'
   import('../config/site')
   // @ts-ignore
+  export type { TauriStorageDriverOptions } from '../config/storage.driver'
+  import('../config/storage.driver')
+  // @ts-ignore
   export type { ReportWorkflowOptions } from '../config/workflow'
   import('../config/workflow')
   // @ts-ignore
@@ -203,6 +209,9 @@ declare global {
   // @ts-ignore
   export type { ReportEditorProps } from '../components/report-editor'
   import('../components/report-editor')
+  // @ts-ignore
+  export type { ReportGeneratorProps } from '../components/report-generator'
+  import('../components/report-generator')
   // @ts-ignore
   export type { IconMap, SourceIconProps } from '../components/source-icon'
   import('../components/source-icon')

@@ -20,7 +20,6 @@ function Page() {
     queryKey: ['sources', debouncedSearch, type],
     queryFn: () => db.source.findMany({ search: debouncedSearch, type }),
   })
-
   return (
     <>
       <Card className="mb-4 flex-shrink-0">

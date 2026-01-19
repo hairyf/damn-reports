@@ -20,7 +20,7 @@ export function SourceItem(props: SourceItemProps) {
   const { item } = props
 
   async function onToggleEnabled() {
-    await sql_updateSource({
+    await db.source.update(item.id, {
       enabled: !item.enabled,
       id: item.id,
     })
@@ -32,7 +32,7 @@ export function SourceItem(props: SourceItemProps) {
       message: '确定要删除这个数据源吗？此操作无法撤销。',
       confirmText: '删除',
     })
-    await sql_deleteSource(item.id)
+    await db.source.delete(item.id)
     queryClient.invalidateQueries({ queryKey: ['sources'] })
   }
   return (
@@ -49,7 +49,7 @@ export function SourceItem(props: SourceItemProps) {
                 <div className="bg-success size-2 rounded-full" />
               )}
             </div>
-            <p className="text-small text-default-500">{item.description}</p>
+            <p className="text-small text-default-500 truncate max-w-[300px]">{item.description}</p>
           </div>
           <div className="flex items-center gap-2">
             <Switch

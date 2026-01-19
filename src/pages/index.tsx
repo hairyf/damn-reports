@@ -1,7 +1,9 @@
 import { Else, If, Then } from '@hairy/react-lib'
 import { useQuery } from '@tanstack/react-query'
+import { useLocalStorage } from 'react-use'
 
 function Page() {
+  const [generating, setGenerating] = useLocalStorage('report_generating', false)
   const { data: generatedReportsCount = 0 } = useQuery({
     queryKey: ['reports'],
     queryFn: () => db.report.count(),
@@ -13,12 +15,15 @@ function Page() {
     queryFn: () => db.record.count(),
     refetchInterval: 5000,
   })
+
   const { data: detail, refetch } = useQuery({
     queryKey: ['reports', 'daily'],
     queryFn: async () => {
       const result = await db.report.findFirstByType({ type: 'daily' })
+      result && setGenerating(false)
       return result ?? null
     },
+    refetchInterval: 5000,
   })
 
   return (
@@ -41,7 +46,10 @@ function Page() {
           />
         </Then>
         <Else>
-          <ReportGenerator />
+          <ReportGenerator
+            generating={generating}
+            onGeneratingChange={setGenerating}
+          />
         </Else>
       </If>
     </div>

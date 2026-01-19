@@ -18,7 +18,7 @@ export class Source extends Model<DB, 'source'> {
   async findMany(input: SourceFindManyInput) {
     const { search, type, enabled, workspace, page = 1, pageSize = 10 } = input
 
-    let query = this.db.selectFrom('source').selectAll().innerJoin('workspace', 'workspace.id', 'source.workspaceId') // 关联 workspace 表，条件是 id 匹配
+    let query = this.db.selectFrom('source').selectAll() // 关联 workspace 表，条件是 id 匹配
 
     // 如果search不为空，添加搜索条件
     if (search) {
@@ -32,7 +32,7 @@ export class Source extends Model<DB, 'source'> {
     }
 
     if (typeof workspace === 'number') {
-      query = query.where('workspace.id', '=', workspace)
+      query = query.where('workspaceId', '=', workspace)
     }
 
     // 如果type不为空，添加类型过滤

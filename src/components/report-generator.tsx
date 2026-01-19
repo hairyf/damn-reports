@@ -1,17 +1,29 @@
 import { addToast, Button, Card, CardBody } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { invoke } from '@tauri-apps/api/core'
+import dayjs from 'dayjs'
 
-export function ReportGenerator() {
+export interface ReportGeneratorProps {
+  generating?: boolean
+  onGeneratingChange?: (isGenerating: boolean) => void
+}
+
+export function ReportGenerator({ generating, onGeneratingChange }: ReportGeneratorProps) {
   async function onGenerate() {
+    await invoke('collect_daily_records')
+
+    const records = await db.record.findMany({
+      date: dayjs().startOf('day').toISOString(),
+    })
+
+    if (records.length === 0) {
+      addToast({ title: '暂无数据', description: '未收集到任何数据' })
+      return
+    }
+
     await invoke('generate_daily_report')
-
-    const count = await invoke<number>('collect_daily_records')
-
-    if (count === 0)
-      return addToast({ title: '没有收集到今天的数据' })
-
-    await invoke('generate_daily_report')
+    addToast({ title: '报告生成中...' })
+    onGeneratingChange?.(true)
   }
   return (
     <Card className="flex-1">
@@ -31,7 +43,8 @@ export function ReportGenerator() {
             onPress={onGenerate}
             radius="full"
             className="w-30"
-            startContent={<Icon icon="lucide:sparkles" className="w-4 h-4" />}
+            isLoading={generating}
+            startContent={!generating ? <Icon icon="lucide:sparkles" className="w-4 h-4" /> : undefined}
           >
             生成
           </Button>

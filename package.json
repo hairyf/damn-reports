@@ -63,8 +63,9 @@
     "tailwind-merge": "^3.4.0",
     "tailwind-variants": "^3.1.1",
     "tiptap-markdown": "^0.9.0",
+    "unstorage": "^1.17.4",
     "valtio": "^2.3.0",
-    "valtio-define": "^0.3.0",
+    "valtio-define": "^0.5.0",
     "zod": "^4.3.5"
   },
   "devDependencies": {
