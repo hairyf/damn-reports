@@ -9,7 +9,7 @@ use crate::collector;
 use utils::map_to_active_models;
 use utils::insert_if_not_exists;
 
-pub async fn trigger(db: DatabaseConnection) -> Result<(), Box<dyn std::error::Error>> {
+pub async fn trigger(db: DatabaseConnection) -> Result<usize, Box<dyn std::error::Error>> {
   let sources = source::Entity::find()
       .filter(source::Column::Enabled.eq(true))
       .all(&db)
@@ -35,11 +35,13 @@ pub async fn trigger(db: DatabaseConnection) -> Result<(), Box<dyn std::error::E
       all_records.extend(records);
   }
 
+  let count = all_records.len();
+  
   if !all_records.is_empty() {
       // 2. 优化：直接尝试批量插入并忽略冲突 (需要底层数据库支持，如 SQLite/Postgres)
       // 如果数据库不支持，这里可以使用前面提到的 HashSet 过滤逻辑，但封装成辅助函数
       insert_if_not_exists(&db, all_records).await?;
   }
 
-  Ok(())
+  Ok(count)
 }

@@ -69,7 +69,11 @@ fn scheduler_loop(app_handle: AppHandle, db: DatabaseConnection, running: Arc<At
         let generate_time_clone = generate_time.clone();
         scheduler.every(1.day()).at(&generate_time.as_str()).run(move || {
             println!("Generating report at: {}", generate_time_clone);
-            task::call_n8n_workflow_webhook::trigger();
+            tauri::async_runtime::spawn(async move {
+                if let Err(e) = task::call_n8n_workflow_webhook::trigger().await {
+                    eprintln!("Failed to trigger n8n workflow webhook: {}", e);
+                }
+            });
         });
 
         // 调度循环

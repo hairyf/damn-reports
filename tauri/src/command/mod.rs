@@ -9,6 +9,7 @@ use crate::axum;
 use crate::schedule;
 use crate::n8n;
 use crate::collector;
+use crate::task;
 
 // 全局标志，确保数据库连接成功只运行一次
 static DATABASE_LOADED: AtomicBool = AtomicBool::new(false);
@@ -38,6 +39,23 @@ pub async fn restart_schedule(
 #[tauri::command]
 pub fn get_n8n_status() -> n8n::status::Status {
   n8n::status::get_status()
+}
+
+#[tauri::command]
+pub async fn collect_daily_records(
+  db: State<'_, DatabaseConnection>,
+) -> Result<usize, String> {
+  let db_inner_clone = db.inner().clone();
+  let count = task::collect_records_of_source::trigger(db_inner_clone)
+    .await
+    .map_err(|e| e.to_string())?;
+  Ok(count)
+}
+
+#[tauri::command]
+pub async fn generate_daily_report() -> Result<(), String> {
+  task::call_n8n_workflow_webhook::trigger().await.map_err(|e| e.to_string())?;
+  Ok(())
 }
 
 #[tauri::command]

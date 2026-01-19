@@ -21,6 +21,8 @@ fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
         command::database_loaded,
         command::restart_schedule,
         command::get_n8n_status,
+        command::collect_daily_records,
+        command::generate_daily_report,
         command::collect_daily_clickup,
         command::collect_daily_git,
     ]

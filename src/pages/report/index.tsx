@@ -91,6 +91,7 @@ function Page() {
               }}
               isClearable
               className="w-full sm:w-40"
+              aria-label="筛选报告类型"
             >
               {typeOptions.map((option) => {
                 return (

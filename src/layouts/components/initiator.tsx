@@ -64,7 +64,7 @@ export function Initiator() {
     if (!workspaceId)
       throw new TypeError('Failed to create workspace')
 
-    const data = await postN8nWorkflow(get_report_workflow_params({
+    const requestData = getReportWorkflowData({
       workflowId: Number(workspaceId),
       name: 'Default Report Workflow',
       credentials: {
@@ -75,10 +75,22 @@ export function Initiator() {
             }
           : undefined,
       },
-    }))
+    })
+
+    const data = await postN8nWorkflow(requestData)
 
     if (!data?.id)
       throw new TypeError('Failed to create workflow')
+
+    await postN8nWorkflowWorkflowIdActivate(
+      { workflowId: data.id },
+      {
+        versionId: data.versionId,
+        expectedChecksum: data.checksum,
+        name: `Version ${data.versionId.split('-')[0]}`,
+        description: '',
+      },
+    )
 
     await db.workspace.update(workspaceId, { workflow: data.id })
 

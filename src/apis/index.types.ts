@@ -50,6 +50,16 @@ export interface PostN8nRegisterBody {
   password: string
 }
 
+export interface PostN8nWorkflowWorkflowIdActivateBody {
+  // versionId
+  versionId: string
+  // checksum
+  expectedChecksum: string
+  // Version [versionId.split('-')[0]]
+  name: string
+  description: string
+}
+
 export interface PostN8nRegisterResult {
   code?: number
   data: any
@@ -61,4 +71,5 @@ export interface PostN8nWorkflowResult {
   createdAt: string
   id: string
   name: string
+  [key: string]: any
 }

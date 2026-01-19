@@ -52,6 +52,7 @@ export function SettingUserInterfaceCard() {
             selectedKeys={[setting.language]}
             onSelectionChange={keys => handleLanguageChange(Array.from(keys)[0] as Language)}
             className="max-w-32 w-full"
+            aria-label="选择语言"
           >
             {languageOptions.map((option) => {
               return (
@@ -78,6 +79,7 @@ export function SettingUserInterfaceCard() {
             selectedKeys={[theme]}
             onSelectionChange={keys => setTheme(Array.from(keys)[0] as string)}
             className="max-w-32 w-full"
+            aria-label="选择主题模式"
             renderValue={([item]) => {
               return (
                 <div className="flex items-center gap-2">

@@ -9,16 +9,13 @@ export interface ReportWorkflowOptions {
   }
 }
 
-export function get_report_workflow_params(options: ReportWorkflowOptions) {
+export function getReportWorkflowData(options: ReportWorkflowOptions) {
   return {
     name: options.name,
     nodes: [
       {
         parameters: {
-          path: 'b7d92e73-c8ef-40cd-8062-adf86697801f',
-          options: {
-            responseData: '{ message: "" }',
-          },
+          path: 'adf86697801f',
         },
         type: 'n8n-nodes-base.webhook',
         typeVersion: 2.1,
@@ -28,7 +25,7 @@ export function get_report_workflow_params(options: ReportWorkflowOptions) {
         ],
         id: '41eb82b9-b4c4-4825-afe9-1e464ef37ec9',
         name: 'Webhook',
-        webhookId: 'b7d92e73-c8ef-40cd-8062-adf86697801f',
+        webhookId: 'adf86697801f',
       },
       {
         parameters: {
@@ -148,31 +145,6 @@ export function get_report_workflow_params(options: ReportWorkflowOptions) {
         ],
         id: '975b1f6d-9f90-48ea-9f37-d13531690672',
         name: 'Edit Fields',
-      },
-      {
-        parameters: {
-          options: {},
-        },
-        type: '@n8n/n8n-nodes-langchain.chatTrigger',
-        typeVersion: 1.4,
-        position: [
-          -304,
-          160,
-        ],
-        id: '82f8e4da-76c4-4409-a2c8-fa02e103726c',
-        name: 'When chat message received',
-        webhookId: 'edd1332c-e33e-4e68-a0d9-dc6bd244519e',
-      },
-      {
-        parameters: {},
-        type: 'n8n-nodes-base.manualTrigger',
-        typeVersion: 1,
-        position: [
-          -304,
-          -160,
-        ],
-        id: 'b42de8e2-40a0-40a8-a9f3-3e5dce817ef5',
-        name: 'When clicking ‘Execute workflow’',
       },
       {
         parameters: {
@@ -324,7 +296,7 @@ export function get_report_workflow_params(options: ReportWorkflowOptions) {
     },
 
     pinData: {},
-    active: true,
+    active: false,
     settings: {
       executionOrder: 'v1',
       availableInMCP: false,

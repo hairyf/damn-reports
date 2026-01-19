@@ -15,7 +15,10 @@ function Page() {
   })
   const { data: detail, refetch } = useQuery({
     queryKey: ['reports', 'daily'],
-    queryFn: () => db.report.findFirstByType('daily'),
+    queryFn: async () => {
+      const result = await db.report.findFirstByType({ type: 'daily' })
+      return result ?? null
+    },
   })
 
   return (

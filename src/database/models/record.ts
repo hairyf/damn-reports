@@ -7,6 +7,7 @@ export interface RecordFindManyInput {
   workspace?: number
   page?: number
   pageSize?: number
+  date?: string
 }
 
 export class Record extends Model<DB, 'record'> {
@@ -15,7 +16,7 @@ export class Record extends Model<DB, 'record'> {
   }
 
   findMany(input: RecordFindManyInput) {
-    const { search, source, workspace, page = 1, pageSize = 10 } = input
+    const { search, source, workspace, page = 1, pageSize = 10, date } = input
 
     let query = this.db
       .selectFrom('record') // 从 record 表开始查询
@@ -47,7 +48,11 @@ export class Record extends Model<DB, 'record'> {
       query = query.where('workspace.id', '=', workspace)
     }
 
-    query = query.orderBy('createdAt', 'desc')
+    if (date) {
+      query = query.where('record.createdAt', '>=', date)
+    }
+
+    query = query.orderBy('record.createdAt', 'desc')
 
     // 分页
     if (pageSize) {

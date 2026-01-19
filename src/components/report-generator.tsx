@@ -1,9 +1,17 @@
-import { Button, Card, CardBody } from '@heroui/react'
+import { addToast, Button, Card, CardBody } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { invoke } from '@tauri-apps/api/core'
 
 export function ReportGenerator() {
-  function onGenerate() {
-    invokeCollectAll()
+  async function onGenerate() {
+    await invoke('generate_daily_report')
+
+    const count = await invoke<number>('collect_daily_records')
+
+    if (count === 0)
+      return addToast({ title: '没有收集到今天的数据' })
+
+    await invoke('generate_daily_report')
   }
   return (
     <Card className="flex-1">

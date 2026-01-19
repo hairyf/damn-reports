@@ -40,6 +40,7 @@ declare global {
   const N8N_API_URL: typeof import('../config/constants').N8N_API_URL
   const N8N_LOGIN_DATA: typeof import('../config/constants').N8N_LOGIN_DATA
   const N8N_REGISTER_DATA: typeof import('../config/constants').N8N_REGISTER_DATA
+  const N8N_WEBHOOK_ID: typeof import('../config/constants').N8N_WEBHOOK_ID
   const NavLink: typeof import('react-router-dom').NavLink
   const Navbar: typeof import('../layouts/components/navbar').Navbar
   const Navigate: typeof import('react-router-dom').Navigate
@@ -95,7 +96,9 @@ declare global {
   const getDatabaseItemById: typeof import('../utils/mock-db').getDatabaseItemById
   const getKysely: typeof import('../database').getKysely
   const getN8nCredentials: typeof import('../apis/index').getN8nCredentials
+  const getN8nWebhook: typeof import('../apis/index').getN8nWebhook
   const getReportById: typeof import('../utils/mock-db').getReportById
+  const getReportWorkflowData: typeof import('../config/workflow').getReportWorkflowData
   const getSetting: typeof import('../utils/settings-store').getSetting
   const getSettings: typeof import('../utils/settings-store').getSettings
   const getSources: typeof import('../utils/mock-db').getSources
@@ -122,6 +125,7 @@ declare global {
   const postN8nWorkflow: typeof import('../apis/index').postN8nWorkflow
   const postN8nWorkflowParamsMock: typeof import('../services/post-n8n-workflow.mock').postN8nWorkflowParamsMock
   const postN8nWorkflowResultMock: typeof import('../services/post-n8n-workflow.mock').postN8nWorkflowResultMock
+  const postN8nWorkflowWorkflowIdActivate: typeof import('../apis/index').postN8nWorkflowWorkflowIdActivate
   const queryClient: typeof import('../config/client').queryClient
   const registerN8N: typeof import('../apis/index').registerN8N
   const registerN8n: typeof import('../apis/index').registerN8n
@@ -221,6 +225,6 @@ declare global {
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
   // @ts-ignore
-  export type { PostN8nCredentialsBody, PostN8nCredentialsResult, PostN8nLoginBody, PostN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nRegisterResult, PostN8nWorkflowResult } from '../apis/index.types'
+  export type { PostN8nCredentialsBody, PostN8nCredentialsResult, PostN8nLoginBody, PostN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nWorkflowWorkflowIdActivateBody, PostN8nRegisterResult, PostN8nWorkflowResult } from '../apis/index.types'
   import('../apis/index.types')
 }

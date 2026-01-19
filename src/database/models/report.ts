@@ -100,7 +100,8 @@ export class Report extends Model<DB, 'report'> {
         .orderBy('createdAt', 'desc')
         .limit(1)
 
-      return query.executeTakeFirst()
+      const result = await query.executeTakeFirst()
+      return result ?? null
     }
     catch {
       return null

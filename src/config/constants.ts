@@ -12,3 +12,5 @@ export const N8N_LOGIN_DATA = {
   emailOrLdapLoginId: 'ddr@ddr.com',
   password: 'ddawdadfa89d8f8dDD.',
 }
+
+export const N8N_WEBHOOK_ID = 'adf86697801f'

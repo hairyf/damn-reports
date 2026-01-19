@@ -55,3 +55,15 @@ export async function postN8nWorkflow(params: any) {
     .then(response => response.json())
     .then(data => data?.data as Types.PostN8nWorkflowResult | null)
 }
+
+export async function postN8nWorkflowWorkflowIdActivate(paths: { workflowId: string }, body: Types.PostN8nWorkflowWorkflowIdActivateBody) {
+  return fetch(`${N8N_API_URL}/rest/workflows/${paths.workflowId}/activate`, {
+    headers: { 'Content-Type': 'application/json' },
+    method: 'POST',
+    body: JSON.stringify(body),
+  })
+}
+
+export async function getN8nWebhook(webhookId: string) {
+  return fetch(`${N8N_API_URL}/webhook/${webhookId}`, { method: 'GET' })
+}

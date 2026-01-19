@@ -28,6 +28,7 @@ export function SourceSelect(props: SourceSelectProps) {
         props.onChange?.(selected || '')
       }}
       isClearable={props.isClearable}
+      aria-label="选择数据源类型"
       renderValue={([item]) => {
         return (
           <div className="flex items-center gap-2">
