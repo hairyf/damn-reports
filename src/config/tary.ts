@@ -13,9 +13,8 @@ async function setup() {
         text: '打开面板',
         action: async () => {
           const current = getCurrentWindow()
-          await current.setAlwaysOnTop(true)
-          await current.show()
           await current.unminimize()
+          await current.show()
           await current.setFocus()
           window.navigate('/')
         },
@@ -25,9 +24,8 @@ async function setup() {
         text: '报告列表',
         action: async () => {
           const current = getCurrentWindow()
-          await current.setAlwaysOnTop(true)
-          await current.show()
           await current.unminimize()
+          await current.show()
           await current.setFocus()
           window.navigate('/report')
         },
@@ -37,9 +35,8 @@ async function setup() {
         text: '设置',
         action: async () => {
           const current = getCurrentWindow()
-          await current.setAlwaysOnTop(true)
-          await current.show()
           await current.unminimize()
+          await current.show()
           await current.setFocus()
 
           window.navigate('/settings')
