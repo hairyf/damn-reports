@@ -3,19 +3,27 @@ use axum::{
   Json,
   extract::State,
 };
-use sea_orm::DatabaseConnection;
-use std::sync::Arc;
 
+use crate::axum::AppState;
 use crate::axum::routes::report::dtos::ReportCreateInput;
 use crate::axum::routes::report::service::create_report;
 use crate::database::entities::report;
 
 pub async fn post(
-  State(db): State<Arc<DatabaseConnection>>,
+  State(state): State<AppState>,
   Json(input): Json<ReportCreateInput>
 ) -> (StatusCode, Json<report::Model>) {
-  match create_report(db, input).await {
+  match create_report(state.db.clone(), input).await {
     Ok(report) => {
+      // 发送通知
+      use tauri_plugin_notification::NotificationExt;
+      if let Err(e) = state.app_handle.notification()
+        .builder()
+        .title("报告已生成完毕")
+        .body(&format!("报告 \"{}\" 已成功保存", report.name))
+        .show() {
+        eprintln!("发送通知失败: {}", e);
+      }
       (StatusCode::OK, Json(report))
     }
     Err(e) => {

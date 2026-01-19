@@ -20,7 +20,7 @@ export function Provider({ children }: { children: React.ReactNode }) {
         <OverlaysProvider>
           {children}
         </OverlaysProvider>
-        <ToastProvider placement="top-center" />
+        <ToastProvider toastOffset={64} placement="top-center" />
       </HeroUIProvider>
     </QueryClientProvider>
   )

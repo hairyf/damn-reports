@@ -1,5 +1,6 @@
 import { If, useWhenever } from '@hairy/react-lib'
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -115,6 +116,14 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
     props.onCancel?.()
   }
 
+  async function onCopy() {
+    await navigator.clipboard.writeText(text)
+    addToast({
+      title: '复制成功',
+      description: 'Markdown 内容已复制到剪贴板',
+    })
+  }
+
   useKey(
     (event) => {
       return (event.ctrlKey || event.metaKey) && event.key === 's'
@@ -187,6 +196,14 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
                   取消
                 </Button>
               </If>
+              <Button
+                variant="light"
+                onPress={onCopy}
+                isDisabled={!text}
+                startContent={<Icon icon="lucide:copy" className="w-4 h-4" />}
+              >
+                复制
+              </Button>
               <Button
                 color="primary"
                 onPress={() => saveMutation.mutate()}

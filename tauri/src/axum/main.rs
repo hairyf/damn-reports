@@ -10,14 +10,26 @@ use std::sync::Arc;
 use serde_json::json;
 use crate::axum::routes;
 
+/// Axum 应用状态
+#[derive(Clone)]
+pub struct AppState {
+  pub db: Arc<DatabaseConnection>,
+  pub app_handle: tauri::AppHandle,
+}
+
 /// 启动 Axum 服务器
-pub async fn start(db: DatabaseConnection) {
+pub async fn start(db: DatabaseConnection, app_handle: tauri::AppHandle) {
+  let app_state = AppState {
+    db: Arc::new(db),
+    app_handle,
+  };
+  
   let app = Router::new()
     .route("/", get(root))
     .route("/health", get(health))
     .route("/record", get(routes::record::get))
     .route("/report", post(routes::report::post))
-    .with_state(Arc::new(db));
+    .with_state(app_state);
   
   match TcpListener::bind("0.0.0.0:6789").await {
     Ok(listener) => {

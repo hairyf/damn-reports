@@ -21,7 +21,7 @@ pub async fn database_loaded(app_handle: tauri::AppHandle) -> Result<(), String>
   }
   let db = connection::connect(&app_handle).await;
   println!("✓ Database Connection Successful");
-  tauri::async_runtime::spawn(axum::start(db.clone()));
+  tauri::async_runtime::spawn(axum::start(db.clone(), app_handle.clone()));
   schedule::start_schedule(&app_handle, db.clone());
   Ok(())
 }
