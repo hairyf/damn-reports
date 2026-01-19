@@ -30,6 +30,7 @@ export function StepStatus({ icon, title, description, progress, loading }: Step
         }}
         size="sm"
         value={progress}
+        aria-label={`${title} 进度: ${progress}%`}
       />
 
       {loading && (

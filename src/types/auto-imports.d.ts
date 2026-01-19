@@ -89,6 +89,7 @@ declare global {
   const db_p: typeof import('../database').db_p
   const db_promise: typeof import('../database').db_promise
   const deleteReport: typeof import('../utils/mock-db').deleteReport
+  const emitter: typeof import('../config/emitter').emitter
   const fixTableStructure: typeof import('../database/index').fixTableStructure
   const forwardRef: typeof import('react').forwardRef
   const getAllDatabaseItems: typeof import('../utils/mock-db').getAllDatabaseItems
@@ -115,6 +116,7 @@ declare global {
   const loginN8nUser: typeof import('../apis/index').loginN8nUser
   const main: typeof import('../database').main
   const memo: typeof import('react').memo
+  const mitt: typeof import('../config/mitt').mitt
   const params: typeof import('../services/post-n8n-workflow.params.mock').params
   const postN8nApiKey: typeof import('../services/post-n8n-api-key').postN8nApiKey
   const postN8nCredentials: typeof import('../apis/index').postN8nCredentials

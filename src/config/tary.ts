@@ -8,32 +8,48 @@ import { exit } from '@tauri-apps/plugin-process'
 async function setup() {
   const menu = await Menu.new({
     items: [
-      // Window Controls Section
       await MenuItem.new({
-        id: 'show',
-        text: 'Show Window',
-        action: () => getCurrentWindow().show(),
+        id: 'overview',
+        text: '打开面板',
+        action: async () => {
+          const current = getCurrentWindow()
+          await current.setAlwaysOnTop(true)
+          await current.show()
+          await current.unminimize()
+          await current.setFocus()
+          window.navigate('/')
+        },
       }),
-
       await MenuItem.new({
-        id: 'hide',
-        text: 'Hide Window',
-        action: () => getCurrentWindow().hide(),
+        id: 'reports',
+        text: '报告列表',
+        action: async () => {
+          const current = getCurrentWindow()
+          await current.setAlwaysOnTop(true)
+          await current.show()
+          await current.unminimize()
+          await current.setFocus()
+          window.navigate('/report')
+        },
       }),
-
-      // Settings Section
       await MenuItem.new({
         id: 'settings',
-        text: 'Settings',
-        action: () => {
-          return getCurrentWindow().show()
+        text: '设置',
+        action: async () => {
+          const current = getCurrentWindow()
+          await current.setAlwaysOnTop(true)
+          await current.show()
+          await current.unminimize()
+          await current.setFocus()
+
+          window.navigate('/settings')
         },
       }),
 
       // Quit Section
       await MenuItem.new({
         id: 'quit',
-        text: 'Quit',
+        text: '退出',
         action: () => void exit(0),
       }),
     ],
