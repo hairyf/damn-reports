@@ -9,10 +9,31 @@ import {
 import { Icon } from '@iconify/react'
 import { useQuery } from '@tanstack/react-query'
 import { getCurrentWindow } from '@tauri-apps/api/window'
+import { useEffect, useState } from 'react'
 import { useStore } from 'valtio-define'
 
 export function Navbar() {
   const user = useStore(store.user)
+  const [currentTime, setCurrentTime] = useState(() => new Date())
+
+  // 实时更新当前时间
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentTime(new Date())
+    }, 1000)
+
+    return () => clearInterval(timer)
+  }, [])
+
+  // 格式化时间显示（仅显示时间，不包含日期）
+  const formatTime = (date: Date) => {
+    return date.toLocaleTimeString('zh-CN', {
+      hour: '2-digit',
+      minute: '2-digit',
+      second: '2-digit',
+      hour12: false,
+    })
+  }
 
   const { data: workspace } = useQuery({
     queryKey: ['workspace', user.workspaceId],
@@ -44,10 +65,10 @@ export function Navbar() {
         <div className="absolute inset-0 w-full" data-tauri-drag-region />
         <NavbarContent justify="start">
           <If cond={!!workspace}>
-            <NavbarItem className="flex items-center gap-1">
+            <NavbarItem className="text-default-500 flex items-center gap-1">
               <Icon icon="lucide:layout-dashboard" className="w-4 h-4" />
-              <span className="text-sm text-default-500">Workspace / </span>
-              <span className="text-sm text-default-500">{workspace?.name}</span>
+              <span className="text-sm">Workspace / </span>
+              <span className="text-sm">{workspace?.name}</span>
             </NavbarItem>
           </If>
         </NavbarContent>
@@ -57,6 +78,11 @@ export function Navbar() {
               <GithubIcon className="text-default-500" />
             </Link>
             <ThemeSwitch />
+          </NavbarItem>
+
+          <NavbarItem className="flex items-center gap-2">
+            <Icon icon="lucide:clock" className="w-4 h-4 text-default-500" />
+            <span className="text-sm text-default-500 font-mono">{formatTime(currentTime)}</span>
           </NavbarItem>
 
           <NavbarItem className="flex items-center gap-1">

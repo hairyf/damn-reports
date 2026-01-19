@@ -1,5 +1,5 @@
 import { Progress } from '@heroui/react'
-import { Loader2 } from 'lucide-react'
+import { Icon } from '@iconify/react'
 
 interface StepStatusProps {
   icon: React.ReactNode
@@ -35,7 +35,7 @@ export function StepStatus({ icon, title, description, progress, loading }: Step
 
       {loading && (
         <div className="flex items-center text-xs font-mono text-foreground/40">
-          <Loader2 className="animate-spin mr-2" size={14} />
+          <Icon icon="lucide:loader-2" className="animate-spin mr-2 w-3.5 h-3.5" />
           PROCESSING...
         </div>
       )}

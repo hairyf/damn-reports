@@ -1,8 +1,5 @@
 import { Button, Card, CardBody, Input } from '@heroui/react'
-import {
-  AlertCircle,
-  ArrowRight,
-} from 'lucide-react'
+import { Icon } from '@iconify/react'
 
 export function StepN8nManualLogin() {
   const [email, setEmail] = useState('')
@@ -13,11 +10,11 @@ export function StepN8nManualLogin() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full" shadow="none">
       <CardBody className="p-8">
         <div className="flex items-center space-x-4 mb-6">
           <div className="bg-red-50 dark:bg-red-500/20 p-3 rounded-xl">
-            <AlertCircle className="text-red-500" size={24} />
+            <Icon icon="lucide:alert-circle" className="text-red-500 w-6 h-6" />
           </div>
           <div>
             <h2 className="text-2xl font-bold">N8N 账号初始化失败</h2>
@@ -54,7 +51,7 @@ export function StepN8nManualLogin() {
             disabled={!email || !password}
           >
             <span>确认登录</span>
-            <ArrowRight size={18} />
+            <Icon icon="lucide:arrow-right" className="w-4.5 h-4.5" />
           </Button>
         </div>
       </CardBody>

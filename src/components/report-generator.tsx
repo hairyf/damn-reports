@@ -25,19 +25,23 @@ export function ReportGenerator({ generating, onGeneratingChange }: ReportGenera
     addToast({ title: '报告生成中...' })
     onGeneratingChange?.(true)
   }
+
   return (
-    <Card className="flex-1">
+    <Card className="flex-1 relative" shadow="none">
       <CardBody>
+        <ScheduleCountdown className="absolute top-4 right-4" />
+
         <h3 className="text-lg font-semibold">
           今日报告
         </h3>
         <div className="flex flex-col items-center justify-center flex-1 gap-4 py-12">
           <div className="flex flex-col items-center justify-center gap-2">
-            <Icon icon="lucide:file-text" className="w-18 h-18 text-default-400" />
+            <Icon icon="line-md:document-report" className="w-18 h-18 text-default-400" />
             <p className="text-default-500 text-center">
               暂无数据，点击按钮进行生成
             </p>
           </div>
+
           <Button
             color="primary"
             onPress={onGenerate}

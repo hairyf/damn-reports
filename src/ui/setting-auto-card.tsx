@@ -82,7 +82,7 @@ export function SettingAutoCard() {
   })()
 
   return (
-    <Card>
+    <Card shadow="none">
       <CardHeader className="flex gap-3">
         <Icon icon="lucide:workflow" className="w-5 h-5" />
         <div className="flex flex-col">

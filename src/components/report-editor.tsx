@@ -140,7 +140,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
   )
 
   return (
-    <Card className="flex-1">
+    <Card className="flex-1" shadow="none">
       <CardBody className="gap-4">
         <div className="flex justify-between">
           <div className="flex flex-col gap-1">

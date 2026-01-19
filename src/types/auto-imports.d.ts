@@ -51,6 +51,7 @@ declare global {
   const ReportNot: typeof import('../components/report-not').ReportNot
   const Route: typeof import('react-router-dom').Route
   const Routes: typeof import('react-router-dom').Routes
+  const ScheduleCountdown: typeof import('../components/schedule-countdown').ScheduleCountdown
   const SearchIcon: typeof import('../components/icons').SearchIcon
   const SettingAboutCard: typeof import('../ui/setting-about-card').SettingAboutCard
   const SettingOtherConfig: typeof import('../ui/setting-other-card').SettingOtherConfig

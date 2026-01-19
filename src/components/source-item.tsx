@@ -36,7 +36,7 @@ export function SourceItem(props: SourceItemProps) {
     queryClient.invalidateQueries({ queryKey: ['sources'] })
   }
   return (
-    <Card>
+    <Card shadow="none">
       <CardBody>
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
