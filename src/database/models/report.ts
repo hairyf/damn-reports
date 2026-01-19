@@ -87,12 +87,11 @@ export class Report extends Model<DB, 'report'> {
       // 查询匹配的报告
       let query = db
         .selectFrom('report')
-        .innerJoin('workspace', 'workspace.id', 'report.workspaceId') // 关联 workspace 表，条件是 id 匹配
         .selectAll()
         .where('type', '=', type)
 
       if (typeof workspace === 'number') {
-        query = query.where('workspace.id', '=', workspace)
+        query = query.where('workspaceId', '=', workspace)
       }
 
       query = query.where('createdAt', '>=', startTime.toDate() as any)

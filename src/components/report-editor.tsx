@@ -49,7 +49,10 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
   })
   const { data: report } = useQuery({
     queryKey: ['report', reportId],
-    queryFn: () => db.report.findUnique(reportId),
+    queryFn: async () => {
+      const report = await db.report.findUnique(reportId)
+      return report ?? null
+    },
     enabled: !!reportId,
   })
 

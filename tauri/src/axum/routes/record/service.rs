@@ -1,9 +1,10 @@
 use chrono::{DateTime, Utc, Local, Datelike};
 use sea_orm::{DatabaseConnection, EntityTrait, QueryFilter, ColumnTrait, QueryOrder};
 use std::sync::Arc;
+use serde_json::Value;
 
-use crate::axum::routes::record::dtos::RecordType;
-use crate::database::entities::{prelude, record};
+use crate::axum::routes::record::dtos::{RecordType, RecordWithSource};
+use crate::database::entities::{prelude, record, source};
 
 pub fn get_time_range(r#type: &RecordType) -> (DateTime<Utc>, DateTime<Utc>) {
   let now = Local::now();
@@ -52,13 +53,13 @@ pub async fn get_records(
   db: Arc<DatabaseConnection>,
   r#type: &RecordType,
   workspace_id: Option<String>,
-) -> Result<Vec<record::Model>, sea_orm::DbErr> {
+) -> Result<Vec<RecordWithSource>, sea_orm::DbErr> {
   // 计算时间范围
   let (start_time, end_time) = get_time_range(r#type);
   let start_iso = start_time.to_rfc3339();
   let end_iso = end_time.to_rfc3339();
 
-  // 查询记录
+  // 查询记录，并关联 source
   let mut query = prelude::Record::find()
     .filter(record::Column::CreatedAt.gte(start_iso.clone()))
     .filter(record::Column::CreatedAt.lte(end_iso.clone()));
@@ -74,8 +75,34 @@ pub async fn get_records(
 
   let records = query
     .order_by_desc(record::Column::CreatedAt)
+    .find_with_related(source::Entity)
     .all(&*db)
     .await?;
 
-  Ok(records)
+  // 将查询结果转换为 RecordWithSource
+  let result: Vec<RecordWithSource> = records
+    .into_iter()
+    .filter_map(|(record, sources)| {
+      // 获取关联的 source（应该只有一个）
+      sources.first().and_then(|source| {
+        // 解析 JSON 字符串为对象
+        let parsed_data: Value = serde_json::from_str(&record.data)
+          .unwrap_or_else(|_| Value::Null); // 如果解析失败，使用 Null
+        
+        Some(RecordWithSource {
+          id: record.id,
+          summary: record.summary,
+          data: parsed_data,
+          created_at: record.created_at,
+          updated_at: record.updated_at,
+          source_id: record.source_id,
+          workspace_id: record.workspace_id,
+          source_name: source.name.clone(),
+          source: source.r#type.clone(),
+        })
+      })
+    })
+    .collect();
+
+  Ok(result)
 }

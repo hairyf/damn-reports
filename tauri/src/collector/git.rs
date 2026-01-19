@@ -40,11 +40,11 @@ pub async fn daily(
     let branch_obj = repo.find_branch(&branch, BranchType::Local).map_err(|e| e.to_string())?;
     let target_oid = branch_obj.get().target().ok_or("Invalid branch target")?;
 
-    // 2. 时间计算 (北京时间今日 12:00 起)
+    // 2. 时间计算 (北京时间今日 00:00:00 起)
     let beijing_tz = FixedOffset::east_opt(8 * 3600).unwrap();
     let now = chrono::Utc::now().with_timezone(&beijing_tz);
     let start_ts = beijing_tz.from_local_datetime(
-        &now.date_naive().and_time(NaiveTime::from_hms_opt(12, 0, 0).unwrap())
+        &now.date_naive().and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
     ).single().unwrap().timestamp();
 
     // 3. 配置 Revwalk

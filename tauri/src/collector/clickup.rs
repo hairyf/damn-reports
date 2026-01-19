@@ -30,11 +30,11 @@ pub async fn daily(
     team: String,
     user: String,
 ) -> Result<CollectClickupResult, String> {
-    // 1. 简洁的时间计算 (UTC+8)
+    // 1. 简洁的时间计算 (北京时间今日 00:00:00 起)
     let offset = FixedOffset::east_opt(8 * 3600).unwrap();
     let today = Utc::now().with_timezone(&offset).date_naive();
     
-    let start_of_day = offset.from_local_datetime(&today.and_hms_opt(8, 0, 0).unwrap()).unwrap().timestamp_millis();
+    let start_of_day = offset.from_local_datetime(&today.and_hms_opt(0, 0, 0).unwrap()).unwrap().timestamp_millis();
     let end_of_day = offset.from_local_datetime(&today.and_hms_opt(23, 59, 59).unwrap()).unwrap().timestamp_millis();
 
     // 2. 使用 reqwest 内置的 Query 序列化

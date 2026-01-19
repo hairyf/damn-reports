@@ -112,7 +112,7 @@ function Page() {
                     size="sm"
                     variant="light"
                     color="danger"
-                    onPress={() => onDelete(record.id)}
+                    onPress={() => onDelete(Number(record.id))}
                   >
                     <Icon icon="lucide:trash" className="w-4 h-4" />
                   </Button>

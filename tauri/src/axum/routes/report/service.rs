@@ -19,11 +19,6 @@ pub async fn create_report(
     format!("报告 {}", Utc::now().format("%Y-%m-%d %H:%M:%S"))
   });
 
-  // 解析 workspace_id 字符串为 i32
-  let workspace_id = input.workspace_id
-    .parse::<i32>()
-    .map_err(|_| sea_orm::DbErr::Custom("Invalid workspace_id".to_string()))?;
-
   // 创建 ActiveModel 并插入报告
   // id 不需要设置，数据库自动生成
   let new_report = report::ActiveModel {
@@ -32,7 +27,7 @@ pub async fn create_report(
     content: Set(input.content.clone()),
     created_at: Set(now.clone()),
     updated_at: Set(now.clone()),
-    workspace_id: Set(workspace_id),
+    workspace_id: Set(input.workspace_id),
     ..Default::default()
   };
 

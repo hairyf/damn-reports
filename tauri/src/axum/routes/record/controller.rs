@@ -6,14 +6,13 @@ use axum::{
 use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 
-use crate::axum::routes::record::dtos::GetRecordsParams;
+use crate::axum::routes::record::dtos::{GetRecordsParams, RecordWithSource};
 use crate::axum::routes::record::service::get_records;
-use crate::database::entities::record;
 
 pub async fn get(
   State(db): State<Arc<DatabaseConnection>>,
   params: Query<GetRecordsParams>
-) -> (StatusCode, Json<Vec<record::Model>>) {
+) -> (StatusCode, Json<Vec<RecordWithSource>>) {
   match get_records(db, &params.r#type, params.workspace_id.clone()).await {
     Ok(records) => {
       (StatusCode::OK, Json(records))

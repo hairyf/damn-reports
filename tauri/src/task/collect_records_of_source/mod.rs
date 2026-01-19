@@ -11,10 +11,11 @@ use utils::insert_if_not_exists;
 
 pub async fn trigger(db: DatabaseConnection) -> Result<usize, Box<dyn std::error::Error>> {
   let sources = source::Entity::find()
-      .filter(source::Column::Enabled.eq(true))
+      .filter(source::Column::Enabled.eq("true"))
       .all(&db)
       .await?;
 
+  println!("Found {} enabled sources", sources.len());
   let now = chrono::Utc::now().to_rfc3339();
   let mut all_records = Vec::new();
 
@@ -22,12 +23,16 @@ pub async fn trigger(db: DatabaseConnection) -> Result<usize, Box<dyn std::error
       let records = match source.r#type.to_lowercase().as_str() {
           "git" => {
               let cfg: config::GitConfig = serde_json::from_str(&source.config)?;
+              println!("Collecting git records for source: {:?}", source.r#type);
+              println!("Config: {:?}", cfg);
               let res = collector::git::daily(cfg.repository, cfg.branch, cfg.author).await?;
               println!("Collected {} git records", res.data.len());
               map_to_active_models(res.data, &source, &now)
           }
           "clickup" => {
               let cfg: config::ClickupConfig = serde_json::from_str(&source.config)?;
+              println!("Collecting git records for source: {:?}", source.r#type);
+              println!("Config: {:?}", cfg);
               let res = collector::clickup::daily(cfg.token, cfg.team, cfg.user).await?;
               map_to_active_models(res.data, &source, &now)
           }

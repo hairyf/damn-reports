@@ -28,6 +28,6 @@ pub struct ReportCreateInput {
   #[serde(alias = "text")]
   pub content: String,
   #[serde(alias = "workspaceId")]
-  pub workspace_id: String,
+  pub workspace_id: i32,
 }
 
