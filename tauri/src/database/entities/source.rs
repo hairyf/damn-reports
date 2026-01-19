@@ -14,7 +14,8 @@ pub struct Model {
     pub r#type: String,
     #[sea_orm(column_type = "Text")]
     pub description: String,
-    pub enabled: bool,
+    #[sea_orm(column_type = "Text")]
+    pub enabled: String,  // Stored as JSON string in SQLite, e.g. "true" or "false"
     #[sea_orm(column_type = "custom(\"JSONB\")")]
     pub config: String,
     #[sea_orm(column_name = "createdAt", column_type = "custom(\"DATETIME\")")]
