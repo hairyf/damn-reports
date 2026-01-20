@@ -11,26 +11,12 @@ export interface ReportWorkflowOptions {
 
 export function getReportWorkflowData(options: ReportWorkflowOptions) {
   return {
-    name: options.name,
+    name: 'Default Report Workflow',
     nodes: [
       {
         parameters: {
-          path: 'adf86697801f',
-        },
-        type: 'n8n-nodes-base.webhook',
-        typeVersion: 2.1,
-        position: [
-          -304,
-          0,
-        ],
-        id: '41eb82b9-b4c4-4825-afe9-1e464ef37ec9',
-        name: 'Webhook',
-        webhookId: 'adf86697801f',
-      },
-      {
-        parameters: {
           promptType: 'define',
-          text: '=请根据以下数据生成日报：\n\n{{ JSON.stringify($json.data) }}\n\n格式要求：\n\n- xxx\n- xxx\n- xxx',
+          text: '=# Role\n你是一位高效的研发技术专家，擅长将复杂的原始日志（Git、ClickUp、Gmail）转化为精炼、专业的中文日报。\n\n# Task\n请根据提供的 JSON 数据生成日报。\n\n# Rules\n1. **内容提炼**：不要直接翻译 Summary，要理解其背后的行为（例如：将 "clean up package.json" 转化为 "优化项目依赖结构"）。\n2. **同类合并**：如果有多条记录都在处理类似的事情（如：都是在清理依赖或修改配置），请合并为一条，避免流水账。\n3. **格式要求**：严格使用纯文本列表格式：\n   1. 类别或项目名称\n      - 细项1\n      - 细项2\n4. **语言风格**：专业、简洁、客观，使用中文。\n\n# Input Data\n\n{{ JSON.stringify($json.data) }}',
           options: {},
         },
         type: '@n8n/n8n-nodes-langchain.agent',
@@ -77,7 +63,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
                 value: '={{ $json.output }}',
               },
               {
-                name: 'workflowId',
+                name: 'workspace_id',
                 value: options.workflowId,
               },
             ],
@@ -95,100 +81,13 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
       },
       {
         parameters: {
-          assignments: {
-            assignments: [
-              {
-                id: 'de1f12f7-7ab9-432f-a423-83593eaa304a',
-                name: 'summary',
-                value: '={{ $json.summary }}',
-                type: 'string',
-              },
-              {
-                id: '0eacc199-869a-4146-9b42-267474137525',
-                name: 'source',
-                value: '={{ $json.source }}',
-                type: 'string',
-              },
-              {
-                id: 'b2b3be97-ecf2-441e-8801-ca44608e1f49',
-                name: 'status',
-                value: '={{ $json.data?.status?.status || \'none\' }}',
-                type: 'string',
-              },
-              {
-                id: 'ce5f36b0-a555-4eed-8be7-c1fb3bbe05e8',
-                name: 'category',
-                value: '={{ $json.data?.list?.name || \'none\' }}',
-                type: 'string',
-              },
-              {
-                id: '24f1e3bc-4aec-4556-ac5b-58fed09761c0',
-                name: 'updatedAt',
-                value: '={{\n  $json?.updatedAt || Date($json?.data?.date_updated)\n}}',
-                type: 'string',
-              },
-              {
-                id: '7e9a2399-563c-4950-b537-7e8164ff5478',
-                name: 'files',
-                value: '={{ $json.data?.files?.map(file => file.path) || null }}',
-                type: 'array',
-              },
-            ],
-          },
-          options: {},
-        },
-        type: 'n8n-nodes-base.set',
-        typeVersion: 3.4,
-        position: [
-          96,
-          0,
-        ],
-        id: '975b1f6d-9f90-48ea-9f37-d13531690672',
-        name: 'Edit Fields',
-      },
-      {
-        parameters: {
-          aggregate: 'aggregateAllItemData',
-          options: {},
-        },
-        type: 'n8n-nodes-base.aggregate',
-        typeVersion: 1,
-        position: [
-          256,
-          0,
-        ],
-        id: '9d4dc1b5-3989-446e-ae91-b3088555228b',
-        name: 'Aggregate',
-      },
-      {
-        parameters: {
-          content: '### Default Automation Report Workflow\nThis workflow is used to generate a report of the daily automation.',
-          height: 80,
-          width: 528,
-          color: 7,
-        },
-        type: 'n8n-nodes-base.stickyNote',
-        position: [
-          -16,
-          -240,
-        ],
-        typeVersion: 1,
-        id: 'ebd9a725-176c-4d65-b74e-497b940505bf',
-        name: 'Sticky Note',
-      },
-      {
-        parameters: {
-          url: 'http://localhost:6789/record',
+          url: 'http://localhost:6789/record/summary',
           sendQuery: true,
           queryParameters: {
             parameters: [
               {
                 name: 'type',
-                value: 'weekly',
-              },
-              {
-                name: 'workflowId',
-                value: options.workflowId,
+                value: 'daily',
               },
             ],
           },
@@ -197,25 +96,30 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
         type: 'n8n-nodes-base.httpRequest',
         typeVersion: 4.3,
         position: [
-          -64,
+          256,
           0,
         ],
-        id: 'e93fc30f-06a5-47a6-b003-9c9b1a32c61e',
-        name: 'Get Records',
+        id: '23ad93af-29f1-4bbd-ad88-38ae8d4b24b5',
+        name: 'HTTP Request',
+      },
+      {
+        parameters: {
+          path: 'adf86697801f',
+          options: {},
+        },
+        type: 'n8n-nodes-base.webhook',
+        typeVersion: 2.1,
+        position: [
+          80,
+          0,
+        ],
+        id: '7b831986-1874-4ff6-ba43-c76fe7e3b3c1',
+        name: 'Webhook',
+        webhookId: 'adf86697801f',
       },
     ],
+    pinData: {},
     connections: {
-      'Webhook': {
-        main: [
-          [
-            {
-              node: 'Get Records',
-              type: 'main',
-              index: 0,
-            },
-          ],
-        ],
-      },
       'DeepSeek Chat Model': {
         ai_languageModel: [
           [
@@ -238,17 +142,6 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
           ],
         ],
       },
-      'Edit Fields': {
-        main: [
-          [
-            {
-              node: 'Aggregate',
-              type: 'main',
-              index: 0,
-            },
-          ],
-        ],
-      },
       'When chat message received': {
         main: [
           [
@@ -260,18 +153,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
           ],
         ],
       },
-      'When clicking ‘Execute workflow’': {
-        main: [
-          [
-            {
-              node: 'Get Records',
-              type: 'main',
-              index: 0,
-            },
-          ],
-        ],
-      },
-      'Aggregate': {
+      'HTTP Request': {
         main: [
           [
             {
@@ -282,11 +164,11 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
           ],
         ],
       },
-      'Get Records': {
+      'Webhook': {
         main: [
           [
             {
-              node: 'Edit Fields',
+              node: 'HTTP Request',
               type: 'main',
               index: 0,
             },
@@ -294,8 +176,6 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
         ],
       },
     },
-
-    pinData: {},
     active: false,
     settings: {
       executionOrder: 'v1',

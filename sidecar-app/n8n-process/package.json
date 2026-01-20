@@ -26,16 +26,23 @@
       "!**/node_modules/*/{CHANGELOG.md,README.md,README,readme.md,readme}",
       "!**/node_modules/*/{test,tests,tests.js,benchmark,demo,example}"
     ],
-    "win": { "target": "portable" },
-    "linux": { "target": "AppImage" },
-    "mac": { "target": "dmg" },
-    "directories": { "output": "dist" }
+    "win": {
+      "target": "portable"
+    },
+    "linux": {
+      "target": "AppImage"
+    },
+    "mac": {
+      "target": "dmg"
+    },
+    "directories": {
+      "output": "dist"
+    }
   },
   "dependencies": {
     "n8n": "^2.1.4"
   },
   "devDependencies": {
-    "electron": "^33.2.1",
-    "electron-builder": "^24"
+    "patch-package": "^8.0.1"
   }
 }

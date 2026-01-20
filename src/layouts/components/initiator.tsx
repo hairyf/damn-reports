@@ -14,6 +14,7 @@ export interface RetryOptions {
 
 export function Initiator() {
   const { status, n8nEmail, n8nPassword, credentialId, credentialName } = useStore(store.user)
+
   async function registerN8nAccount() {
     const result = await postN8nRegister({
       ...N8N_REGISTER_DATA,

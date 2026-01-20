@@ -17,7 +17,6 @@ export interface DefaultLayoutProps {
 
 export function DefaultLayout(props: DefaultLayoutProps) {
   const { initialized } = useStore(store.user)
-
   return (
     <AnimatePresence mode="wait">
       <motion.div
