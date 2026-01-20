@@ -67,7 +67,7 @@ export function SettingAboutCard() {
   }
 
   return (
-    <Card>
+    <Card shadow="none">
       <CardHeader className="flex gap-3">
         <Icon icon="lucide:info" className="w-5 h-5" />
         <div className="flex flex-col">
@@ -80,7 +80,7 @@ export function SettingAboutCard() {
         <div className="flex flex-col gap-2 text-sm">
           <div className="flex items-center gap-2">
             <Icon icon="lucide:package" className="w-4 h-4 text-default-500" />
-            <span className="text-default-600">应用名称：</span>
+            <span className="text-default-600">名称：</span>
             <span className="text-default-900">Damn Daily Reports</span>
           </div>
           <div className="flex items-center gap-2">
@@ -108,18 +108,30 @@ export function SettingAboutCard() {
         </div>
 
         {/* 检查更新按钮 */}
-        <Button
-          color="primary"
-          variant="flat"
-          radius="full"
-          onPress={checkForUpdate}
-          isLoading={checkingUpdate}
-          startContent={
-            !checkingUpdate && <Icon icon="lucide:search" className="w-4 h-4" />
-          }
-        >
-          {checkingUpdate ? '检查中...' : '立即检查'}
-        </Button>
+        <div className="flex gap-4">
+          <Button
+            color="primary"
+            variant="flat"
+            className="flex-1"
+            radius="full"
+            onPress={checkForUpdate}
+            isLoading={checkingUpdate}
+            startContent={
+              !checkingUpdate && <Icon icon="lucide:search" className="w-4 h-4" />
+            }
+          >
+            {checkingUpdate ? '检查中...' : '立即检查'}
+          </Button>
+          <Button
+            color="danger"
+            variant="flat"
+            radius="full"
+            startContent={<Icon icon="lucide:refresh-cw" className="w-4 h-4" />}
+
+          >
+            重置数据
+          </Button>
+        </div>
       </CardBody>
     </Card>
   )

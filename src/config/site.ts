@@ -1,31 +1,31 @@
 export type SiteConfig = typeof siteConfig
 
 export const siteConfig = {
-  name: 'Daily Reports',
+  name: 'Damn Reports',
   description: 'Make beautiful websites regardless of your design experience.',
   sideItems: [
     {
-      label: 'Overview',
+      label: '概览',
       href: '/',
     },
     {
-      label: 'Reports',
+      label: '报告',
       href: '/report',
     },
     {
-      label: 'Records',
+      label: '记录',
       href: '/record',
     },
     {
-      label: 'Soruce',
+      label: '数据源',
       href: '/source/',
     },
     {
-      label: 'Automation',
-      href: '/n8n',
+      label: '工作流',
+      href: '/workflow',
     },
     {
-      label: 'Settings',
+      label: '设置',
       href: '/settings',
     },
   ],

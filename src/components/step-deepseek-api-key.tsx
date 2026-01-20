@@ -1,8 +1,5 @@
 import { addToast, Button, Card, CardBody, Input } from '@heroui/react'
-import {
-  ArrowRight,
-  BrainCircuit,
-} from 'lucide-react'
+import { Icon } from '@iconify/react'
 
 export function StepDeepSeekApiKey() {
   const [apiKey, setApiKey] = useState('')
@@ -29,11 +26,11 @@ export function StepDeepSeekApiKey() {
   }
 
   return (
-    <Card className="w-full">
+    <Card className="w-full" shadow="none">
       <CardBody className="p-8">
         <div className="flex items-center space-x-4 mb-6">
           <div className="bg-indigo-50 dark:bg-indigo-500/20 p-3 rounded-xl">
-            <BrainCircuit className="text-indigo-600" size={24} />
+            <Icon icon="lucide:brain-circuit" className="text-indigo-600 w-6 h-6" />
           </div>
           <div>
             <h2 className="text-2xl font-bold">配置 DeepSeek API</h2>
@@ -71,7 +68,7 @@ export function StepDeepSeekApiKey() {
               disabled={!apiKey}
             >
               <span>确认配置</span>
-              <ArrowRight size={18} />
+              <Icon icon="lucide:arrow-right" className="w-4.5 h-4.5" />
             </Button>
           </div>
         </div>

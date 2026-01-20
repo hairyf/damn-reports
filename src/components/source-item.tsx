@@ -36,7 +36,7 @@ export function SourceItem(props: SourceItemProps) {
     queryClient.invalidateQueries({ queryKey: ['sources'] })
   }
   return (
-    <Card>
+    <Card shadow="none">
       <CardBody>
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
@@ -49,7 +49,9 @@ export function SourceItem(props: SourceItemProps) {
                 <div className="bg-success size-2 rounded-full" />
               )}
             </div>
-            <p className="text-small text-default-500 truncate max-w-[300px]">{item.description}</p>
+            <Ellipsis className="text-small text-default-500 max-w-[300px]">
+              {item.description}
+            </Ellipsis>
           </div>
           <div className="flex items-center gap-2">
             <Switch

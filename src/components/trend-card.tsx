@@ -10,7 +10,7 @@ interface TrendCardProps {
 
 export function TrendCard({ title, value }: TrendCardProps) {
   return (
-    <Card>
+    <Card shadow="none">
       <div className="flex p-4">
         <div className="flex flex-col gap-y-2">
           <dt className="text-small text-default-500 font-medium">{title}</dt>

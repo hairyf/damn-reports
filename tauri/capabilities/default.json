@@ -12,6 +12,7 @@
     "core:window:allow-maximize",
     "core:window:allow-set-focus",
     "core:window:allow-show",
+    "core:window:allow-unmaximize",
     "core:window:allow-unminimize",
     "core:window:allow-close",
     "core:window:allow-hide",

@@ -16,6 +16,7 @@ declare global {
   const DeleteReportModal: typeof import('../components/delete-report-modal').DeleteReportModal
   const Dialog: typeof import('../components/dialog').Dialog
   const DiscordIcon: typeof import('../components/icons').DiscordIcon
+  const Ellipsis: typeof import('../components/ellipsis').Ellipsis
   const Form: typeof import('../components/form').Form
   const FormControl: typeof import('../components/form').FormControl
   const FormDescription: typeof import('../components/form').FormDescription
@@ -37,6 +38,7 @@ declare global {
   const ManualLoginN8n: typeof import('../components/step-manual-login').ManualLoginN8n
   const Model: typeof import('../database/model').Model
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
+  const N8NIcon: typeof import('../components/icons').N8NIcon
   const N8N_API_URL: typeof import('../config/constants').N8N_API_URL
   const N8N_LOGIN_DATA: typeof import('../config/constants').N8N_LOGIN_DATA
   const N8N_REGISTER_DATA: typeof import('../config/constants').N8N_REGISTER_DATA
@@ -50,6 +52,7 @@ declare global {
   const ReportNot: typeof import('../components/report-not').ReportNot
   const Route: typeof import('react-router-dom').Route
   const Routes: typeof import('react-router-dom').Routes
+  const ScheduleCountdown: typeof import('../components/schedule-countdown').ScheduleCountdown
   const SearchIcon: typeof import('../components/icons').SearchIcon
   const SettingAboutCard: typeof import('../ui/setting-about-card').SettingAboutCard
   const SettingOtherConfig: typeof import('../ui/setting-other-card').SettingOtherConfig
@@ -206,6 +209,9 @@ declare global {
   // @ts-ignore
   export type { DialogProps } from '../components/dialog'
   import('../components/dialog')
+  // @ts-ignore
+  export type { EllipsisProps } from '../components/ellipsis'
+  import('../components/ellipsis')
   // @ts-ignore
   export type { IconSvgProps } from '../components/icons'
   import('../components/icons')

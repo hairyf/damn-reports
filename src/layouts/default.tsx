@@ -32,6 +32,7 @@ export function DefaultLayout(props: DefaultLayoutProps) {
             ? (
                 <div className={clsx('relative flex min-h-screen', props.classNames?.root)}>
                   <Sidebar />
+
                   <div className="flex flex-col flex-1">
                     <Navbar />
                     <Main className={props.classNames?.main}>

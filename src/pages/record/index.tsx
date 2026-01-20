@@ -58,7 +58,7 @@ function Page() {
 
   return (
     <>
-      <Card className="mb-4 flex-shrink-0">
+      <Card className="mb-4 flex-shrink-0" shadow="none">
         <CardBody className="gap-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <Input
@@ -79,7 +79,7 @@ function Page() {
         </CardBody>
       </Card>
 
-      <Table aria-label="Database items table">
+      <Table aria-label="Database items table" shadow="none">
         <TableHeader>
           <TableColumn minWidth={120}>来源</TableColumn>
           <TableColumn minWidth={120}>日期</TableColumn>
@@ -103,7 +103,9 @@ function Page() {
                 <TableCell>{dayjs(record.createdAt).format('YYYY-MM-DD')}</TableCell>
                 <TableCell>
                   <div className="w-full relative h-5">
-                    <div className="truncate absolute inset-0">{record.summary}</div>
+                    <div className="absolute inset-0">
+                      <Ellipsis>{record.summary}</Ellipsis>
+                    </div>
                   </div>
                 </TableCell>
                 <TableCell>

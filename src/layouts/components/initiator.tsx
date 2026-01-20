@@ -1,7 +1,7 @@
 import { useWhenever } from '@hairy/react-lib'
+import { Icon } from '@iconify/react'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
-import { Layout, PackageCheck, UserPlus, Zap } from 'lucide-react'
 import { useStore } from 'valtio-define'
 import { StartupState } from '@/store/modules/user'
 import { Main } from './main'
@@ -115,7 +115,7 @@ export function Initiator() {
       case StartupState.UNZIPPING:
         return (
           <StepStatus
-            icon={<PackageCheck className="text-blue-400" size={32} />}
+            icon={<Icon icon="lucide:package-check" className="text-blue-400 w-8 h-8" />}
             title="解压 n8n 服务"
             description="正在准备环境组件，这可能需要一点时间..."
             progress={33}
@@ -125,7 +125,7 @@ export function Initiator() {
       case StartupState.STARTING_SERVICE:
         return (
           <StepStatus
-            icon={<Zap className="text-yellow-400" size={32} />}
+            icon={<Icon icon="lucide:zap" className="text-yellow-400 w-8 h-8" />}
             title="正在启动 n8n 服务"
             description="正在拉起后台进程与依赖服务..."
             progress={66}
@@ -135,7 +135,7 @@ export function Initiator() {
       case StartupState.INITIALIZING_ACCOUNT:
         return (
           <StepStatus
-            icon={<UserPlus className="text-emerald-400" size={32} />}
+            icon={<Icon icon="lucide:user-plus" className="text-emerald-400 w-8 h-8" />}
             title="n8n 服务已启动"
             description="正在初始化系统管理账号..."
             progress={90}
@@ -153,7 +153,7 @@ export function Initiator() {
       case StartupState.TEMPLATE_INIT:
         return (
           <StepStatus
-            icon={<Layout className="text-purple-400" size={32} />}
+            icon={<Icon icon="lucide:layout" className="text-purple-400 w-8 h-8" />}
             title="账号初始化成功"
             description="工作区资源初始化，正在加载自动化任务模版..."
             progress={95}

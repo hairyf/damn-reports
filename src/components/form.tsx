@@ -87,7 +87,7 @@ function FormLabel({ ref, className, ...props }: React.ComponentPropsWithoutRef<
   return (
     <Label
       ref={ref}
-      className={cn(error && 'text-destructive', className)}
+      className={cn(error && 'text-destructive', 'block ml-1 mb-2', className)}
       htmlFor={formItemId}
       {...props}
     />

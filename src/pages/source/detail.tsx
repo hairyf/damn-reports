@@ -1,5 +1,5 @@
 import { If, useWatch, useWhenever } from '@hairy/react-lib'
-import { addToast, Button, Input, Textarea } from '@heroui/react'
+import { addToast, Button, Divider, Input, Textarea } from '@heroui/react'
 import { useForm } from 'react-hook-form'
 import { useStore } from 'valtio-define'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
@@ -105,7 +105,7 @@ function Page() {
           name="description"
           render={({ field }) => (
             <FormItem>
-              <FormLabel>Description(optional)</FormLabel>
+              <FormLabel>Description</FormLabel>
               <FormControl>
                 <Textarea
                   {...field}

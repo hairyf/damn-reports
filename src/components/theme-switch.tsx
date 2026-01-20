@@ -29,19 +29,13 @@ export const ThemeSwitch: FC<ThemeSwitchProps> = ({
     getWrapperProps,
   } = useSwitch({
     isSelected: theme === 'light',
-    onChange: () => {
-      const newTheme = theme === 'light' ? 'dark' : 'light'
-
+    onChange: (event) => {
+      const newTheme = event.target.checked ? 'light' : 'dark'
       // 使用 View Transition API 添加过渡效果
-      if (document.startViewTransition) {
-        document.startViewTransition(() => {
-          setTheme(newTheme)
-        })
-      }
-      else {
-        // 降级处理：如果浏览器不支持 View Transition API
+      if (document.startViewTransition)
+        document.startViewTransition(() => setTheme(newTheme))
+      else
         setTheme(newTheme)
-      }
     },
   })
 

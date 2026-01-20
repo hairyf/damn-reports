@@ -20,6 +20,7 @@ import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
+import removeMd from 'remove-markdown'
 
 function Page() {
   const navigate = useNavigate()
@@ -59,20 +60,15 @@ function Page() {
     refetch()
   }
 
-  function getTypeLabel(type: string) {
+  function findTypeLabel(type: string) {
     return typeOptions.find(opt => opt.value === type)?.label || type
-  }
-
-  function getContentPreview(content: string) {
-    const text = content.replace(/<[^>]*>/g, '').trim()
-    return text.length > 50 ? `${text.substring(0, 50)}...` : text
   }
 
   useWatch([search, type], () => pagination.pageChange(1))
 
   return (
     <>
-      <Card className="mb-4 flex-shrink-0">
+      <Card className="mb-4 flex-shrink-0" shadow="none">
         <CardBody className="gap-4">
           <div className="flex flex-col sm:flex-row gap-4">
             <Input
@@ -105,7 +101,7 @@ function Page() {
         </CardBody>
       </Card>
 
-      <Table aria-label="Reports table">
+      <Table aria-label="Reports table" shadow="none">
         <TableHeader>
           <TableColumn minWidth={120}>日期</TableColumn>
           <TableColumn minWidth={80}>类型</TableColumn>
@@ -121,10 +117,8 @@ function Page() {
             return (
               <TableRow key={item.id}>
                 <TableCell>{dayjs(item.createdAt).format('YYYY-MM-DD')}</TableCell>
-                <TableCell>{getTypeLabel(item.type)}</TableCell>
-                <TableCell>
-                  {getContentPreview(item.content)}
-                </TableCell>
+                <TableCell>{findTypeLabel(item.type)}</TableCell>
+                <TableCell>{removeMd(item.content)}</TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
                     <Button
