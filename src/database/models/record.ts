@@ -49,7 +49,13 @@ export class Record extends Model<DB, 'record'> {
     }
 
     if (date) {
-      query = query.where('record.createdAt', '>=', date)
+      // date 是当天的开始时间（ISO 字符串），需要转换为时间戳（秒）进行比较
+      // 即 createdAt >= date && createdAt < date + 1 day
+      const startDate = Math.floor(new Date(date).getTime() / 1000) // 转换为秒级时间戳
+      const endDate = Math.floor((new Date(date).getTime() + 24 * 60 * 60 * 1000) / 1000) // 转换为秒级时间戳
+      query = query
+        .where('record.createdAt', '>=', startDate)
+        .where('record.createdAt', '<', endDate)
     }
 
     query = query.orderBy('record.createdAt', 'desc')

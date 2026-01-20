@@ -1,5 +1,6 @@
 import { useDebounce, useOffsetPagination, useWatch } from '@hairy/react-lib'
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -13,7 +14,8 @@ import {
   TableRow,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useQuery } from '@tanstack/react-query'
+import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
+import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 
 import { createElement, useState } from 'react'
@@ -30,6 +32,7 @@ const mapping = {
 function Page() {
   const [search, setSearch] = useState('')
   const [sourceFilter, setSourceFilter] = useState<string>('')
+  const queryClient = useQueryClient()
   const pagination = useOffsetPagination({
     pageSize: 20,
   })
@@ -49,13 +52,37 @@ function Page() {
     },
   })
 
-  async function onDelete(id: string) {
-    const { numDeletedRows } = await db.record.delete(id)
-
-    if (numDeletedRows > 0) {
+  const syncMutation = useMutation({
+    mutationFn: async () => {
+      return await invoke<number>('collect_daily_records')
+    },
+    onSuccess: (count) => {
       queryClient.invalidateQueries({ queryKey: ['records'] })
-    }
-  }
+      addToast({
+        title: '同步成功',
+        description: `已同步 ${count} 条记录`,
+        color: 'success',
+      })
+    },
+    onError: (error) => {
+      addToast({
+        title: '同步失败',
+        description: error instanceof Error ? error.message : '未知错误',
+        color: 'danger',
+      })
+    },
+  })
+
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return await db.record.delete(id)
+    },
+    onSuccess: (result) => {
+      if (result.numDeletedRows > 0) {
+        queryClient.invalidateQueries({ queryKey: ['records'] })
+      }
+    },
+  })
 
   useWatch([search, sourceFilter], () => pagination.pageChange(1))
 
@@ -78,6 +105,16 @@ function Page() {
               placeholder="全部来源"
               className="w-full sm:w-40"
             />
+            <Button
+              color="primary"
+              variant="flat"
+              onPress={() => syncMutation.mutate()}
+              isLoading={syncMutation.isPending}
+              startContent={!syncMutation.isPending ? <Icon icon="lucide:refresh-cw" className="w-4 h-4" /> : undefined}
+              className="w-full sm:w-auto"
+            >
+              同步记录
+            </Button>
           </div>
         </CardBody>
       </Card>
@@ -103,7 +140,7 @@ function Page() {
                     <span>{record.sourceName}</span>
                   </div>
                 </TableCell>
-                <TableCell>{dayjs(record.createdAt).format('YYYY-MM-DD')}</TableCell>
+                <TableCell>{dayjs(record.createdAt * 1000).format('YYYY-MM-DD')}</TableCell>
                 <TableCell>
                   <div className="w-full relative h-5">
                     <div className="absolute inset-0">
@@ -117,7 +154,8 @@ function Page() {
                     size="sm"
                     variant="light"
                     color="danger"
-                    onPress={() => onDelete(record.id)}
+                    onPress={() => deleteMutation.mutate(record.id)}
+                    isLoading={deleteMutation.isPending}
                   >
                     <Icon icon="lucide:trash" className="w-4 h-4" />
                   </Button>

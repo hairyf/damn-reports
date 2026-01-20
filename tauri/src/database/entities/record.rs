@@ -12,10 +12,10 @@ pub struct Model {
     pub summary: String,
     #[sea_orm(column_type = "custom(\"JSONB\")")]
     pub data: String,
-    #[sea_orm(column_name = "createdAt", column_type = "custom(\"DATETIME\")")]
-    pub created_at: String,
-    #[sea_orm(column_name = "updatedAt", column_type = "custom(\"DATETIME\")")]
-    pub updated_at: String,
+    #[sea_orm(column_name = "createdAt", column_type = "Integer")]
+    pub created_at: i64,
+    #[sea_orm(column_name = "updatedAt", column_type = "Integer")]
+    pub updated_at: i64,
     #[sea_orm(column_name = "sourceId")]
     pub source_id: i32,
     #[sea_orm(column_name = "workspaceId")]

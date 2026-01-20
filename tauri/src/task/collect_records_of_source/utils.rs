@@ -16,7 +16,7 @@ pub fn map_to_active_models<T: traits::Collectible + Serialize>(
           data: Set(item.to_json()),
           source_id: Set(source.id),
           workspace_id: Set(source.workspace_id),
-          created_at: Set(date.clone()),
+          created_at: Set(date),
           updated_at: Set(date),
       }
   }).collect()

@@ -57,13 +57,13 @@ pub async fn get_records(
 ) -> Result<Vec<GroupedRecordsResponse>, sea_orm::DbErr> {
   // 计算时间范围
   let (start_time, end_time) = get_time_range(r#type);
-  let start_iso = start_time.to_rfc3339();
-  let end_iso = end_time.to_rfc3339();
+  let start_ts = start_time.timestamp();
+  let end_ts = end_time.timestamp();
 
   // 查询记录，并关联 source
   let mut query = prelude::Record::find()
-    .filter(record::Column::CreatedAt.gte(start_iso.clone()))
-    .filter(record::Column::CreatedAt.lte(end_iso.clone()));
+    .filter(record::Column::CreatedAt.gte(start_ts))
+    .filter(record::Column::CreatedAt.lte(end_ts));
 
   // 如果提供了 workspace_id，则过滤
   if let Some(ws_id_str) = workspace_id {

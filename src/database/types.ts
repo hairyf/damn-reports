@@ -9,8 +9,8 @@ export interface Record {
   id: string
   summary: string
   data: any
-  createdAt: Generated<string>
-  updatedAt: string
+  createdAt: Generated<number> // INTEGER 时间戳（秒）
+  updatedAt: number // INTEGER 时间戳（秒）
   sourceId: number
   workspaceId: number
 }
