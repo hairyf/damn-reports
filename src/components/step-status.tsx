@@ -24,7 +24,7 @@ export function StepStatus({ icon, title, description, progress, loading }: Step
         classNames={{
           base: 'max-w-md mb-4',
           track: 'drop-shadow-md',
-          indicator: 'bg-linear-to-r from-blue-500 to-blue-200',
+          indicator: 'bg-linear-to-r from-primary-500 to-primary-200',
           label: 'tracking-wider font-medium text-default-600',
           value: 'text-foreground/60',
         }}
