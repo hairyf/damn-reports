@@ -16,7 +16,6 @@ pub async fn trigger(db: DatabaseConnection) -> Result<usize, Box<dyn std::error
       .await?;
 
   println!("Found {} enabled sources", sources.len());
-  let now = chrono::Utc::now().to_rfc3339();
   let mut all_records = Vec::new();
 
   for source in sources {
@@ -27,14 +26,14 @@ pub async fn trigger(db: DatabaseConnection) -> Result<usize, Box<dyn std::error
               println!("Config: {:?}", cfg);
               let res = collector::git::daily(cfg.repository, cfg.branch, cfg.author).await?;
               println!("Collected {} git records", res.data.len());
-              map_to_active_models(res.data, &source, &now)
+              map_to_active_models(res.data, &source)
           }
           "clickup" => {
               let cfg: config::ClickupConfig = serde_json::from_str(&source.config)?;
               println!("Collecting git records for source: {:?}", source.r#type);
               println!("Config: {:?}", cfg);
               let res = collector::clickup::daily(cfg.token, cfg.team, cfg.user).await?;
-              map_to_active_models(res.data, &source, &now)
+              map_to_active_models(res.data, &source)
           }
           _ => continue,
       };

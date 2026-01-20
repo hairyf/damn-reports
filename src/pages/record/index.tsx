@@ -100,7 +100,7 @@ function Page() {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {createElement(mapping[record.source as keyof typeof mapping].icon, { size: 20 })}
-                    <span>{mapping[record.source as keyof typeof mapping].label}</span>
+                    <span>{record.sourceName}</span>
                   </div>
                 </TableCell>
                 <TableCell>{dayjs(record.createdAt).format('YYYY-MM-DD')}</TableCell>

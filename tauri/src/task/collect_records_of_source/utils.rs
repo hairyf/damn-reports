@@ -7,16 +7,18 @@ use super::traits;
 pub fn map_to_active_models<T: traits::Collectible + Serialize>(
   items: Vec<T>,
   source: &source::Model,
-  now: &str,
 ) -> Vec<record::ActiveModel> {
-  items.into_iter().map(|item| record::ActiveModel {
-      id: Set(item.get_id()),
-      summary: Set(item.get_summary()),
-      data: Set(item.to_json()),
-      source_id: Set(source.id),
-      workspace_id: Set(source.workspace_id),
-      created_at: Set(now.to_string()),
-      updated_at: Set(now.to_string()),
+  items.into_iter().map(|item| {
+      let date = item.get_date();
+      record::ActiveModel {
+          id: Set(item.get_id()),
+          summary: Set(item.get_summary()),
+          data: Set(item.to_json()),
+          source_id: Set(source.id),
+          workspace_id: Set(source.workspace_id),
+          created_at: Set(date.clone()),
+          updated_at: Set(date),
+      }
   }).collect()
 }
 
