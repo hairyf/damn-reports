@@ -49,9 +49,10 @@ export function SourceItem(props: SourceItemProps) {
                 <div className="bg-success size-2 rounded-full" />
               )}
             </div>
-            <Ellipsis className="text-small text-default-500 max-w-[300px]">
+            <Ellipsis lineClamp={2} className="text-sm text-default-500">
               {item.description}
             </Ellipsis>
+
           </div>
           <div className="flex items-center gap-2">
             <Switch

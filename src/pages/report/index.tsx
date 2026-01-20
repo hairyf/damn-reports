@@ -136,7 +136,7 @@ function Page() {
                       <Ellipsis
                         tooltip={(
                           <div
-                            className="max-w-[400px] max-h-[160px] overflow-y-auto"
+
                             dangerouslySetInnerHTML={{ __html: snarkdown(item.content) }}
                           />
 

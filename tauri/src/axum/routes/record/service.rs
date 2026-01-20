@@ -74,6 +74,23 @@ pub async fn get_records(
     }
   }
 
+  // 先查询 enabled = "true" 的 source IDs
+  let enabled_sources = source::Entity::find()
+    .filter(source::Column::Enabled.eq("true"))
+    .all(&*db)
+    .await?;
+
+  // 如果没有任何启用的 source，直接返回空结果
+  if enabled_sources.is_empty() {
+    return Ok(Vec::new());
+  }
+
+  // 提取 source IDs
+  let enabled_source_ids: Vec<i32> = enabled_sources.iter().map(|s| s.id).collect();
+
+  // 过滤只查询 enabled = "true" 的 source 关联的记录
+  query = query.filter(record::Column::SourceId.is_in(enabled_source_ids));
+
   let records = query
     .order_by_desc(record::Column::CreatedAt)
     .find_with_related(source::Entity)
@@ -85,6 +102,7 @@ pub async fn get_records(
 
   for (record, sources) in records {
     if let Some(source) = sources.first() {
+
       // 解析 JSON 字符串为对象
       let parsed_data: Value = serde_json::from_str(&record.data)
         .unwrap_or_else(|_| Value::Null);

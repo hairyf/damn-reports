@@ -22,7 +22,7 @@ export function ReportGenerator({ generating, onGeneratingChange }: ReportGenera
     }
 
     await invoke('generate_daily_report')
-    addToast({ title: '报告生成中...' })
+    addToast({ title: '报告生成中...', promise: new Promise(() => {}) })
     onGeneratingChange?.(true)
   }
 

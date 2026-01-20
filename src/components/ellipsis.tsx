@@ -42,7 +42,11 @@ export function Ellipsis({ className, ...props }: EllipsisProps) {
         ...props.classNames,
         content: ['py-3 px-4', ...(props.classNames?.content || [])],
       }}
-      content={props.tooltip || props.children}
+      content={(
+        <div className="max-w-[400px] max-h-[160px] overflow-y-auto">
+          {props.tooltip || props.children}
+        </div>
+      )}
       isOpen={open}
       onOpenChange={onOpenChange}
     >

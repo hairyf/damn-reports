@@ -1,4 +1,5 @@
 import { Else, If, Then } from '@hairy/react-lib'
+import { closeAll } from '@heroui/react'
 import { useQuery } from '@tanstack/react-query'
 import { useLocalStorage } from 'react-use'
 
@@ -20,7 +21,10 @@ function Page() {
     queryKey: ['reports', 'daily'],
     queryFn: async () => {
       const result = await db.report.findFirstByType({ type: 'daily' })
-      result && setGenerating(false)
+      if (result) {
+        setGenerating(false)
+        closeAll()
+      }
       return result ?? null
     },
     refetchInterval: 5000,
