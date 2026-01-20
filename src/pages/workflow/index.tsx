@@ -6,7 +6,7 @@ function Page() {
   const params = new URLSearchParams([
     ['email', n8nEmail || N8N_LOGIN_DATA.emailOrLdapLoginId],
     ['password', n8nPassword || N8N_LOGIN_DATA.password],
-    // ['hideUI', 'true'], // 通过 URL 参数告诉 n8n 隐藏 UI 元素
+    ['hideUI', 'true'], // 通过 URL 参数告诉 n8n 隐藏 UI 元素
   ])
   const n8nUrl = `http://localhost:5678/workflow/${workflowId}?${params.toString()}`
 

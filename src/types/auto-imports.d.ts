@@ -103,8 +103,8 @@ declare global {
   const getN8nWebhook: typeof import('../apis/index').getN8nWebhook
   const getReportById: typeof import('../utils/mock-db').getReportById
   const getReportWorkflowData: typeof import('../config/workflow').getReportWorkflowData
-  const getSetting: typeof import('../utils/settings-store').getSetting
-  const getSettings: typeof import('../utils/settings-store').getSettings
+  const getSetting: typeof import('../utils/setting-store').getSetting
+  const getSettings: typeof import('../utils/setting-store').getSettings
   const getSources: typeof import('../utils/mock-db').getSources
   const get_report_workflow_params: typeof import('../config/workflow').get_report_workflow_params
   const iconMap: typeof import('../components/source-icon').iconMap
@@ -136,10 +136,10 @@ declare global {
   const registerN8n: typeof import('../apis/index').registerN8n
   const registerN8nUser: typeof import('../apis/index').registerN8nUser
   const retry: typeof import('../utils/utility').retry
-  const saveSettings: typeof import('../utils/settings-store').saveSettings
+  const saveSettings: typeof import('../utils/setting-store').saveSettings
   const searchDatabaseItems: typeof import('../utils/mock-db').searchDatabaseItems
   const searchReports: typeof import('../utils/mock-db').searchReports
-  const setSetting: typeof import('../utils/settings-store').setSetting
+  const setSetting: typeof import('../utils/setting-store').setSetting
   const settingsStore: typeof import('../config/store').settingsStore
   const siteConfig: typeof import('../config/site').siteConfig
   const sourceOptions: typeof import('../config/options').sourceOptions

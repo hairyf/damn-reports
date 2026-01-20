@@ -11,7 +11,7 @@ const iconMap: Record<string, string> = {
   '/record': 'lucide:database',
   '/source': 'lucide:file-text',
   '/workflow': 'lucide:workflow',
-  '/settings': 'lucide:settings',
+  '/setting': 'lucide:settings',
 }
 
 const MIN_WIDTH = 80

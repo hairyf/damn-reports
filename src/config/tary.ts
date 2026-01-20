@@ -39,7 +39,7 @@ async function setup() {
           await current.show()
           await current.setFocus()
 
-          window.navigate('/settings')
+          window.navigate('/setting')
         },
       }),
 

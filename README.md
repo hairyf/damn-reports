@@ -1,114 +1,171 @@
-# Starter Tauri (Vite + React + HeroUI)
+# 📊 Damn Reports
 
-This is a starter template for building modern desktop applications with Tauri, Vite, React, and HeroUI (v2). It provides a pre-configured UI stack, fast dev experience, and the ability to ship native installers across platforms.
+A modern desktop application that automatically collects daily activities from multiple sources (ClickUp, Git, etc.) and generates beautiful daily reports powered by AI.
 
-[Try the base UI on CodeSandbox](https://githubbox.com/heroui-inc/vite-template)
+![Home](static/home.png)
 
-## Technologies Used
+![Workflow](static/workflow.png)
 
-- [Vite](https://vitejs.dev/guide/)
-- [HeroUI](https://heroui.com)
-- [Tailwind CSS](https://tailwindcss.com)
-- [Tailwind Variants](https://tailwind-variants.org)
-- [TypeScript](https://www.typescriptlang.org)
-- [Framer Motion](https://www.framer.com/motion)
-- [Tauri](https://tauri.app/)
+## Features
 
-## Prerequisites
+- 🤖 **AI-Powered Report Generation** - Automatically generates professional daily reports using DeepSeek AI via n8n workflows
+- 📥 **Multiple Data Sources** - Collects activities from ClickUp tasks, Git commits, and more
+- ⏰ **Scheduled Collection** - Automatically collects data on a schedule without manual intervention
+- 🎨 **Modern UI** - Built with HeroUI v2, Tailwind CSS, and Framer Motion for a delightful experience
+- 💾 **Local Database** - All data stored locally using SQLite with Prisma ORM
+- 🔄 **Workflow Integration** - Seamless integration with n8n for customizable report generation workflows
+- 🪟 **System Tray** - Runs in the background with system tray support
+- ⚡ **Fast & Lightweight** - Built with Tauri for native performance and small bundle size
 
-- Node.js 18+ and a package manager (`npm`, `yarn`, `pnpm`, or `bun`)
-- Rust toolchain (stable) installed via [rustup](https://rustup.rs)
-- Platform-specific Tauri prerequisites: see [Tauri prerequisites](https://tauri.app/start/prerequisites/)
-  - Windows: Visual Studio Build Tools with Desktop development with C++, WebView2
-  - macOS: Xcode Command Line Tools
-  - Linux: Required system libraries (link above)
+## Usage
 
-## How to Use (Web + Tauri)
+### Getting Started
 
-To clone the project, run the following command:
+1. **Configure Data Sources**
+   - Add ClickUp source with your API token, team ID, and user ID
+   - Add Git source with repository URL, branch, and author name
+   - Enable/disable sources as needed
+
+2. **Setup n8n Workflow**
+   - Configure n8n integration (automatically started with the app)
+   - Set up DeepSeek API key for AI-powered report generation
+   - Customize the report generation workflow as needed
+
+3. **Generate Reports**
+   - Click "Generate" to manually trigger report generation
+   - Or wait for scheduled automatic collection and generation
+
+4. **View & Edit Reports**
+   - Browse generated reports in the Reports page
+   - Edit report content using the built-in rich text editor
+   - View collection statistics and trends
+
+### Configuration
+
+No environment variables required. All configurations are stored in the local database and app settings.
+
+## Development
+
+### Prerequisites
+
+- **Node.js** 20.19+ and a package manager (`pnpm` recommended)
+- **Rust** toolchain (stable) installed via [rustup](https://rustup.rs)
+- **Tauri prerequisites**:
+  - **Windows**: Visual Studio Build Tools with Desktop development with C++, WebView2
+  - **macOS**: Xcode Command Line Tools
+  - **Linux**: Required system libraries (see [Tauri prerequisites](https://tauri.app/start/prerequisites/))
+
+### Quick Start
+
+#### Install dependencies
 
 ```bash
-git clone https://github.com/heroui-inc/vite-template.git
+pnpm install
 ```
 
-### Install dependencies
-
-You can use one of them `npm`, `yarn`, `pnpm`, `bun`, Example using `npm`:
+#### Run in development
 
 ```bash
-npm install
+# Start the web development server
+pnpm dev
+
+# Or run the Tauri desktop app
+pnpm tauri dev
 ```
 
-### Run the web development server
+#### Build for production
 
 ```bash
-npm run dev
+pnpm tauri build
 ```
 
-### Run the Tauri desktop app (development)
+This will generate platform-specific installers (`.msi` for Windows, `.dmg` for macOS, `.AppImage` for Linux).
 
-This will start the Vite dev server and launch the Tauri shell:
+### pnpm Configuration
 
-```bash
-npm run tauri dev
-```
+If you're using `pnpm`, add this to your `.npmrc` file:
 
-### Build the Tauri desktop app (production)
-
-Generates platform-specific bundles (e.g., `.msi`, `.dmg`, `.AppImage`, etc.):
-
-```bash
-npm run tauri build
-```
-
-### Setup pnpm (optional)
-
-If you are using `pnpm`, you need to add the following code to your `.npmrc` file:
-
-```bash
+```ini
 public-hoist-pattern[]=*@heroui/*
 ```
 
-After modifying the `.npmrc` file, you need to run `pnpm install` again to ensure that the dependencies are installed correctly.
+Then run `pnpm install` again.
 
-## Available Scripts
+### Available Scripts
 
-- `dev`: run Vite dev server for the web app
-- `build`: build the web assets
-- `preview`: preview the built web app
-- `tauri dev`: run the Tauri desktop app in development
-- `tauri build`: build the Tauri production bundles
+- `pnpm dev` - Start Vite dev server
+- `pnpm build` - Build web assets
+- `pnpm preview` - Preview built web app
+- `pnpm tauri dev` - Run Tauri app in development
+- `pnpm tauri build` - Build Tauri production bundles
+- `pnpm lint` - Run ESLint
+- `pnpm prisma:generate` - Generate Prisma client
+- `pnpm prisma:migrate` - Run database migrations
 
-Note: Exact script names may vary depending on your package manager configuration.
+### Project Structure
 
-## Project Structure
-
-Common relevant files and directories:
-
-- `src/`: React application source code
-  - `components/`: UI components (e.g., `Navbar.tsx`, `primitives.ts`, `icons.tsx`)
-  - `store/`: state management setup (e.g., `store/index.ts`)
-  - `provider.tsx`: app-level providers
-  - `main.tsx`, `App.tsx`: app bootstrap and root component
-- `vite.config.ts`: Vite configuration
-- `tauri/`: Tauri Rust side configuration and sources (appears after initializing Tauri)
-
-If `tauri/` is not present, initialize Tauri with:
-
-```bash
-npm create tauri-app@latest
+```
+.
+├── src/                    # React frontend source
+│   ├── components/         # UI components
+│   ├── pages/              # Application pages
+│   ├── services/           # API service functions
+│   ├── store/              # State management
+│   ├── database/           # Database models (generated from Prisma)
+│   └── config/             # Configuration files
+├── tauri/                  # Tauri Rust backend
+│   ├── src/
+│   │   ├── collector/      # Data collection logic (ClickUp, Git)
+│   │   ├── n8n/            # n8n integration
+│   │   ├── schedule/       # Scheduled task management
+│   │   ├── task/           # Background tasks
+│   │   ├── axum/           # Internal API server
+│   │   └── database/       # Database connection and entities
+│   └── prisma/             # Database schema and migrations
+└── sidecar-app/            # n8n process sidecar
 ```
 
-Then choose “use existing frontend” and point it to this Vite app.
+### Technologies
 
-## Troubleshooting
+- **Frontend**: React 19, TypeScript, Vite
+- **UI**: HeroUI v2, Tailwind CSS, Framer Motion
+- **Backend**: Rust, Tauri
+- **Database**: SQLite with Prisma ORM
+- **Workflow**: n8n (embedded)
+- **AI**: DeepSeek API
+- **State**: Valtio, TanStack Query
+- **Forms**: React Hook Form, Zod
 
-- If Tauri build fails on Windows, ensure:
-  - WebView2 Runtime is installed
-  - Visual Studio Build Tools with C++ workload are installed
-- If Tailwind classes don’t apply, ensure the Tailwind config `content` includes your `src/**` files and HeroUI’s paths if required.
-- For dependency hoisting issues with `pnpm`, verify `.npmrc` contains the `public-hoist-pattern` above.
+### Troubleshooting
+
+#### Tauri Build Issues
+
+**Windows**:
+
+- Ensure WebView2 Runtime is installed
+- Install Visual Studio Build Tools with C++ workload
+
+**macOS**:
+
+- Ensure Xcode Command Line Tools are installed: `xcode-select --install`
+
+**Linux**:
+
+- See [Tauri prerequisites](https://tauri.app/start/prerequisites/) for required system libraries
+
+#### Database Issues
+
+If you encounter database errors:
+
+- Run `pnpm prisma:migrate` to apply migrations
+- Run `pnpm prisma:generate` to regenerate the Prisma client
+
+#### n8n Not Starting
+
+- Check that port 5678 is not already in use
+- Ensure the n8n process has proper permissions
+- Check console logs for error messages
 
 ## License
 
-Licensed under the [MIT license](https://github.com/heroui-inc/vite-template/blob/main/LICENSE).
+MIT License © 2024

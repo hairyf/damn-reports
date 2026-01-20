@@ -26,7 +26,7 @@ export const siteConfig = {
     },
     {
       label: '设置',
-      href: '/settings',
+      href: '/setting',
     },
   ],
   links: {
