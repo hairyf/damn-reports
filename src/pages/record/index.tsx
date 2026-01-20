@@ -49,9 +49,12 @@ function Page() {
     },
   })
 
-  async function onDelete(id: number) {
-    await db.record.delete(id)
-    queryClient.invalidateQueries({ queryKey: ['records'] })
+  async function onDelete(id: string) {
+    const { numDeletedRows } = await db.record.delete(id)
+
+    if (numDeletedRows > 0) {
+      queryClient.invalidateQueries({ queryKey: ['records'] })
+    }
   }
 
   useWatch([search, sourceFilter], () => pagination.pageChange(1))
@@ -114,7 +117,7 @@ function Page() {
                     size="sm"
                     variant="light"
                     color="danger"
-                    onPress={() => onDelete(Number(record.id))}
+                    onPress={() => onDelete(record.id)}
                   >
                     <Icon icon="lucide:trash" className="w-4 h-4" />
                   </Button>
