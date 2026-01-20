@@ -14,6 +14,7 @@
 - **多数据源支持**：支持从 [ClickUp](https://clickup.com/)、[Git](https://git-scm.com/) 等多个平台同步工作内容。
 - **定时自动生成**：不需要人工干预，系统自动生成收集数据，生成报告。
 - **现代化的 UI**：基于 [HeroUI](https://hero-ui.com/) v2、[Tailwind CSS](https://tailwindcss.com/) 和 [Framer Motion](https://www.framer.com/motion/) 构建。
+- **本地数据库**：使用 SQLite 数据库配合 Prisma ORM，确保你的日报隐私不出本地。
 - **灵活的工作流**：集成 [N8N Workflow](https://n8n.io/workflows)，支持自定义的报告生成逻辑。
 
 ## 预览
