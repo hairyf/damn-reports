@@ -26,7 +26,16 @@ export async function postN8nLogin(body: Types.PostN8nLoginBody) {
   return response.json() as Promise<Types.PostN8nLoginResult>
 }
 
-export async function postN8nRegister(body: PostN8nRegisterBody) {
+export async function patchN8nMe(body: Types.PatchN8nMeBody) {
+  const response = await fetch(`${N8N_API_URL}/rest/me`, {
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    method: 'PATCH',
+  })
+  return response.json() as Promise<Types.PatchN8nMeResult>
+}
+
+export async function postN8nRegister(body: Types.PostN8nRegisterBody) {
   const response = await fetch(`${N8N_API_URL}/rest/owner/setup`, {
     headers: { 'Content-Type': 'application/json' },
     body: JSON.stringify(body),

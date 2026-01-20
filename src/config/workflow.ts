@@ -100,7 +100,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
           0,
         ],
         id: '23ad93af-29f1-4bbd-ad88-38ae8d4b24b5',
-        name: 'HTTP Request',
+        name: 'Get Records',
       },
       {
         parameters: {

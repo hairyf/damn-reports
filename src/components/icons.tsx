@@ -6,19 +6,12 @@ export type IconSvgProps = SVGProps<SVGSVGElement> & {
 
 export function Logo({ size = 36, width, height, ...props }: IconSvgProps) {
   return (
-    <svg
-      fill="none"
-      height={size || height}
-      viewBox="0 0 32 32"
-      width={size || width}
-      {...props}
-    >
-      <path
-        clipRule="evenodd"
-        d="M17.6482 10.1305L15.8785 7.02583L7.02979 22.5499H10.5278L17.6482 10.1305ZM19.8798 14.0457L18.11 17.1983L19.394 19.4511H16.8453L15.1056 22.5499H24.7272L19.8798 14.0457Z"
-        fill="currentColor"
-        fillRule="evenodd"
-      />
+    <svg height={size || height} width={size || width} xmlns="http://www.w3.org/2000/svg" xmlnsXlink="http://www.w3.org/1999/xlink" aria-hidden="true" role="img" className="iconify iconify--lucide w-8 h-8" viewBox="0 0 24 24" {...props}>
+      <g fill="none" stroke="#1f2842" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2">
+        <rect width="24" height="24" fill="" stroke="none" />
+        <path d="M6 22a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h8a2.4 2.4 0 0 1 1.704.706l3.588 3.588A2.4 2.4 0 0 1 20 8v12a2 2 0 0 1-2 2z" fill="#fff" />
+        <path d="M14 2v5a1 1 0 0 0 1 1h5M8 18v-2m4 2v-4m4 4v-6" />
+      </g>
     </svg>
   )
 }

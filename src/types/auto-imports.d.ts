@@ -121,6 +121,7 @@ declare global {
   const memo: typeof import('react').memo
   const mitt: typeof import('../config/mitt').mitt
   const params: typeof import('../services/post-n8n-workflow.params.mock').params
+  const patchN8nMe: typeof import('../apis/index').patchN8nMe
   const postN8nApiKey: typeof import('../services/post-n8n-api-key').postN8nApiKey
   const postN8nCredentials: typeof import('../apis/index').postN8nCredentials
   const postN8nLogin: typeof import('../apis/index').postN8nLogin
@@ -243,6 +244,6 @@ declare global {
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
   // @ts-ignore
-  export type { PostN8nCredentialsBody, PostN8nCredentialsResult, PostN8nLoginBody, PostN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nWorkflowWorkflowIdActivateBody, PostN8nRegisterResult, PostN8nWorkflowResult } from '../apis/index.types'
+  export type { PostN8nCredentialsBody, PostN8nCredentialsResult, PatchN8nMeBody, PatchN8nMeResult, PostN8nLoginBody, PostN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nWorkflowWorkflowIdActivateBody, PostN8nRegisterResult, PostN8nWorkflowResult } from '../apis/index.types'
   import('../apis/index.types')
 }

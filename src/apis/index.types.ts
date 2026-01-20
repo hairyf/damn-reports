@@ -25,6 +25,18 @@ export interface PostN8nCredentialsResult {
   message?: string
 }
 
+export interface PatchN8nMeBody {
+  firstName: string
+  lastName: string
+  email: string
+}
+
+export interface PatchN8nMeResult {
+  code?: number
+  data: any
+  message?: string
+}
+
 export interface PostN8nLoginBody {
   emailOrLdapLoginId: string
   password: string

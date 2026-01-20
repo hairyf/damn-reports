@@ -65,7 +65,7 @@ export function Sidebar() {
 
       <div className="pt-1 pb-4 h-full overflow-hidden px-4">
         <div className={`flex items-center gap-2 py-4 mb-1 select-none ${isCompact ? 'justify-center px-0' : 'px-2'}`}>
-          <Icon icon="lucide:file-bar-chart" className="w-8 h-8" />
+          <Logo className="w-8 h-8" />
           {!isCompact && (
             <h2 className="text-lg font-semibold flex-shrink-0">{siteConfig.name}</h2>
           )}
