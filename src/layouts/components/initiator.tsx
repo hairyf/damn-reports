@@ -137,7 +137,7 @@ export function Initiator() {
           <StepStatus
             icon={<Icon icon="lucide:user-plus" className="text-emerald-400 w-8 h-8" />}
             title="n8n 服务已启动"
-            description="正在初始化系统管理账号..."
+            description="正在加载系统账号..."
             progress={90}
             loading
           />

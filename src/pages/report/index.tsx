@@ -1,5 +1,7 @@
+/* eslint-disable react-dom/no-dangerously-set-innerhtml */
 import { useDebounce, useOffsetPagination, useWatch } from '@hairy/react-lib'
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -21,6 +23,7 @@ import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import removeMd from 'remove-markdown'
+import snarkdown from 'snarkdown'
 
 function Page() {
   const navigate = useNavigate()
@@ -60,9 +63,18 @@ function Page() {
     refetch()
   }
 
-  function findTypeLabel(type: string) {
-    return typeOptions.find(opt => opt.value === type)?.label || type
+  async function onCopy(content: string) {
+    await navigator.clipboard.writeText(content)
+    addToast({
+      title: '复制成功',
+      description: 'Markdown 内容已复制到剪贴板',
+      color: 'success',
+    })
   }
+
+  // function findTypeLabel(type: string) {
+  //   return typeOptions.find(opt => opt.value === type)?.label || type
+  // }
 
   useWatch([search, type], () => pagination.pageChange(1))
 
@@ -104,7 +116,7 @@ function Page() {
       <Table aria-label="Reports table" shadow="none">
         <TableHeader>
           <TableColumn minWidth={120}>日期</TableColumn>
-          <TableColumn minWidth={80}>类型</TableColumn>
+          {/* <TableColumn minWidth={80}>类型</TableColumn> */}
           <TableColumn minWidth={300}>内容</TableColumn>
           <TableColumn minWidth={120}>操作</TableColumn>
         </TableHeader>
@@ -117,10 +129,34 @@ function Page() {
             return (
               <TableRow key={item.id}>
                 <TableCell>{dayjs(item.createdAt).format('YYYY-MM-DD')}</TableCell>
-                <TableCell>{findTypeLabel(item.type)}</TableCell>
-                <TableCell>{removeMd(item.content)}</TableCell>
+                {/* <TableCell>{findTypeLabel(item.type)}</TableCell> */}
+                <TableCell>
+                  <div className="w-full relative h-5">
+                    <div className="absolute inset-0">
+                      <Ellipsis
+                        tooltip={(
+                          <div
+                            className="max-w-[400px] max-h-[160px] overflow-y-auto"
+                            dangerouslySetInnerHTML={{ __html: snarkdown(item.content) }}
+                          />
+
+                        )}
+                      >
+                        {removeMd(item.content)}
+                      </Ellipsis>
+                    </div>
+                  </div>
+                </TableCell>
                 <TableCell>
                   <div className="flex items-center gap-2">
+                    <Button
+                      isIconOnly
+                      size="sm"
+                      variant="light"
+                      onPress={() => onCopy(item.content)}
+                    >
+                      <Icon icon="lucide:copy" className="w-4 h-4" />
+                    </Button>
                     <Button
                       isIconOnly
                       size="sm"

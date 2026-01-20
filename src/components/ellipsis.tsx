@@ -36,6 +36,7 @@ export function Ellipsis({ className, ...props }: EllipsisProps) {
   return (
     <Tooltip
       showArrow
+      color="foreground"
       {...props}
       classNames={{
         ...props.classNames,
