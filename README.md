@@ -1,4 +1,4 @@
-## 该死的报告 (Damn Reports)
+## Damn Reports
 
 <img src="static/hero.png" alt="Damn Reports" />
 
