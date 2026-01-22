@@ -126,6 +126,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
       title: '复制成功',
       description: 'Markdown 内容已复制到剪贴板',
       color: 'success',
+      timeout: 500,
     })
   }
 
@@ -144,7 +145,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
 
   return (
     <>
-      <div className="flex justify-between px-4 mb-3">
+      <div className="flex justify-between items-center px-4 mb-3">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
             <h3 className="text-lg font-semibold">
@@ -175,7 +176,15 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
             </div>
           </div>
         </div>
-
+        <Button
+          onPress={onCopy}
+          variant="flat"
+          radius="full"
+          isDisabled={!text}
+          startContent={<Icon icon="lucide:copy" className="w-4 h-4" />}
+        >
+          复制
+        </Button>
       </div>
       <Card className="flex-1" shadow="none">
         <CardBody className="gap-4 absolute inset-0">
@@ -187,6 +196,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
               <Button
                 color="danger"
                 variant="light"
+                radius="full"
                 onPress={() => deleteMutation.mutate()}
                 isDisabled={deleteMutation.isPending}
                 startContent={<Icon icon="lucide:trash" className="w-4 h-4" />}
@@ -199,22 +209,17 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
                 <Button
                   variant="light"
                   onPress={onCancel}
+                  radius="full"
                 >
-                  取消
+                  返回
                 </Button>
               </If>
-              <Button
-                onPress={onCopy}
-                variant="flat"
-                isDisabled={!text}
-                startContent={<Icon icon="lucide:copy" className="w-4 h-4" />}
-              >
-                复制
-              </Button>
+
               <Button
                 color="primary"
                 onPress={() => saveMutation.mutate()}
                 isDisabled={!isUnsaved || saveMutation.isPending}
+                radius="full"
                 startContent={<Icon icon="lucide:save" className="w-4 h-4" />}
               >
                 保存
