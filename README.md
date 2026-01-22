@@ -1,8 +1,8 @@
-## 该死的报告 (Damn Reports)
+## Damn Reports
 
 <img src="static/hero.png" alt="Damn Reports" />
 
-> 很难想象在 2026 年，竟然还有公司执着于让员工每天花半小时去回应当天的“灵魂拷问”——What did you do? 与其把生命浪费在措辞委婉、注水严重的报告上，不如把这种“体力活”交给 AI。这个项目的初衷就是为了帮那些深陷报告泥潭的打工人一键脱身：毕竟，有写报告的功夫，代码都写完好几行了。
+> 如果写报告的时间能换成代码，我可能已经把整个宇宙重构了。
 
 <h3>
 一款基于 <a href="https://github.com/tauri-apps/tauri">Tauri</a> 开发的 AI 驱动日报生成器。
