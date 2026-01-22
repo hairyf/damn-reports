@@ -6,7 +6,7 @@ use std::sync::{
 
 use sea_orm::DatabaseConnection;
 use std::time::Duration;
-use tauri::{AppHandle, Manager, State};
+use tauri::{AppHandle, Manager, State, async_runtime::spawn};
 mod utils;
 
 use crate::task;
@@ -58,23 +58,17 @@ async fn scheduler_loop(app_handle: AppHandle, db: DatabaseConnection, running: 
     println!("Scheduler started for collect records time: {}", collect_time);
     println!("Scheduler started for generate report time: {}", generate_time);
 
-    let collect_time_clone = collect_time.clone();
     scheduler.every(1.day()).at(&collect_time.as_str()).run(move || {
-        println!("Collecting records of source at: {}", collect_time_clone);
+        let collect_time_clone = collect_time.clone();
         let db_clone = db.clone();
-        tauri::async_runtime::spawn(async move {
-            task::collect_records_of_source::trigger(db_clone).await.unwrap();
-        });
+        println!("Collecting records of source at: {}", collect_time_clone);
+        spawn(async move { task::collect_records_of_source::trigger(db_clone).await.unwrap(); });
     });
 
-    let generate_time_clone = generate_time.clone();
     scheduler.every(1.day()).at(&generate_time.as_str()).run(move || {
+        let generate_time_clone = generate_time.clone();
         println!("Generating report at: {}", generate_time_clone);
-        tauri::async_runtime::spawn(async move {
-            if let Err(e) = task::call_n8n_workflow_webhook::trigger().await {
-                eprintln!("Failed to trigger n8n workflow webhook: {}", e);
-            }
-        });
+        spawn(async move { task::call_n8n_workflow_webhook::trigger().await.unwrap(); });
     });
 
     while running.load(Ordering::SeqCst) {
