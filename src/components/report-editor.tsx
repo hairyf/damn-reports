@@ -144,7 +144,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
   )
 
   return (
-    <>
+    <div className="flex-1 flex flex-col">
       <div className="flex justify-between items-center px-4 mb-3">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
@@ -228,6 +228,6 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
           </div>
         </CardBody>
       </Card>
-    </>
+    </div>
   )
 }
