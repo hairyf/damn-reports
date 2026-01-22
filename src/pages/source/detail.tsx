@@ -1,6 +1,10 @@
+import type { Source } from '@/database/types'
 import { If, useWatch, useWhenever } from '@hairy/react-lib'
-import { addToast, Button, Divider, Input, Textarea } from '@heroui/react'
+import { isEqual } from '@hairy/utils'
+import { addToast, Button, Card, CardBody, CardHeader, Divider, Input, Textarea } from '@heroui/react'
+import { Icon } from '@iconify/react'
 import { useForm } from 'react-hook-form'
+import { useKey } from 'react-use'
 import { useStore } from 'valtio-define'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
 import { SourceFormGit } from '@/components/souce-form-git'
@@ -10,6 +14,7 @@ function Page() {
   const [searchParams] = useSearchParams()
   const sourceId = searchParams.get('id')
   const [configs, setConfigs] = useState<Record<string, any>>({})
+  const [originalData, setOriginalData] = useState<Partial<Source> | null>(null)
   const form = useForm({
     defaultValues: {
       id: 0,
@@ -23,6 +28,7 @@ function Page() {
 
   const source = form.watch('type')
   const config = form.watch('config')
+  const formValues = form.watch()
 
   useWatch(source, (source, oldSource) => {
     if (!oldSource)
@@ -36,15 +42,21 @@ function Page() {
 
     if (!source)
       return
-    form.setValue('name', source.name)
-    form.setValue('description', source.description)
-
-    form.setValue('config', JSON.parse(source.config))
-    form.setValue('type', source.type)
-    setConfigs(prev => ({ ...prev, [source.type]: source.config }))
+    const parsedSource = {
+      name: source.name,
+      description: source.description,
+      type: source.type,
+      config: JSON.parse(source.config),
+    }
+    form.reset(parsedSource)
+    setConfigs(prev => ({ ...prev, [parsedSource.type]: parsedSource.config }))
+    setOriginalData(parsedSource)
   }
 
   useWhenever(sourceId, reset, { immediate: true })
+
+  // 对比数据是否有变化
+  const hasChanges = sourceId ? !isEqual(formValues, originalData) : true
 
   const onSubmit = form.handleSubmit(async (data) => {
     if (sourceId) {
@@ -54,10 +66,12 @@ function Page() {
         type: data.type,
         config: data.config,
       })
+      reset()
       addToast({
         title: 'Success',
         description: 'Source updated successfully',
         color: 'success',
+        timeout: 500,
       })
     }
     else {
@@ -75,78 +89,139 @@ function Page() {
         description: 'Source created successfully',
         color: 'success',
       })
+      navigate('/source')
     }
-    navigate('/source')
     queryClient.invalidateQueries({ queryKey: ['sources'] })
   })
+
+  // 支持 Ctrl + S 快捷键保存
+  useKey(
+    event => (event.ctrlKey || event.metaKey) && event.key === 's',
+    (event) => {
+      event.preventDefault()
+      hasChanges && onSubmit()
+    },
+    { event: 'keydown' },
+  )
+
   return (
     <Form {...form}>
-      <form onSubmit={onSubmit} className="flex flex-col gap-4">
-        <FormField
-          control={form.control}
-          name="name"
-          rules={{ required: 'Please enter source name' }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Name</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  labelPlacement="outside"
-                  placeholder="Enter source name"
+      <form onSubmit={onSubmit} className="max-w-2xl w-full mx-auto">
+        <div className="ml-2.5 mb-2">
+          <div className="flex justify-between items-center">
+            <div>
+              <h3 className="text-lg font-bold">
+                添加数据源
+              </h3>
+              <span className="text-sm text-default-500">
+                配置数据源以同步数据。
+              </span>
+            </div>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                color="default"
+                variant="light"
+                radius="full"
+                onPress={() => navigate('/source')}
+              >
+                返回
+              </Button>
+              <Button
+                type="submit"
+                color="primary"
+                radius="full"
+                className="flex-1"
+                isDisabled={sourceId ? !hasChanges : !hasChanges}
+                startContent={<Icon icon="lucide:save" className="w-4 h-4" />}
+              >
+                {sourceId ? '更新' : '创建'}
+              </Button>
+            </div>
+          </div>
+        </div>
+        <div className="flex flex-col gap-4">
+          <Card shadow="none">
+            <CardHeader className="flex gap-1">
+              <Icon icon="lucide:info" className="text-lg mt-0.3" />
+              <p className="text-md">基本信息</p>
+            </CardHeader>
+            <Divider className="opacity-30 shadow" />
+            <CardBody className="flex flex-col gap-4">
+              <div className="flex gap-4">
+                <FormField
+                  control={form.control}
+                  name="name"
+                  rules={{ required: 'Please enter source name' }}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Name</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          labelPlacement="outside"
+                          placeholder="Enter source name"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="description"
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Description</FormLabel>
-              <FormControl>
-                <Textarea
-                  {...field}
-                  labelPlacement="outside"
-                  placeholder="Enter source description"
+                <FormField
+                  control={form.control}
+                  name="type"
+                  rules={{ required: 'Please select a source' }}
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>Source</FormLabel>
+                      <FormControl>
+                        <SourceSelect onChange={field.onChange} value={field.value} />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
                 />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
+              </div>
+              <FormField
+                control={form.control}
+                name="description"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Description</FormLabel>
+                    <FormControl>
+                      <Textarea
+                        {...field}
+                        labelPlacement="outside"
+                        placeholder="Enter source description"
+                      />
+                    </FormControl>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+            </CardBody>
+          </Card>
+          <Card shadow="none">
+            <CardHeader className="flex gap-1">
+              <SourceIcon type={source} size={18} />
+              <p className="text-md flex gap-1">
+                <span>
+                  {sourceOptions.find(option => option.value === source)?.label}
+                </span>
+                <span>配置</span>
+              </p>
+            </CardHeader>
+            <Divider className="opacity-30 shadow" />
 
-        <FormField
-          control={form.control}
-          name="type"
-          rules={{ required: 'Please select a source' }}
-          render={({ field }) => (
-            <FormItem>
-              <FormLabel>Source</FormLabel>
-              <FormControl>
-                <SourceSelect onChange={field.onChange} value={field.value} />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <If cond={source === 'git'}>
-          <SourceFormGit />
-        </If>
-        <If cond={source === 'clickup'}>
-          <SourceFormClickup />
-        </If>
-
-        <div className="flex gap-4 mt-4">
-          <Button type="button" color="default" onPress={() => navigate('/source')}>
-            Cancel
-          </Button>
-          <Button type="submit" color="primary" className="flex-1">
-            {sourceId ? 'Update' : 'Create'}
-          </Button>
+            <CardBody className="flex flex-col gap-4">
+              <If cond={source === 'git'}>
+                <SourceFormGit />
+              </If>
+              <If cond={source === 'clickup'}>
+                <SourceFormClickup />
+              </If>
+            </CardBody>
+          </Card>
         </div>
       </form>
     </Form>
