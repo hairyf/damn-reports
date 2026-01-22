@@ -201,27 +201,29 @@ function Page() {
               />
             </CardBody>
           </Card>
-          <Card shadow="none">
-            <CardHeader className="flex gap-1">
-              <SourceIcon type={source} size={18} />
-              <p className="text-md flex gap-1">
-                <span>
-                  {sourceOptions.find(option => option.value === source)?.label}
-                </span>
-                <span>配置</span>
-              </p>
-            </CardHeader>
-            <Divider className="opacity-30 shadow" />
+          <If cond={source}>
+            <Card shadow="none">
+              <CardHeader className="flex gap-1">
+                <SourceIcon type={source} size={18} />
+                <p className="text-md flex gap-1">
+                  <span>
+                    {sourceOptions.find(option => option.value === source)?.label}
+                  </span>
+                  <span>配置</span>
+                </p>
+              </CardHeader>
+              <Divider className="opacity-30 shadow" />
 
-            <CardBody className="flex flex-col gap-4">
-              <If cond={source === 'git'}>
-                <SourceFormGit />
-              </If>
-              <If cond={source === 'clickup'}>
-                <SourceFormClickup />
-              </If>
-            </CardBody>
-          </Card>
+              <CardBody className="flex flex-col gap-4">
+                <If cond={source === 'git'}>
+                  <SourceFormGit />
+                </If>
+                <If cond={source === 'clickup'}>
+                  <SourceFormClickup />
+                </If>
+              </CardBody>
+            </Card>
+          </If>
         </div>
       </form>
     </Form>
