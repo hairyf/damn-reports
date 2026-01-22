@@ -1,6 +1,6 @@
 use serde::{Deserialize, Serialize};
 use std::path::Path;
-use git2::{Repository, BranchType, DiffOptions, DiffFormat};
+use git2::{Repository, DiffOptions, DiffFormat};
 use chrono::{FixedOffset, NaiveTime, TimeZone};
 
 #[derive(Debug, Serialize, Deserialize)]
@@ -31,25 +31,32 @@ pub struct CollectGitResult {
 
 pub async fn daily(
     repository: String,
-    branch: String,
     author: String,
 ) -> Result<CollectGitResult, String> {
     let repo = Repository::open(&repository).map_err(|e| e.to_string())?;
     
-    // 1. 定位分支
-    let branch_obj = repo.find_branch(&branch, BranchType::Local).map_err(|e| e.to_string())?;
-    let target_oid = branch_obj.get().target().ok_or("Invalid branch target")?;
-
-    // 2. 时间计算 (北京时间今日 00:00:00 起)
+    // 1. 时间计算 (北京时间今日 00:00:00 起)
     let beijing_tz = FixedOffset::east_opt(8 * 3600).unwrap();
     let now = chrono::Utc::now().with_timezone(&beijing_tz);
     let start_ts = beijing_tz.from_local_datetime(
         &now.date_naive().and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
     ).single().unwrap().timestamp();
 
-    // 3. 配置 Revwalk
+    // 2. 配置 Revwalk，实现 --all 效果：遍历所有引用
     let mut revwalk = repo.revwalk().map_err(|e| e.to_string())?;
-    revwalk.push(target_oid).map_err(|e| e.to_string())?;
+    
+    // 获取所有引用（包括所有分支和标签）
+    let refs = repo.references().map_err(|e| e.to_string())?;
+    for reference_result in refs {
+        let reference = reference_result.map_err(|e| e.to_string())?;
+        if let Some(oid) = reference.target() {
+            if let Err(e) = revwalk.push(oid) {
+                // 忽略无法推送的引用（例如已删除的分支）
+                eprintln!("Warning: Failed to push reference: {}", e);
+            }
+        }
+    }
+    
     revwalk.set_sorting(git2::Sort::TIME).map_err(|e| e.to_string())?;
 
     let mut commits = Vec::new();

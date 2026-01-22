@@ -24,7 +24,7 @@ pub async fn trigger(db: DatabaseConnection) -> Result<usize, Box<dyn std::error
               let cfg: config::GitConfig = serde_json::from_str(&source.config)?;
               println!("Collecting git records for source: {:?}", source.r#type);
               println!("Config: {:?}", cfg);
-              let res = collector::git::daily(cfg.repository, cfg.branch, cfg.author).await?;
+              let res = collector::git::daily(cfg.repository, cfg.author).await?;
               println!("Collected {} git records", res.data.len());
               map_to_active_models(res.data, &source)
           }

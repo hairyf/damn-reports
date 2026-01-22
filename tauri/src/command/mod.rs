@@ -70,9 +70,8 @@ pub async fn collect_daily_clickup(
 #[tauri::command]
 pub async fn collect_daily_git(
   repository: String,
-  branch: String,
   author: String,
 ) -> Result<collector::git::CollectGitResult, String> {
-  collector::git::daily(repository, branch, author).await.map_err(|e| e.to_string())
+  collector::git::daily(repository, author).await.map_err(|e| e.to_string())
 }
 

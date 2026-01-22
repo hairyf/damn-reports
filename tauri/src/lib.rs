@@ -108,12 +108,23 @@ fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
 
 // configure sql migrations
 fn migrations() -> tauri_plugin_sql::Builder {
-    let migrations = vec![Migration {
-        version: 1,
-        description: "initialize database",
-        sql: include_str!("../prisma/migrations/20260118100407/migration.sql"),
-        kind: MigrationKind::Up,
-    }];
+    let migrations = vec![
+        Migration {
+            version: 1,
+            description: "initialize database",
+            sql: include_str!("../prisma/migrations/20260118100407/migration.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 2,
+            description: "add branch field to git source configs",
+            sql: include_str!("../prisma/migrations/20260122130600/migration.sql"),
+            kind: MigrationKind::Up,
+        },
+    ];
+    for migration in &migrations {
+      println!("Migration: {}", migration.description);
+    }
     tauri_plugin_sql::Builder::default().add_migrations("sqlite:main.db", migrations)
 }
 

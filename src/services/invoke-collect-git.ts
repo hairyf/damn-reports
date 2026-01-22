@@ -2,7 +2,6 @@ import { invoke } from '@tauri-apps/api/core'
 
 export interface InvokeCollectGitParams {
   repository: string
-  branch: string
   author: string
 }
 

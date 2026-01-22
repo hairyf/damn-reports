@@ -55,45 +55,24 @@ export function SourceFormGit() {
         )}
       />
 
-      <div className="flex gap-4">
-        <FormField
-          control={control}
-          name="config.branch"
-          rules={{ required: 'Please enter your Git branch' }}
-          render={({ field }) => (
-            <FormItem className="flex-1">
-              <FormLabel>Git Branch</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  labelPlacement="outside"
-                  placeholder="Enter your Git Branch"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-
-        <FormField
-          control={control}
-          name="config.author"
-          rules={{ required: 'Please enter your Git username' }}
-          render={({ field }) => (
-            <FormItem className="flex-1">
-              <FormLabel>Git Username</FormLabel>
-              <FormControl>
-                <Input
-                  {...field}
-                  labelPlacement="outside"
-                  placeholder="Enter your Git Username"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-      </div>
+      <FormField
+        control={control}
+        name="config.author"
+        rules={{ required: 'Please enter your Git username' }}
+        render={({ field }) => (
+          <FormItem>
+            <FormLabel>Git Username</FormLabel>
+            <FormControl>
+              <Input
+                {...field}
+                labelPlacement="outside"
+                placeholder="Enter your Git Username"
+              />
+            </FormControl>
+            <FormMessage />
+          </FormItem>
+        )}
+      />
     </>
   )
 }
