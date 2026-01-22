@@ -17,8 +17,7 @@ use tauri_plugin_sql::{Migration, MigrationKind};
 use utils::{navigate, show_window};
 
 // setup app
-fn setup(app_handle: tauri::AppHandle) {
-    let _ = command::database_loaded(app_handle);
+fn setup(_app_handle: tauri::AppHandle) {
     let _ = n8n::start();
 }
 
