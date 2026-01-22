@@ -22,6 +22,7 @@ fn setup(app_handle: tauri::AppHandle) {
     let _ = n8n::start();
 }
 
+// setup tray
 fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     // 使用默认窗口图标
     let icon = app.default_window_icon().unwrap().clone();
@@ -92,7 +93,7 @@ fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
     Ok(())
 }
 
-// configure handler
+// configure invoke handler
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         command::database_loaded,
@@ -105,23 +106,24 @@ fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     ]
 }
 
-// configure builder
-fn builder() -> tauri::Builder<tauri::Wry> {
+// configure sql migrations
+fn migrations() -> tauri_plugin_sql::Builder {
     let migrations = vec![Migration {
         version: 1,
         description: "initialize database",
         sql: include_str!("../prisma/migrations/20260118100407/migration.sql"),
         kind: MigrationKind::Up,
     }];
+    tauri_plugin_sql::Builder::default().add_migrations("sqlite:main.db", migrations)
+}
+
+// configure tauri builder
+fn builder() -> tauri::Builder<tauri::Wry> {
     tauri::Builder::default()
         // Simple Store plugin
         .plugin(tauri_plugin_store::Builder::new().build())
         // Sql store plugin
-        .plugin(
-            tauri_plugin_sql::Builder::default()
-                .add_migrations("sqlite:main.db", migrations)
-                .build(),
-        )
+        .plugin(migrations().build())
         // HTTP plugin
         .plugin(tauri_plugin_http::init())
         // Notification plugin
