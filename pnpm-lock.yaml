@@ -156,8 +156,8 @@ importers:
         specifier: ^2.3.0
         version: 2.3.0(@types/react@19.2.7)(react@19.2.3)
       valtio-define:
-        specifier: ^0.5.0
-        version: 0.5.0(@types/react@19.2.7)(react@19.2.3)
+        specifier: ^1.0.3
+        version: 1.0.3(@types/react@19.2.7)(react@19.2.3)
       zod:
         specifier: ^4.3.5
         version: 4.3.5
@@ -4795,8 +4795,8 @@ packages:
       typescript:
         optional: true
 
-  valtio-define@0.5.0:
-    resolution: {integrity: sha512-HBgqxXivcwnoT1RNMR5GbObSFKGOYB1AEQCLhCXJRGSnsmGPwJ4Pmc2vseSW9uFF/ixmC5ux8RLPBNaPD5u6og==}
+  valtio-define@1.0.3:
+    resolution: {integrity: sha512-FVXgYXW9uCtb+vCiJpBZ553klr5bVk6jK4fVz3mFzcnaPpZKKxwOk1K9g+4YRvjxJU2yy1gRX63Zw8QlL0U7rg==}
     peerDependencies:
       react: ^18.2.0
 
@@ -10547,9 +10547,10 @@ snapshots:
     optionalDependencies:
       typescript: 5.8.3
 
-  valtio-define@0.5.0(@types/react@19.2.7)(react@19.2.3):
+  valtio-define@1.0.3(@types/react@19.2.7)(react@19.2.3):
     dependencies:
       '@hairy/utils': 1.46.0
+      destr: 2.0.5
       react: 19.2.3
       structure-id: 1.2.9
       valtio: 2.3.0(@types/react@19.2.7)(react@19.2.3)

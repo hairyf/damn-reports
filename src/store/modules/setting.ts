@@ -1,6 +1,7 @@
 import { debounce } from '@hairy/utils'
 import { invoke } from '@tauri-apps/api/core'
 import { defineStore } from 'valtio-define'
+import 'valtio-define/types'
 
 export type ThemeMode = 'light' | 'dark' | 'system'
 export type Language = 'zh-CN' | 'en-US'
@@ -15,17 +16,13 @@ export const setting = defineStore(
       collectTime: '17:45',
       generateTime: '17:50',
     }),
+    persist: {
+      key: 'setting',
+      storage,
+    },
   },
 )
+const restart_schedule = debounce(() => invoke('restart_schedule'), 500)
 
-const restartSchedule = debounce(() => invoke('restart_schedule'), 1000)
-
-storage.getItem<any>('setting').then(store =>
-  !store
-    ? storage.setItem('setting', setting.$state)
-    : setting.$patch(store),
-)
-setting.$subscribe(async (state) => {
-  await storage.setItem('setting', state)
-  restartSchedule()
-})
+setting.$subscribeKey('collectTime', restart_schedule)
+setting.$subscribeKey('generateTime', restart_schedule)

@@ -22,7 +22,8 @@ export const tauriStorageDriver = defineDriver<TauriStorageDriverOptions | undef
     },
     async getItem(key) {
       await promise
-      return store.get(key)
+      const value = await store.get(key)
+      return value
     },
     async setItem(key, value) {
       await promise
