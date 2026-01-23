@@ -19,7 +19,12 @@ impl Collectible for crate::collector::git::GitCommit {
 }
 
 impl Collectible for crate::collector::clickup::ClickupTask {
-  fn get_id(&self) -> String { self.id.clone() }
+  fn get_id(&self) -> String {
+      // 使用组合键：任务ID + 状态
+      // 这样同一个任务的状态变更可以创建不同的记录
+      let status = &self.status.status;
+      format!("{}:{}", self.id, status)
+  }
   fn get_summary(&self) -> String { self.name.clone() }
   fn get_date(&self) -> i64 {
       // 如果 date_updated 存在，解析为时间戳；否则使用当前时间戳

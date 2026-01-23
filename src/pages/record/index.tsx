@@ -42,13 +42,15 @@ function Page() {
 
   const { data: records = [], isLoading } = useQuery({
     queryKey: ['records', debouncedSearch, debouncedSourceFilter, pagination.page, pagination.pageSize],
-    queryFn: () => {
-      return db.record.findMany({
+    queryFn: async () => {
+      const { data, total } = await db.record.findManyPage({
         search: debouncedSearch,
         source: debouncedSourceFilter,
         page: pagination.page,
         pageSize: pagination.pageSize,
       })
+      pagination.pageSizeChange(total)
+      return data
     },
   })
 

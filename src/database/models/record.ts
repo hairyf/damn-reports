@@ -5,9 +5,29 @@ export interface RecordFindManyInput {
   search?: string
   source?: string
   workspace?: number
+  date?: string
+}
+
+export interface RecordInJoined {
+  id: string
+  summary: string
+  data: any
+  createdAt: number
+  updatedAt: number
+  sourceId: number
+  workspaceId: number
+  sourceName: string
+  source: string
+}
+
+export interface RecordFindManyPageInput extends RecordFindManyInput {
   page?: number
   pageSize?: number
-  date?: string
+}
+
+export interface RecordFindManyPageOutput {
+  data: RecordInJoined[]
+  total: number
 }
 
 export class Record extends Model<DB, 'record'> {
@@ -15,8 +35,34 @@ export class Record extends Model<DB, 'record'> {
     super(db, 'record', 'id')
   }
 
-  findMany(input: RecordFindManyInput) {
-    const { search, source, workspace, page = 1, pageSize = 10, date } = input
+  async findManyPage(input: RecordFindManyPageInput): Promise<RecordFindManyPageOutput> {
+    const { page = 1, pageSize = 20, ...queryInput } = input
+
+    // 构建基础查询（用于获取总数和分页数据）
+    const baseQuery = this.findManyQuery(queryInput)
+
+    // 计算总数：使用相同的查询条件，但只计算数量
+    const countQuery = baseQuery
+      .clearSelect()
+      .select(this.db.fn.count('record.id').as('count'))
+
+    // 应用分页
+    const offset = page > 0 ? (page - 1) * pageSize : 0
+    const dataQuery = baseQuery
+      .limit(pageSize)
+      .offset(offset)
+
+    // 执行查询获取数据
+    const [total, data] = await Promise.all([
+      countQuery.executeTakeFirst().then(rs => Number(rs?.count ?? 0)),
+      dataQuery.execute(),
+    ])
+
+    return { data, total }
+  }
+
+  findManyQuery(input: RecordFindManyInput) {
+    const { search, source, workspace, date } = input
 
     let query = this.db
       .selectFrom('record') // 从 record 表开始查询
@@ -60,12 +106,11 @@ export class Record extends Model<DB, 'record'> {
 
     query = query.orderBy('record.createdAt', 'desc')
 
-    // 分页
-    if (pageSize) {
-      const offset = page && page > 0 ? (page - 1) * pageSize : 0
-      query = query.limit(pageSize).offset(offset)
-    }
+    return query
+  }
 
+  findMany(input: RecordFindManyInput) {
+    const query = this.findManyQuery(input)
     return query.execute()
   }
 }
