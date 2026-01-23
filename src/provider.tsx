@@ -14,6 +14,7 @@ declare module '@react-types/shared' {
 
 export function Provider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
+
   return (
     <QueryClientProvider client={queryClient}>
       <HeroUIProvider navigate={navigate} useHref={useHref}>

@@ -1,5 +1,5 @@
-import { loop } from '@hairy/utils'
 import { invoke } from '@tauri-apps/api/core'
+import { listen } from '@tauri-apps/api/event'
 import { defineStore } from 'valtio-define'
 
 export enum StartupState {
@@ -97,7 +97,5 @@ export const user = defineStore({
   },
 })
 
-loop(async (next) => {
-  await user.syncN8nStatus()
-  await next(1000)
-})
+listen('n8n-status-updated', user.syncN8nStatus)
+user.syncN8nStatus()

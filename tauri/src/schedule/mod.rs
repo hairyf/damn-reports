@@ -6,12 +6,12 @@ use std::sync::{
 
 use sea_orm::DatabaseConnection;
 use std::time::Duration;
-use tauri::{AppHandle, Manager, State, async_runtime::spawn};
+use tauri::{async_runtime::spawn, AppHandle, Manager, State};
 mod utils;
 
 use crate::task;
-use utils::{get_time_from_setting};
 use tokio::time::{self};
+use utils::get_time_from_setting;
 /// 用于控制调度器运行状态的结构体
 pub struct SchedulerHandle {
     running: Arc<AtomicBool>,
@@ -20,11 +20,18 @@ pub struct SchedulerHandle {
 pub fn start(app_handle: &AppHandle, db: DatabaseConnection) {
     // 初始化状态并注入 Tauri
     let running = Arc::new(AtomicBool::new(true));
-    app_handle.manage(SchedulerHandle { running: running.clone() });
+    app_handle.manage(SchedulerHandle {
+        running: running.clone(),
+    });
     let app_handle_clone = app_handle.clone();
     tokio::spawn(async move {
-        scheduler_loop(app_handle_clone, db, running).await;
+        scheduler_permanent_loop(app_handle_clone.clone()).await;
     });
+    let app_handle_clone = app_handle.clone();
+    tokio::spawn(async move {
+        scheduler_loop(app_handle_clone.clone(), db, running).await;
+    });
+   
 }
 
 pub async fn restart(
@@ -36,7 +43,7 @@ pub async fn restart(
 
     // 1. 停止当前正在运行的调度循环
     handle.running.store(false, Ordering::SeqCst);
-    
+
     // 给足够的时间让旧循环退出（使用异步 sleep，等待至少 2 秒）
     tokio::time::sleep(Duration::from_millis(2000)).await;
 
@@ -53,23 +60,41 @@ async fn scheduler_loop(app_handle: AppHandle, db: DatabaseConnection, running: 
     let mut scheduler = Scheduler::new();
     let mut interval = time::interval(Duration::from_millis(100));
 
-    let (collect_time, generate_time) = get_time_from_setting(&app_handle); 
-    
-    println!("Scheduler started for collect records time: {}", collect_time);
-    println!("Scheduler started for generate report time: {}", generate_time);
+    let (collect_time, generate_time) = get_time_from_setting(&app_handle);
 
-    scheduler.every(1.day()).at(&collect_time.as_str()).run(move || {
-        let collect_time_clone = collect_time.clone();
-        let db_clone = db.clone();
-        println!("Collecting records of source at: {}", collect_time_clone);
-        spawn(async move { task::collect_records_of_source::trigger(db_clone).await.unwrap(); });
-    });
+    println!(
+        "Scheduler started for collect records time: {}",
+        collect_time
+    );
+    println!(
+        "Scheduler started for generate report time: {}",
+        generate_time
+    );
 
-    scheduler.every(1.day()).at(&generate_time.as_str()).run(move || {
-        let generate_time_clone = generate_time.clone();
-        println!("Generating report at: {}", generate_time_clone);
-        spawn(async move { task::call_n8n_workflow_webhook::trigger().await.unwrap(); });
-    });
+    scheduler
+        .every(1.day())
+        .at(&collect_time.as_str())
+        .run(move || {
+            let collect_time_clone = collect_time.clone();
+            let db_clone = db.clone();
+            println!("Collecting records of source at: {}", collect_time_clone);
+            spawn(async move {
+                task::collect_records_of_source::trigger(db_clone)
+                    .await
+                    .unwrap();
+            });
+        });
+
+    scheduler
+        .every(1.day())
+        .at(&generate_time.as_str())
+        .run(move || {
+            let generate_time_clone = generate_time.clone();
+            println!("Generating report at: {}", generate_time_clone);
+            spawn(async move {
+                task::call_n8n_workflow_webhook::trigger().await.unwrap();
+            });
+        });
 
     while running.load(Ordering::SeqCst) {
         scheduler.run_pending();
@@ -77,4 +102,14 @@ async fn scheduler_loop(app_handle: AppHandle, db: DatabaseConnection, running: 
     }
 
     println!("Scheduler stopped.");
+}
+
+async fn scheduler_permanent_loop(app_handle: AppHandle) {
+  let mut interval = time::interval(Duration::from_secs(1));
+
+   
+   loop {
+     task::tick_check_n8n_process::trigger(app_handle.clone()).await.unwrap();
+     interval.tick().await;
+   }
 }

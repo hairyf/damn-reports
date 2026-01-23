@@ -52,3 +52,24 @@ pub fn is_port_in_use(port: u16) -> bool {
         Err(_) => false, // 连接失败或超时，端口未被占用
     }
 }
+
+/// 检查 n8n 是否真正在运行（通过 HTTP 请求 /rest 端点）
+/// 如果返回 404，说明 n8n 服务正常运行
+pub async fn is_n8n_running() -> bool {
+    let client = reqwest::Client::builder()
+        .timeout(Duration::from_secs(2))
+        .build();
+    
+    match client {
+        Ok(client) => {
+            match client.get("http://localhost:5678/rest").send().await {
+                Ok(response) => {
+                    // 如果返回 404，说明 n8n 服务正常运行（/rest 端点不存在是正常的）
+                    response.status() == reqwest::StatusCode::NOT_FOUND
+                }
+                Err(_) => false, // 请求失败，说明服务未运行
+            }
+        }
+        Err(_) => false, // 客户端构建失败
+    }
+}
