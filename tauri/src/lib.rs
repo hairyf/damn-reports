@@ -1,11 +1,6 @@
-mod axum;
-mod collector;
-mod command;
-mod database;
-mod n8n;
-mod schedule;
-mod task;
-mod utils;
+mod bridge;
+mod core;
+mod services;
 
 use tauri::{
     ipc::Invoke,
@@ -14,11 +9,11 @@ use tauri::{
     Manager, Runtime, Wry,
 };
 use tauri_plugin_sql::{Migration, MigrationKind};
-use utils::{navigate, show_window};
+use core::utils::{navigate, show_window};
 
 // setup app
 fn setup(_app_handle: tauri::AppHandle) {
-    let _ = n8n::start();
+    let _ = services::workflow::start();
 }
 
 // setup tray
@@ -95,13 +90,13 @@ fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
 // configure invoke handler
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
-        command::database_loaded,
-        command::restart_schedule,
-        command::get_n8n_status,
-        command::collect_daily_records,
-        command::generate_daily_report,
-        command::collect_daily_clickup,
-        command::collect_daily_git,
+        bridge::cmd::database_loaded,
+        bridge::cmd::restart_schedule,
+        bridge::cmd::get_n8n_status,
+        bridge::cmd::collect_daily_records,
+        bridge::cmd::generate_daily_report,
+        bridge::cmd::collect_daily_clickup,
+        bridge::cmd::collect_daily_git,
     ]
 }
 

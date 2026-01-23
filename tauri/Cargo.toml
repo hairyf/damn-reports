@@ -35,7 +35,7 @@ tauri-plugin-notification = "2"
 tauri-plugin-store = "2"
 tauri-plugin-dialog = "2"
 tauri-plugin-fs = "2"
-reqwest = { version = "0.12", features = [ "json" ] }
+reqwest = { version = "0.12", features = [ "json", "stream" ] }
 git2 = "0.18"
 chrono = { version = "0.4", features = [ "serde" ] }
 uuid = { version = "1.0", features = [ "v4" ] }
@@ -52,6 +52,11 @@ sea-orm = { version = "1.1.19", features = [
   "sqlx-sqlite",
   "macros"
 ] }
+zip = "0.6"
+futures-util = "0.3"
+flate2 = "1.1.8"
+tar = "0.4.44"
+sha2 = "0.10"
 
 [dependencies.tauri-plugin-sql]
 features = [ "sqlite" ] # or "postgres", or "mysql"
