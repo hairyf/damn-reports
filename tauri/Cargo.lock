@@ -950,6 +950,41 @@ dependencies = [
 ]
 
 [[package]]
+name = "damn-daily-reports"
+version = "0.1.0"
+dependencies = [
+ "async-trait",
+ "axum",
+ "chrono",
+ "clokwerk",
+ "flate2",
+ "futures-util",
+ "git2",
+ "log",
+ "reqwest",
+ "sea-orm",
+ "serde",
+ "serde_json",
+ "sha2",
+ "sqlx",
+ "tar",
+ "tauri",
+ "tauri-build",
+ "tauri-plugin-dialog",
+ "tauri-plugin-fs",
+ "tauri-plugin-http",
+ "tauri-plugin-notification",
+ "tauri-plugin-opener",
+ "tauri-plugin-process",
+ "tauri-plugin-sql",
+ "tauri-plugin-store",
+ "tokio",
+ "tower-http 0.5.2",
+ "uuid",
+ "zip",
+]
+
+[[package]]
 name = "darling"
 version = "0.21.3"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -7295,40 +7330,6 @@ checksum = "32e45ad4206f6d2479085147f02bc2ef834ac85886624a23575ae137c8aa8156"
 dependencies = [
  "libc",
  "rustix",
-]
-
-[[package]]
-name = "y"
-version = "0.1.0"
-dependencies = [
- "async-trait",
- "axum",
- "chrono",
- "clokwerk",
- "flate2",
- "futures-util",
- "git2",
- "reqwest",
- "sea-orm",
- "serde",
- "serde_json",
- "sha2",
- "sqlx",
- "tar",
- "tauri",
- "tauri-build",
- "tauri-plugin-dialog",
- "tauri-plugin-fs",
- "tauri-plugin-http",
- "tauri-plugin-notification",
- "tauri-plugin-opener",
- "tauri-plugin-process",
- "tauri-plugin-sql",
- "tauri-plugin-store",
- "tokio",
- "tower-http 0.5.2",
- "uuid",
- "zip",
 ]
 
 [[package]]

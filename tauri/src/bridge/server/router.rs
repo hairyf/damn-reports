@@ -36,15 +36,15 @@ pub async fn start(db: DatabaseConnection, app_handle: tauri::AppHandle) {
   let bind_address = app_server_bind_address();
   match TcpListener::bind(&bind_address).await {
     Ok(listener) => {
-      println!("✓ Axum Service Started: {}", app_server_url());
+      log::info!("Axum Service Started: {}", app_server_url());
 
       if let Err(e) = axum::serve(listener, app).await {
-        eprintln!("✗ Axum Service Error: {}", e);
+        log::error!("Axum Service Error: {}", e);
       }
     }
     Err(e) => {
-      eprintln!("✗ Failed to Bind {}: {}", bind_address, e);
-      eprintln!("  Possible Reasons: Port Occupied or Permission Denied");
+      log::error!("Failed to Bind {}: {}", bind_address, e);
+      log::error!("Possible Reasons: Port Occupied or Permission Denied");
     }
   }
 }

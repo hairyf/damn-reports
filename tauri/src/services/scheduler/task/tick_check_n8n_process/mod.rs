@@ -34,10 +34,13 @@ pub async fn trigger(app_handle: AppHandle) -> Result<(), Box<dyn std::error::Er
   // 先快速检测端口
   let is_port_in_use = utils::is_port_in_use(N8N_PORT);
   let is_http_ok = workflow_utils::is_n8n_running().await;
+  log::trace!("N8N status check: port_in_use={}, http_ok={}", is_port_in_use, is_http_ok);
+  
   let new_status = current_status.update_based_checks(is_port_in_use, is_http_ok);
   
   // 如果状态发生变化，就更新状态
   if new_status != current_status {
+      log::info!("N8N status changed: {:?} -> {:?}", current_status, new_status);
       status::set_status(new_status.clone());
       status::emit_status(&app_handle);
   }

@@ -13,10 +13,15 @@ pub fn extract_zip<'a, R: Runtime>(
     buffer: &[u8],
     dest: &PathBuf,
 ) -> Result<(), String> {
+    log::debug!("Starting ZIP extraction to: {:?}", dest);
     let mut archive = zip::ZipArchive::new(Cursor::new(buffer))
-        .map_err(|e| format!("Zip格式非法: {}", e))?;
+        .map_err(|e| {
+            log::error!("Invalid ZIP format: {}", e);
+            format!("Invalid ZIP format: {}", e)
+        })?;
 
     let total_files = archive.len();
+    log::debug!("ZIP file contains {} files", total_files);
 
     for i in 0..total_files {
         // 1. 获取当前文件
@@ -46,15 +51,27 @@ pub fn extract_zip<'a, R: Runtime>(
 
         // 4. 处理目录或文件
         if (*file.name()).ends_with('/') {
-            fs::create_dir_all(&outpath).map_err(|e| e.to_string())?;
+            fs::create_dir_all(&outpath).map_err(|e| {
+                log::error!("Failed to create directory {:?}: {}", outpath, e);
+                e.to_string()
+            })?;
         } else {
             if let Some(p) = outpath.parent() {
                 if !p.exists() {
-                    fs::create_dir_all(&p).map_err(|e| e.to_string())?;
+                    fs::create_dir_all(&p).map_err(|e| {
+                        log::error!("Failed to create parent directory {:?}: {}", p, e);
+                        e.to_string()
+                    })?;
                 }
             }
-            let mut outfile = fs::File::create(&outpath).map_err(|e| e.to_string())?;
-            copy(&mut file, &mut outfile).map_err(|e| e.to_string())?;
+            let mut outfile = fs::File::create(&outpath).map_err(|e| {
+                log::error!("Failed to create file {:?}: {}", outpath, e);
+                e.to_string()
+            })?;
+            copy(&mut file, &mut outfile).map_err(|e| {
+                log::error!("Failed to copy file {:?}: {}", outpath, e);
+                e.to_string()
+            })?;
         }
 
         // 设置权限（仅限 Unix 系统可选）
@@ -66,6 +83,7 @@ pub fn extract_zip<'a, R: Runtime>(
             }
         }
     }
+    log::info!("ZIP extraction completed, {} files total", total_files);
     Ok(())
 }
 
@@ -74,6 +92,7 @@ pub fn extract_tgz<'a, R: Runtime>(
     buffer: &[u8],
     dest: &PathBuf,
 ) -> Result<(), String> {
+    log::debug!("Starting TGZ extraction to: {:?}", dest);
     use flate2::read::GzDecoder;
     use tar::Archive;
 
@@ -81,11 +100,21 @@ pub fn extract_tgz<'a, R: Runtime>(
     let mut archive = Archive::new(tar_gz);
 
     // 使用 entries() 替代 unpack() 以便手动控制
-    let entries = archive.entries().map_err(|e| e.to_string())?;
+    let entries = archive.entries().map_err(|e| {
+        log::error!("Failed to read TGZ entries: {}", e);
+        e.to_string()
+    })?;
 
+    let mut file_count = 0;
     for entry_result in entries {
-        let mut entry = entry_result.map_err(|e| e.to_string())?;
-        let path = entry.path().map(|p| p.to_path_buf()).map_err(|e| e.to_string())?;
+        let mut entry = entry_result.map_err(|e| {
+            log::error!("Failed to read TGZ entry: {}", e);
+            e.to_string()
+        })?;
+        let path = entry.path().map(|p| p.to_path_buf()).map_err(|e| {
+            log::error!("Failed to get entry path: {}", e);
+            e.to_string()
+        })?;
         
         // 打印当前解压的文件名（格式：Extract 路径/文件）
         // -1.0 表示未知进度(让前端持续增加)
@@ -94,8 +123,13 @@ pub fn extract_tgz<'a, R: Runtime>(
         tracker.update(-1.0, display_text);
 
         // 执行解压
-        entry.unpack_in(dest).map_err(|e| e.to_string())?;
+        entry.unpack_in(dest).map_err(|e| {
+            log::error!("Failed to unpack entry {:?}: {}", path, e);
+            e.to_string()
+        })?;
+        file_count += 1;
     }
 
+    log::info!("TGZ extraction completed, {} files total", file_count);
     Ok(())
 }

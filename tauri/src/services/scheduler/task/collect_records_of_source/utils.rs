@@ -24,6 +24,9 @@ pub fn map_to_active_models<T: traits::Collectible + Serialize>(
 
 // 4. 封装查重逻辑
 pub async fn insert_if_not_exists(db: &DatabaseConnection, records: Vec<record::ActiveModel>) -> Result<(), sea_orm::DbErr> {
+  let total_count = records.len();
+  log::debug!("Preparing to insert {} records", total_count);
+  
   let ids: Vec<String> = records.iter().map(|r| r.id.as_ref().clone()).collect();
   
   let existing_ids: std::collections::HashSet<String> = record::Entity::find()
@@ -38,8 +41,16 @@ pub async fn insert_if_not_exists(db: &DatabaseConnection, records: Vec<record::
       .filter(|r| !existing_ids.contains(r.id.as_ref()))
       .collect();
 
+  let existing_count = total_count - new_records.len();
+  if existing_count > 0 {
+    log::debug!("Skipping {} existing records", existing_count);
+  }
+
   if !new_records.is_empty() {
+      log::info!("Inserting {} new records", new_records.len());
       record::Entity::insert_many(new_records).exec(db).await?;
+  } else {
+      log::debug!("No new records to insert");
   }
   Ok(())
 }

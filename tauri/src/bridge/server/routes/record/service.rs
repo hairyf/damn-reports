@@ -55,10 +55,12 @@ pub async fn get_records(
   r#type: &RecordType,
   workspace_id: Option<String>,
 ) -> Result<Vec<GroupedRecordsResponse>, sea_orm::DbErr> {
+  log::debug!("Querying records: type={:?}, workspace_id={:?}", r#type, workspace_id);
   // 计算时间范围
   let (start_time, end_time) = get_time_range(r#type);
   let start_ts = start_time.timestamp();
   let end_ts = end_time.timestamp();
+  log::trace!("Time range: {} - {}", start_ts, end_ts);
 
   // 查询记录，并关联 source
   let mut query = prelude::Record::find()
@@ -82,8 +84,11 @@ pub async fn get_records(
 
   // 如果没有任何启用的 source，直接返回空结果
   if enabled_sources.is_empty() {
+    log::warn!("No enabled data sources");
     return Ok(Vec::new());
   }
+  
+  log::debug!("Found {} enabled data sources", enabled_sources.len());
 
   // 提取 source IDs
   let enabled_source_ids: Vec<i32> = enabled_sources.iter().map(|s| s.id).collect();
@@ -140,6 +145,10 @@ pub async fn get_records(
     })
     .collect();
 
+  log::info!("Query completed, returning {} groups, {} records total", 
+    result.len(), 
+    result.iter().map(|g| g.records.len()).sum::<usize>()
+  );
   Ok(result)
 }
 
@@ -148,10 +157,12 @@ pub async fn get_summary_prompt(
   r#type: &RecordType,
   workspace_id: Option<String>,
 ) -> Result<String, sea_orm::DbErr> {
+  log::debug!("Generating summary prompt: type={:?}, workspace_id={:?}", r#type, workspace_id);
   let grouped_records = get_records(db, r#type, workspace_id).await?;
   
   if grouped_records.is_empty() {
-    return Ok(String::from("暂无记录数据。"));
+    log::info!("No record data, returning empty summary");
+    return Ok(String::from("No record data available."));
   }
 
   let mut prompt = String::new();
@@ -189,6 +200,7 @@ pub async fn get_summary_prompt(
     }
   }
   
+  log::info!("Summary prompt generated, length: {} characters", prompt.len());
   Ok(prompt)
 }
 

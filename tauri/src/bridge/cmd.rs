@@ -21,7 +21,7 @@ pub async fn database_loaded(app_handle: tauri::AppHandle) -> Result<(), String>
     return Ok(());
   }
   let db = connection::connect(&app_handle).await;
-  println!("✓ Database Connection Successful");
+  log::info!("Database Connection Successful");
   tauri::async_runtime::spawn(server::start(db.clone(), app_handle.clone()));
   scheduler::start(&app_handle, db.clone());
   Ok(())
@@ -40,16 +40,15 @@ pub async fn restart_schedule(
 #[tauri::command]
 pub async fn install_dependencies(app_handle: AppHandle) -> Result<(), String> {
   let mut setting = config::get_store_dat_setting(&app_handle);
-  dbg!(&setting.installed);
   if setting.installed {
-    println!("[DEBUG] workflow::start: 已安装，跳过安装步骤");
+    log::debug!("Already installed, skipping installation");
     return Ok(());
   }
-  println!("[DEBUG] workflow::start: 检测到未安装，开始安装流程");
+  log::debug!("Not installed detected, starting installation process");
   workflow::status::set_status(workflow::status::Status::Installing);
   workflow::status::emit_status(&app_handle);
   workflow::install(&app_handle).await?;
-  println!("[DEBUG] workflow::start: 安装完成，已标记为已安装");
+  log::debug!("Installation completed, marked as installed");
   setting.installed = true;
   config::set_store_dat_setting(&app_handle, setting);
   workflow::launch(app_handle).await?;

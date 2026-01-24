@@ -1,6 +1,7 @@
 mod bridge;
 mod config;
 mod core;
+mod logger;
 mod services;
 
 use tauri::{
@@ -17,7 +18,7 @@ use crate::config::{DB_NAME, DB_URL_PREFIX};
 fn setup(app_handle: tauri::AppHandle) {
     tauri::async_runtime::spawn(async move {
         if let Err(e) = services::workflow::start(app_handle).await {
-            eprintln!("[workflow] start failed: {}", e);
+            log::error!("start failed: {}", e);
         }
     });
 }
@@ -124,7 +125,7 @@ fn migrations() -> tauri_plugin_sql::Builder {
         },
     ];
     for migration in &migrations {
-      println!("Migration: {}", migration.description);
+      log::info!("Migration: {}", migration.description);
     }
     tauri_plugin_sql::Builder::default().add_migrations(&format!("{}{}", DB_URL_PREFIX, DB_NAME), migrations)
 }
@@ -152,6 +153,9 @@ fn builder() -> tauri::Builder<tauri::Wry> {
 
 // run app
 pub fn run() {
+    // 初始化日志系统
+    logger::init();
+    
     builder()
         .setup(|app| {
             tray(&app.handle()).unwrap();

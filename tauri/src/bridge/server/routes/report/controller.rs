@@ -20,7 +20,7 @@ pub async fn post(
       let app_handle = state.app_handle.clone();
       let report_name = report.name.clone();
       
-      println!("Attempting to send notification for report: {}", report_name);
+      log::debug!("Attempting to send notification for report: {}", report_name);
         
       // 发送通知
       use tauri_plugin_notification::NotificationExt;
@@ -32,17 +32,17 @@ pub async fn post(
       
       match notification_result {
         Ok(_) => {
-          println!("✓ Notification sent successfully for report: {}", report_name);
+          log::info!("Notification sent successfully for report: {}", report_name);
         }
         Err(e) => {
-          eprintln!("✗ Failed to send notification: {:?}", e);
+          log::warn!("Failed to send notification: {:?}", e);
         }
       }
       
       (StatusCode::OK, Json(report))
     }
     Err(e) => {
-      eprintln!("Insert report failed: {}", e);
+      log::error!("Insert report failed: {}", e);
       (
         StatusCode::INTERNAL_SERVER_ERROR,
         Json(report::Model {

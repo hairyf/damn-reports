@@ -33,7 +33,11 @@ pub async fn daily(
     repository: String,
     author: String,
 ) -> Result<CollectGitResult, String> {
-    let repo = Repository::open(&repository).map_err(|e| e.to_string())?;
+    log::info!("Starting Git record collection: repository={}, author={}", repository, author);
+    let repo = Repository::open(&repository).map_err(|e| {
+        log::error!("Failed to open repository {}: {}", repository, e);
+        e.to_string()
+    })?;
     
     // 1. 时间计算 (北京时间今日 00:00:00 起)
     let beijing_tz = FixedOffset::east_opt(8 * 3600).unwrap();
@@ -41,6 +45,7 @@ pub async fn daily(
     let start_ts = beijing_tz.from_local_datetime(
         &now.date_naive().and_time(NaiveTime::from_hms_opt(0, 0, 0).unwrap())
     ).single().unwrap().timestamp();
+    log::debug!("Collection time range: starting from {}", start_ts);
 
     // 2. 配置 Revwalk，实现 --all 效果：遍历所有引用
     let mut revwalk = repo.revwalk().map_err(|e| e.to_string())?;
@@ -52,7 +57,7 @@ pub async fn daily(
         if let Some(oid) = reference.target() {
             if let Err(e) = revwalk.push(oid) {
                 // 忽略无法推送的引用（例如已删除的分支）
-                eprintln!("Warning: Failed to push reference: {}", e);
+                log::warn!("Failed to push reference: {}", e);
             }
         }
     }
@@ -117,5 +122,6 @@ pub async fn daily(
         });
     }
 
+    log::info!("Collection completed, {} commits total", commits.len());
     Ok(CollectGitResult { count: commits.len(), data: commits })
 }

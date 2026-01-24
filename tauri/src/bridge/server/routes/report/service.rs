@@ -9,15 +9,18 @@ pub async fn create_report(
   db: Arc<DatabaseConnection>,
   input: ReportCreateInput,
 ) -> Result<report::Model, sea_orm::DbErr> {
+  log::info!("Creating report: workspace_id={}", input.workspace_id);
   // 生成当前时间戳（ISO 8601 格式）
   let now = Utc::now().to_rfc3339();
   
   let report_type = input.r#type.unwrap_or_else(|| ReportType::Daily);
+  log::debug!("Report type: {:?}", report_type);
 
   // 为缺失的字段提供默认值
   let name = input.name.unwrap_or_else(|| {
-    format!("报告 {}", Utc::now().format("%Y-%m-%d %H:%M:%S"))
+    format!("Report {}", Utc::now().format("%Y-%m-%d %H:%M:%S"))
   });
+  log::debug!("Report name: {}", name);
 
   // 创建 ActiveModel 并插入报告
   // id 不需要设置，数据库自动生成
@@ -31,5 +34,7 @@ pub async fn create_report(
     ..Default::default()
   };
 
-  Ok(new_report.insert(&*db).await?)
+  let result = new_report.insert(&*db).await?;
+  log::info!("Report created successfully: id={}, name={}", result.id, result.name);
+  Ok(result)
 }

@@ -11,7 +11,7 @@ use crate::config::{n8n_base_url, N8N_WEBHOOK_ID};
 pub async fn trigger() -> Result<(), Box<dyn std::error::Error>> {
   let webhook_url = format!("{}/webhook/{}", n8n_base_url(), N8N_WEBHOOK_ID);
   
-  println!("Triggering n8n workflow webhook: {}", webhook_url);
+  log::info!("Triggering n8n workflow webhook: {}", webhook_url);
   
   let client = reqwest::Client::new();
   let response = client
@@ -20,12 +20,13 @@ pub async fn trigger() -> Result<(), Box<dyn std::error::Error>> {
     .await?;
   
   if !response.status().is_success() {
+    log::error!("n8n webhook request failed with status: {}", response.status());
     return Err(format!(
       "n8n webhook request failed with status: {}",
       response.status()
     ).into());
   }
   
-  println!("✓ n8n workflow webhook triggered successfully");
+  log::info!("n8n workflow webhook triggered successfully");
   Ok(())
 }

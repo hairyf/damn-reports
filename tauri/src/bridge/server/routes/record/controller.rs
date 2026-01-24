@@ -19,7 +19,7 @@ pub async fn get(
       (StatusCode::OK, Json(records))
     }
     Err(e) => {
-      eprintln!("Get Records Error: {}", e);
+      log::error!("Get Records Error: {}", e);
       (StatusCode::INTERNAL_SERVER_ERROR, Json(vec![]))
     }
   }
@@ -38,7 +38,7 @@ pub async fn get_summary(
         .unwrap())
     }
     Err(e) => {
-      eprintln!("Get Summary Error: {}", e);
+      log::error!("Get Summary Error: {}", e);
       Err(StatusCode::INTERNAL_SERVER_ERROR)
     }
   }
