@@ -17,7 +17,6 @@ export enum StartupState {
 export const user = defineStore({
   state: () => ({
     info: null as N8nUser | null,
-
     // 状态分类：运行状态
     n8nprocessStatus: 'initial' as 'initial' | 'installing' | 'starting' | 'running',
     loggedIn: false,
@@ -130,7 +129,7 @@ export const user = defineStore({
 
   },
   getters: {
-    initialized() {
+    ready() {
       return (
         !!(this.n8nprocessStatus === 'running'
           && this.loggedIn

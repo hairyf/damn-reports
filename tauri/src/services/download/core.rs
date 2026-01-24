@@ -52,6 +52,7 @@ pub async fn download_file<'a, R: Runtime>(
 /// 
 /// # 参数
 /// - `tracker`: 进度追踪器
+/// - `name`: 文件名
 /// - `buffer`: 压缩文件内容
 /// - `dest`: 解压目标目录
 /// 

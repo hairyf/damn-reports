@@ -1,76 +1,55 @@
 pub mod status;
 pub mod utils;
 
-use crate::config;
+use crate::config::{self};
 use crate::services::download;
-use std::fs;
-use std::process::{Command, Stdio};
-use tauri::Manager;
+use std::process::{Command, Stdio, ChildStdout, ChildStderr};
+use std::io::{BufRead, BufReader};
+use std::thread;
+use tauri::{Manager};
 use tauri;
 use crate::services::workflow::utils::{is_n8n_running, is_port_in_use};
 
 pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
-    println!("[DEBUG] workflow::start: 开始启动工作流");
-    let mut setting = config::get_store_dat_setting(&app_handle);
-    dbg!(&setting.installed);
-
+    let setting = config::get_store_dat_setting(&app_handle);
     if !setting.installed {
-        println!("[DEBUG] workflow::start: 检测到未安装，开始安装流程");
-        status::set_status(status::Status::Installing);
-        install(&app_handle).await?;
-        // 标记为已初始化
-        setting.installed = true;
-        config::set_store_dat_setting(&app_handle, setting);
-        println!("[DEBUG] workflow::start: 安装完成，已标记为已安装");
-    } else {
-        println!("[DEBUG] workflow::start: 已安装，跳过安装步骤");
+        return Ok(());
     }
 
     let port_in_use = is_port_in_use(config::N8N_PORT);
     let n8n_running = is_n8n_running().await;
-    println!("[DEBUG] workflow::start: 端口 {} 使用状态: {}, n8n 运行状态: {}", config::N8N_PORT, port_in_use, n8n_running);
 
     if port_in_use && n8n_running {
-        println!("[DEBUG] workflow::start: n8n 已在运行，直接返回");
         status::set_status(status::Status::Running);
+        status::emit_status(&app_handle);
         return Ok(());
     }
 
-    println!("[DEBUG] workflow::start: 开始启动 n8n");
     status::set_status(status::Status::Starting);
+    status::emit_status(&app_handle);
     launch(app_handle).await?;
-    println!("[DEBUG] workflow::start: n8n 启动命令已执行");
     // 之后由 scheduler/task/tick_check_n8n_process/mod.rs 检测状态
 
     Ok(())
 }
 
-async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
-    println!("[DEBUG] workflow::launch: 开始启动 n8n 进程");
+pub async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
     let get_node_binary_path = config::get_node_binary_path(&app_handle);
     let get_n8n_binary_path = config::get_n8n_binary_path(&app_handle);
     let get_n8n_data_path = config::get_n8n_data_path(&app_handle);
 
-    println!("[DEBUG] workflow::launch: Node.js 路径: {:?}", get_node_binary_path);
-    println!("[DEBUG] workflow::launch: n8n 路径: {:?}", get_n8n_binary_path);
-    println!("[DEBUG] workflow::launch: n8n 数据路径: {:?}", get_n8n_data_path);
-
     if !get_node_binary_path.exists() {
-        println!("[DEBUG] workflow::launch: 错误 - Node.js 未找到");
         return Err("NODE_NOT_FOUND: Node.js 未安装".to_string());
     }
     if !get_n8n_binary_path.exists() {
-        println!("[DEBUG] workflow::launch: 错误 - n8n 未找到");
         return Err("N8N_NOT_FOUND: n8n 未安装".to_string());
     }
 
     #[cfg(unix)]
     {
-        println!("[DEBUG] workflow::launch: Unix 系统，尝试清理现有 node 进程");
         let _ = Command::new("pkill").arg("-9").arg("node").output();
     }
 
-    println!("[DEBUG] workflow::launch: 构建启动命令");
     let mut cmd = Command::new(&get_node_binary_path);
     cmd.arg(&get_n8n_binary_path)
         .arg("start")
@@ -87,31 +66,31 @@ async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
         .env("N8N_HOST", "127.0.0.1")
         // 核心修正：提供一个空的 stdin 防止 setRawMode 报错
         .stdin(Stdio::null())
-        .stdout(Stdio::inherit())
-        .stderr(Stdio::inherit());
+        // 使用管道捕获输出，以便在子线程中读取
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
 
     #[cfg(windows)]
     {
         use std::os::windows::process::CommandExt;
-        println!("[DEBUG] workflow::launch: Windows 系统，设置创建标志");
         cmd.creation_flags(0x08000000);
     }
 
-    println!("[DEBUG] workflow::launch: 执行 spawn 命令");
     match cmd.spawn() {
-        Ok(child) => {
-            println!("[DEBUG] workflow::launch: 进程启动成功，PID: {:?}", child.id());
+        Ok(mut child) => {
+            // 获取 stdout 和 stderr，并启动读取线程
+            let stdout = child.stdout.take();
+            let stderr = child.stderr.take();
+            spawn_output_readers(stdout, stderr);
+            
             Ok(())
         }
-        Err(e) => {
-            println!("[DEBUG] workflow::launch: 进程启动失败: {}", e);
-            Err(format!("进程启动失败: {}", e))
-        }
+        Err(e) => Err(format!("进程启动失败: {}", e))
     }
 }
 
 /// 安装 Node.js 和 n8n
-async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
+pub async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
     println!("[DEBUG] workflow::install: 开始安装流程");
     let window = app_handle
         .get_webview_window("main")
@@ -133,21 +112,9 @@ async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
         }
 
         println!("[DEBUG] workflow::install: 任务 {} 未安装，开始安装", index + 1);
-        // 1. 清理并准备目录
-        let temp_dir = task.get_temp_dir(app_handle);
-        println!("[DEBUG] workflow::install: 临时目录: {:?}", temp_dir);
-        if temp_dir.exists() {
-            println!("[DEBUG] workflow::install: 清理现有临时目录");
-            fs::remove_dir_all(&temp_dir).ok();
-        }
-        fs::create_dir_all(&temp_dir).map_err(|e| {
-            println!("[DEBUG] workflow::install: 创建临时目录失败: {}", e);
-            e.to_string()
-        })?;
-        println!("[DEBUG] workflow::install: 临时目录准备完成");
 
         // 2. 下载
-        tracker.start_phase("download", &format!("正在下载 Node.js Binary"));
+        tracker.start_phase("download", &format!("正在下载 {}", task.title()));
         let url = task.get_download_url()?;
         println!("[DEBUG] workflow::install: 下载 URL: {}", url);
         let name = url.split('/').last().unwrap().to_string();
@@ -157,7 +124,7 @@ async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
         tracker.end_phase();
 
         // 3. 解压
-        tracker.start_phase("extract", &format!("正在下载 Node.js Binary"));
+        tracker.start_phase("extract", &format!("正在解压 {}", task.title()));
         let dest = task.get_install_path(app_handle);
         println!("[DEBUG] workflow::install: 安装路径: {:?}", dest);
         download::ensure_extract(
@@ -174,4 +141,35 @@ async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
     tracker.update(100.0, "所有任务已完成".into());
 
     Ok(())
+}
+
+/// 在独立线程中读取子进程的输出
+/// 
+/// # 参数
+/// - `stdout`: 子进程的标准输出
+/// - `stderr`: 子进程的标准错误输出
+fn spawn_output_readers(stdout: Option<ChildStdout>, stderr: Option<ChildStderr>) {
+    // 在独立线程中读取 stdout
+    if let Some(stdout) = stdout {
+        thread::spawn(move || {
+            let reader = BufReader::new(stdout);
+            for line in reader.lines() {
+                if let Ok(line) = line {
+                    println!("[n8n stdout] {}", line);
+                }
+            }
+        });
+    }
+    
+    // 在独立线程中读取 stderr
+    if let Some(stderr) = stderr {
+        thread::spawn(move || {
+            let reader = BufReader::new(stderr);
+            for line in reader.lines() {
+                if let Ok(line) = line {
+                    eprintln!("[n8n stderr] {}", line);
+                }
+            }
+        });
+    }
 }

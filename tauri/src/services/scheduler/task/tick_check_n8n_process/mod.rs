@@ -1,6 +1,6 @@
 use crate::services::workflow::{status::{self, Status}, utils as workflow_utils};
 use crate::core::utils;
-use tauri::{AppHandle, Emitter};
+use tauri::{AppHandle};
 use crate::config::N8N_PORT;
 
 impl Status {
@@ -14,8 +14,10 @@ impl Status {
           // 无论当前是什么状态，只要两个检测都通过，就是运行中
           (_, true) => Status::Running,
           // 如果检测失败，但当前是启动中，则保持启动中（等待超时或成功）
-          // (Status::Starting, false) => Status::Starting,
-          // 其他情况（如原本运行中但检测失败），回退到初始状态
+          (Status::Starting, false) => Status::Starting,
+          // 如果检测失败，但当前是安装中，则保持安装中
+          (Status::Installing, false) => Status::Installing,
+          // 其他情况（如原本运行中但检测失败，或从初始状态检测失败），回退到初始状态
           _ => Status::Initial,
       }
   }
@@ -33,10 +35,11 @@ pub async fn trigger(app_handle: AppHandle) -> Result<(), Box<dyn std::error::Er
   let is_port_in_use = utils::is_port_in_use(N8N_PORT);
   let is_http_ok = workflow_utils::is_n8n_running().await;
   let new_status = current_status.update_based_checks(is_port_in_use, is_http_ok);
+  
+  // 如果状态发生变化，就更新状态
   if new_status != current_status {
-      println!("N8N status updated to: {:?}", new_status);
       status::set_status(new_status.clone());
-      app_handle.emit("n8n-status-updated", &new_status)?;
+      status::emit_status(&app_handle);
   }
   Ok(())
 }

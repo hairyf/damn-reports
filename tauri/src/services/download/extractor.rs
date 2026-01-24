@@ -28,12 +28,20 @@ pub fn extract_zip<'a, R: Runtime>(
             None => continue,
         };
 
-        // 3. 打印进度和当前文件名
+        // 3. 打印进度和当前文件名（格式：Extract 路径/文件）
+        let relative_path = outpath.strip_prefix(dest)
+            .ok()
+            .and_then(|p| p.to_str())
+            .map(|s| s.replace('\\', "/"))
+            .unwrap_or_else(|| {
+                outpath.file_name()
+                    .map(|n| n.to_string_lossy().to_string())
+                    .unwrap_or_default()
+            });
+        let display_text = format!("Extract {}", relative_path);
         tracker.update(
             (i + 1) as f64 / total_files as f64,
-            outpath.file_name()
-                .map(|n| n.to_string_lossy().to_string())
-                .unwrap_or_default()
+            display_text
         );
 
         // 4. 处理目录或文件
@@ -79,11 +87,11 @@ pub fn extract_tgz<'a, R: Runtime>(
         let mut entry = entry_result.map_err(|e| e.to_string())?;
         let path = entry.path().map(|p| p.to_path_buf()).map_err(|e| e.to_string())?;
         
-        // 打印当前解压的文件名
+        // 打印当前解压的文件名（格式：Extract 路径/文件）
         // -1.0 表示未知进度(让前端持续增加)
-        tracker.update(-1.0, path.file_name()
-            .map(|n| n.to_string_lossy().to_string())
-            .unwrap_or_else(|| path.to_string_lossy().to_string()));
+        let relative_path = path.to_string_lossy().replace('\\', "/");
+        let display_text = format!("Extract {}", relative_path);
+        tracker.update(-1.0, display_text);
 
         // 执行解压
         entry.unpack_in(dest).map_err(|e| e.to_string())?;

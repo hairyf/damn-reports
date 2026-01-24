@@ -11,6 +11,7 @@ export const setting = defineStore(
   {
     state: () => ({
       installed: false,
+      ininitialized: false,
       language: 'zh-CN' as Language,
       autoSave: true,
       notifications: true,

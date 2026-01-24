@@ -4,7 +4,7 @@ import { defineStore } from 'valtio-define'
 export const installer = defineStore({
   state: () => ({
     title: '正在准备安装...',
-    type: null as 'download' | 'extract' | null,
+    type: 'extract' as 'download' | 'extract' | null,
     percentage: 0,
     progress: 0,
     detail: '',

@@ -17,20 +17,20 @@ export interface DefaultLayoutProps {
 }
 
 export function DefaultLayout(props: DefaultLayoutProps) {
-  const { initialized } = useStore(store.user)
+  const { ready } = useStore(store.user)
   const { installed } = useStore(store.setting)
 
   function render(content: React.ReactNode) {
     if (!installed)
       return <Installer />
-    if (initialized)
+    if (!ready)
       return <Initiator />
     return content
   }
   return (
     <AnimatePresence mode="wait">
       <motion.div
-        key={initialized ? 'layout' : 'initiator'}
+        key={ready ? 'layout' : 'initiator'}
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={{ opacity: 0, y: -10 }}

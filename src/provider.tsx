@@ -1,9 +1,11 @@
 import type { NavigateOptions } from 'react-router-dom'
 
+import { If } from '@hairy/react-lib'
 import { HeroUIProvider, ToastProvider } from '@heroui/react'
 import { OverlaysProvider } from '@overlastic/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useHref, useNavigate } from 'react-router-dom'
+import { useMount } from 'react-use'
 import { queryClient } from './config/client'
 
 declare module '@react-types/shared' {
@@ -14,15 +16,22 @@ declare module '@react-types/shared' {
 
 export function Provider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
+  const [initial, setInitial] = useState(false)
+
+  useMount(() => {
+    storage.getItem('installed').then(() => setInitial(true))
+  })
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <HeroUIProvider navigate={navigate} useHref={useHref}>
-        <OverlaysProvider>
-          {children}
-        </OverlaysProvider>
-        <ToastProvider toastOffset={64} placement="top-center" />
-      </HeroUIProvider>
-    </QueryClientProvider>
+    <If cond={initial}>
+      <QueryClientProvider client={queryClient}>
+        <HeroUIProvider navigate={navigate} useHref={useHref}>
+          <OverlaysProvider>
+            {children}
+          </OverlaysProvider>
+          <ToastProvider toastOffset={64} placement="top-center" />
+        </HeroUIProvider>
+      </QueryClientProvider>
+    </If>
   )
 }

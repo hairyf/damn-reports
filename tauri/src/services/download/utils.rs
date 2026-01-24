@@ -21,6 +21,9 @@ pub fn fix_recursive_permissions(path: &Path) -> std::io::Result<()> {
     Ok(())
 }
 
+/// 不应被拉平的目录名（解压后保留层级，避免 node_modules 等被拆散）
+const PRESERVE_DIRS: &[&str] = &["node_modules", ".git"];
+
 pub fn flatten_directory(dest: &PathBuf) -> Result<(), String> {
     let entries: Vec<_> = fs::read_dir(dest).map_err(|e| e.to_string())?
         .filter_map(|e| e.ok())
@@ -32,7 +35,8 @@ pub fn flatten_directory(dest: &PathBuf) -> Result<(), String> {
             let is_dir = path.is_dir();
             let file_name = path.file_name().and_then(|n| n.to_str());
             let is_hidden = file_name.map(|n| n.starts_with('.')).unwrap_or(false);
-            is_dir && !is_hidden
+            let preserve = file_name.map(|n| PRESERVE_DIRS.contains(&n)).unwrap_or(false);
+            is_dir && !is_hidden && !preserve
         })
         .collect();
 

@@ -10,6 +10,7 @@ use crate::services::scheduler;
 use crate::services::workflow;
 use crate::services::collector;
 use crate::services::scheduler::task;
+use crate::config;
 
 // 全局标志，确保数据库连接成功只运行一次
 static DATABASE_LOADED: AtomicBool = AtomicBool::new(false);
@@ -33,6 +34,25 @@ pub async fn restart_schedule(
   handle: State<'_, SchedulerHandle>,
 ) -> Result<(), String> {
   scheduler::restart(app_handle, db, handle).await.map_err(|e| e.to_string())?;
+  Ok(())
+}
+
+#[tauri::command]
+pub async fn install_dependencies(app_handle: AppHandle) -> Result<(), String> {
+  let mut setting = config::get_store_dat_setting(&app_handle);
+  dbg!(&setting.installed);
+  if setting.installed {
+    println!("[DEBUG] workflow::start: 已安装，跳过安装步骤");
+    return Ok(());
+  }
+  println!("[DEBUG] workflow::start: 检测到未安装，开始安装流程");
+  workflow::status::set_status(workflow::status::Status::Installing);
+  workflow::status::emit_status(&app_handle);
+  workflow::install(&app_handle).await?;
+  println!("[DEBUG] workflow::start: 安装完成，已标记为已安装");
+  setting.installed = true;
+  config::set_store_dat_setting(&app_handle, setting);
+  workflow::launch(app_handle).await?;
   Ok(())
 }
 

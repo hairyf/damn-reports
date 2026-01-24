@@ -98,6 +98,7 @@ fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         bridge::cmd::database_loaded,
         bridge::cmd::restart_schedule,
+        bridge::cmd::install_dependencies,
         bridge::cmd::get_n8n_status,
         bridge::cmd::collect_daily_records,
         bridge::cmd::generate_daily_report,
