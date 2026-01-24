@@ -1,5 +1,6 @@
 import { debounce, delay } from '@hairy/utils'
 import { invoke } from '@tauri-apps/api/core'
+import { listen } from '@tauri-apps/api/event'
 import { defineStore } from 'valtio-define'
 import 'valtio-define/types'
 
@@ -9,6 +10,7 @@ export type Language = 'zh-CN' | 'en-US'
 export const setting = defineStore(
   {
     state: () => ({
+      installed: false,
       language: 'zh-CN' as Language,
       autoSave: true,
       notifications: true,
@@ -30,3 +32,5 @@ delay(1000).then(() => {
   setting.$subscribeKey('collectTime', restart_schedule)
   setting.$subscribeKey('generateTime', restart_schedule)
 })
+
+listen<typeof setting.$state>('setting_updated', event => setting.$patch(event.payload))

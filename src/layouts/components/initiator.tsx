@@ -13,116 +13,23 @@ export interface RetryOptions {
 }
 
 export function Initiator() {
-  const { status, n8nEmail, n8nPassword, credentialId, credentialName } = useStore(store.user)
-
-  async function registerN8nAccount() {
-    const result = await postN8nRegister({
-      ...N8N_REGISTER_DATA,
-      email: n8nEmail || N8N_REGISTER_DATA.email,
-      password: n8nPassword || N8N_REGISTER_DATA.password,
-    })
-    if (typeof result.code === 'number')
-      throw new TypeError(result.message)
-    if (!result)
-      throw new TypeError('Failed to register n8n account')
-    return result.data
-  }
-
-  async function loginN8nAccount() {
-    const login_data = {
-      emailOrLdapLoginId: n8nEmail || N8N_REGISTER_DATA.email,
-      password: n8nPassword || N8N_REGISTER_DATA.password,
-    }
-    const result = await postN8nLogin(login_data)
-    if (typeof result.code === 'number')
-      throw new TypeError(result.message)
-    return result.data
-  }
-  async function initializeN8nAccount() {
-    try {
-      const n8nUser = await registerN8nAccount()
-      await loginN8nAccount()
-      await postN8nMeSurvey({
-        version: 'v4',
-        personalization_survey_submitted_at: new Date().toISOString(),
-        personalization_survey_n8n_version: 'v4',
-      })
-      store.user.$patch({ n8nLoggedIn: true, n8nUser })
-    }
-    catch {
-      const n8nUser = await loginN8nAccount()
-      store.user.$patch({ n8nLoggedIn: true, n8nUser })
-    }
-  }
-
-  async function initializeN8nWorkflow() {
-    const { insertId } = await db.workspace.create({
-      name: 'Default Report Workflow',
-      workflow: '__workflow__',
-    })
-    const workspaceId = insertId?.toString()
-
-    if (!workspaceId)
-      throw new TypeError('Failed to create workspace')
-
-    const requestData = getReportWorkflowData({
-      workflowId: Number(workspaceId),
-      name: 'Default Report Workflow',
-      credentials: {
-        deepSeekApi: credentialId
-          ? {
-              id: credentialId!,
-              name: credentialName!,
-            }
-          : undefined,
-      },
-    })
-
-    const data = await postN8nWorkflow(requestData)
-
-    if (!data?.id)
-      throw new TypeError('Failed to create workflow')
-
-    await postN8nWorkflowWorkflowIdActivate(
-      { workflowId: data.id },
-      {
-        versionId: data.versionId,
-        expectedChecksum: data.checksum,
-        name: `Version ${data.versionId.split('-')[0]}`,
-        description: '',
-      },
-    )
-
-    await db.workspace.update(workspaceId, { workflow: data.id })
-
-    store.user.$patch({ workflowId: data.id, workspaceId: Number(workspaceId) })
-  }
+  const { status } = useStore(store.user)
 
   useWhenever(
     status === StartupState.INITIALIZING_ACCOUNT,
     // 登录重试多一些，避免启动 n8n 端口还未完全启动成功
-    () => retry(initializeN8nAccount, { retries: 10, delay: 1000 }),
+    () => retry(store.user.initializeAccount, { retries: 10, delay: 1000 }),
     { immediate: true },
   )
 
   useWhenever(
     status === StartupState.TEMPLATE_INIT,
-    () => retry(initializeN8nWorkflow),
+    () => retry(store.user.initializeWorkflow),
     { immediate: true },
   )
 
   function renderStatus() {
     switch (status) {
-      case StartupState.UNZIPPING:
-        return (
-          <StepStatus
-            icon={<Icon icon="lucide:package-check" className="text-blue-400 w-8 h-8" />}
-            title="解压 n8n 服务"
-            description="正在准备环境组件，这可能需要一点时间..."
-            progress={33}
-            loading
-          />
-        )
       case StartupState.STARTING_SERVICE:
         return (
           <StepStatus

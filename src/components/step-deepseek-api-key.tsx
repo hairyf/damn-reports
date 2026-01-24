@@ -1,28 +1,11 @@
-import { addToast, Button, Card, CardBody, Input } from '@heroui/react'
+import { Button, Card, CardBody, Input } from '@heroui/react'
 import { Icon } from '@iconify/react'
 
 export function StepDeepSeekApiKey() {
   const [apiKey, setApiKey] = useState('')
-  async function onDeepSeekSubmit(apiKey: string) {
-    if (!apiKey.startsWith('sk-')) {
-      addToast({ description: 'API Key 格式不正确' })
-      return
-    }
-    const { data } = await postN8nCredentials({
-      isGlobal: false,
-      isResolvable: false,
-      data: { apiKey },
-      name: 'DeepSeek account',
-      type: 'deepSeekApi',
-    })
-    store.user.$patch({
-      credentialId: data.id,
-      credentialName: data.name,
-    })
-  }
 
   function onSkip() {
-    store.user.$patch({ deepseekSkip: true })
+    store.user.deepseekSkip = true
   }
 
   return (
@@ -62,7 +45,7 @@ export function StepDeepSeekApiKey() {
               Skip
             </Button>
             <Button
-              onPress={() => onDeepSeekSubmit(apiKey)}
+              onPress={() => store.user.createCredential(apiKey)}
               color="primary"
               className="flex-1"
               disabled={!apiKey}

@@ -1,3 +1,23 @@
+export interface N8nUser {
+  createdAt: string
+  disabled: boolean
+  email: string
+  featureFlags: Record<string, boolean>
+  firstName: string
+  globalScopes: string[]
+  id: string
+  isOwner: boolean
+  isPending: boolean
+  lastActiveAt: string
+  lastName: string
+  mfaAuthenticated: boolean
+  mfaEnabled: boolean
+  personalizationAnswers: Record<string, unknown> | null
+  role: string
+  settings: { userActivated: boolean }
+  signInType: 'email'
+}
+
 export interface PostN8nCredentialsBody {
   isGlobal: boolean
   isResolvable: boolean
@@ -45,7 +65,7 @@ export interface PostN8nLoginBody {
 export interface PostN8nLoginResult {
   code?: number
   message?: string
-  data: any
+  data: N8nUser
 }
 
 export interface PostN8nMeSurveyParams {
@@ -74,7 +94,7 @@ export interface PostN8nWorkflowWorkflowIdActivateBody {
 
 export interface PostN8nRegisterResult {
   code?: number
-  data: any
+  data: N8nUser
   message?: string
 }
 

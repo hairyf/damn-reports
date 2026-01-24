@@ -16,16 +16,14 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
         .store(config::STORE_DAT_FILE)
         .map_err(|e| format!("无法加载存储: {}", e))?;
 
-    let is_initialized = store
-        .get("initialized")
-        .and_then(|v| v.as_bool())
-        .unwrap_or(false);
+    let mut setting = config::get_store_dat_setting(&app_handle);
 
-    if !is_initialized {
-        status::set_status(status::Status::Initializing);
+    if !setting.installed {
+        status::set_status(status::Status::Installing);
         install(&app_handle).await?;
         // 标记为已初始化
-        store.set("initialized", serde_json::json!(true));
+        setting.installed = true;
+        config::set_store_dat_setting(&app_handle, setting);
     }
 
     if is_port_in_use(config::N8N_PORT) && is_n8n_running().await {

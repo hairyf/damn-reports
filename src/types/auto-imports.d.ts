@@ -244,6 +244,6 @@ declare global {
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
   // @ts-ignore
-  export type { PostN8nCredentialsBody, PostN8nCredentialsResult, PatchN8nMeBody, PatchN8nMeResult, PostN8nLoginBody, PostN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nWorkflowWorkflowIdActivateBody, PostN8nRegisterResult, PostN8nWorkflowResult } from '../apis/index.types'
+  export type { N8nUser, PostN8nCredentialsBody, PostN8nCredentialsResult, PatchN8nMeBody, PatchN8nMeResult, PostN8nLoginBody, PostN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nWorkflowWorkflowIdActivateBody, PostN8nRegisterResult, PostN8nWorkflowResult } from '../apis/index.types'
   import('../apis/index.types')
 }

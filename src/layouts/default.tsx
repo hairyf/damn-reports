@@ -1,3 +1,4 @@
+import { If } from '@hairy/react-lib'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useStore } from 'valtio-define'
@@ -26,24 +27,18 @@ export function DefaultLayout(props: DefaultLayoutProps) {
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.4 }}
       >
-        {
-          initialized
-            ? (
-                <div className={clsx('relative flex min-h-screen', props.classNames?.root)}>
-                  <Sidebar />
-
-                  <div className="flex flex-col flex-1">
-                    <Navbar />
-                    <Main className={props.classNames?.main}>
-                      {props.children}
-                    </Main>
-                  </div>
-                </div>
-              )
-            : <Initiator />
-        }
+        <If cond={true} else={<Initiator />}>
+          <div className={clsx('relative flex min-h-screen', props.classNames?.root)}>
+            <Sidebar />
+            <div className="flex flex-col flex-1">
+              <Navbar />
+              <Main className={props.classNames?.main}>
+                {props.children}
+              </Main>
+            </div>
+          </div>
+        </If>
       </motion.div>
     </AnimatePresence>
-
   )
 }
