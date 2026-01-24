@@ -9,13 +9,7 @@ use tauri::Manager;
 use tauri;
 use crate::services::workflow::utils::{is_n8n_running, is_port_in_use};
 
-use tauri_plugin_store::StoreExt;
-
 pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
-    let store = app_handle
-        .store(config::STORE_DAT_FILE)
-        .map_err(|e| format!("无法加载存储: {}", e))?;
-
     let mut setting = config::get_store_dat_setting(&app_handle);
 
     if !setting.installed {
@@ -108,14 +102,14 @@ async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
         fs::create_dir_all(&temp_dir).map_err(|e| e.to_string())?;
 
         // 2. 下载
-        tracker.start_phase(&format!("正在下载 {}", task.name()));
+        tracker.start_phase("download", &format!("正在下载 Node.js Binary"));
         let url = task.get_download_url()?;
         let name = url.split('/').last().unwrap().to_string();
         let buffer = download::download_file(&tracker, url).await.unwrap();
         tracker.end_phase();
 
         // 3. 解压
-        tracker.start_phase(&format!("正在解压 {}", task.name()));
+        tracker.start_phase("extract", &format!("正在下载 Node.js Binary"));
         let dest = task.get_install_path(app_handle);
         download::ensure_extract(
             &tracker, 

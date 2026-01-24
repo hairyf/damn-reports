@@ -17,8 +17,6 @@ pub const APP_SERVER_PORT: u16 = 6789;
 pub const APP_SERVER_BIND_ADDRESS: &str = "0.0.0.0";
 
 pub const STORE_DAT_FILE: &str = ".store.dat";
-pub const DEFAULT_COLLECT_TIME: &str = "17:45";
-pub const DEFAULT_GENERATE_TIME: &str = "17:50";
 
 pub const N8N_WEBHOOK_ID: &str = "adf86697801f";
 
@@ -26,5 +24,3 @@ pub const DB_NAME: &str = "main.db";
 pub const DB_URL_PREFIX: &str = "sqlite:";
 
 pub const STORE_SETTING_KEY: &str = "setting";
-pub const STORE_SETTING_COLLECT_TIME_KEY: &str = "collectTime";
-pub const STORE_SETTING_GENERATE_TIME_KEY: &str = "generateTime";

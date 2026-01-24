@@ -1,5 +1,5 @@
 use std::fs;
-use std::path::{Path, PathBuf};
+use std::path::{PathBuf};
 
 // 引入 Unix 专属权限库
 #[cfg(unix)]

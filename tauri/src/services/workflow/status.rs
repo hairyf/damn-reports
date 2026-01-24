@@ -3,7 +3,6 @@ use std::sync::{Mutex, OnceLock};
 #[derive(Debug, Clone, serde::Serialize, PartialEq)]
 pub enum Status {
     Initial,
-    // only for production environment
     Installing,
     Starting,
     Running,

@@ -1,3 +1,4 @@
+import type { ProgressProps } from '@heroui/react'
 import { Progress } from '@heroui/react'
 import { Icon } from '@iconify/react'
 
@@ -5,13 +6,15 @@ interface StepStatusProps {
   icon: React.ReactNode
   title: string
   description: string
+  extra?: React.ReactNode
   progress: number
   loading?: boolean
+  progressProps?: ProgressProps
 }
 
-export function StepStatus({ icon, title, description, progress, loading }: StepStatusProps) {
+export function StepStatus({ icon, title, description, extra, progress, loading, progressProps }: StepStatusProps) {
   return (
-    <div className="p-8 text-center flex flex-col items-center w-full">
+    <div className="p-8 text-center flex flex-col items-center w-full max-w-xl">
       <div className="mb-6">
         <div className="p-5 rounded-full dark:bg-foreground/10 bg-foreground/5">
           {icon}
@@ -22,7 +25,7 @@ export function StepStatus({ icon, title, description, progress, loading }: Step
 
       <Progress
         classNames={{
-          base: 'max-w-md mb-4',
+          base: 'mb-4',
           track: 'drop-shadow-md',
           indicator: 'bg-linear-to-r from-primary-500 to-primary-200',
           label: 'tracking-wider font-medium text-default-600',
@@ -31,7 +34,10 @@ export function StepStatus({ icon, title, description, progress, loading }: Step
         size="sm"
         value={progress}
         aria-label={`${title} 进度: ${progress}%`}
+        {...progressProps}
       />
+
+      {extra}
 
       {loading && (
         <div className="flex items-center text-xs font-mono text-foreground/40">

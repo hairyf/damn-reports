@@ -1,10 +1,10 @@
-import { If } from '@hairy/react-lib'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useStore } from 'valtio-define'
 import { Navbar } from '@/layouts/components/navbar'
 import { Sidebar } from '@/layouts/components/sidebar'
 import { Initiator } from './components/initiator'
+import { Installer } from './components/installer'
 import { Main } from './components/main'
 
 export interface DefaultLayoutProps {
@@ -18,6 +18,15 @@ export interface DefaultLayoutProps {
 
 export function DefaultLayout(props: DefaultLayoutProps) {
   const { initialized } = useStore(store.user)
+  const { installed } = useStore(store.setting)
+
+  function render(content: React.ReactNode) {
+    if (!installed)
+      return <Installer />
+    if (initialized)
+      return <Initiator />
+    return content
+  }
   return (
     <AnimatePresence mode="wait">
       <motion.div
@@ -27,7 +36,7 @@ export function DefaultLayout(props: DefaultLayoutProps) {
         exit={{ opacity: 0, y: -10 }}
         transition={{ duration: 0.4 }}
       >
-        <If cond={true} else={<Initiator />}>
+        {render(
           <div className={clsx('relative flex min-h-screen', props.classNames?.root)}>
             <Sidebar />
             <div className="flex flex-col flex-1">
@@ -36,8 +45,8 @@ export function DefaultLayout(props: DefaultLayoutProps) {
                 {props.children}
               </Main>
             </div>
-          </div>
-        </If>
+          </div>,
+        )}
       </motion.div>
     </AnimatePresence>
   )

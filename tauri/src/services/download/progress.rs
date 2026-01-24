@@ -7,8 +7,11 @@ use serde::Serialize;
 #[serde(rename_all = "camelCase")]
 pub struct ProgressPayload {
     pub title: String,
-    pub percentage: f64,
     pub detail: String,
+    pub r#type: String,
+    pub percentage: f64,
+    // 子任务进度
+    pub progress: f64,
 }
 
 pub struct ProgressTracker<'a, R: Runtime> {
@@ -16,6 +19,7 @@ pub struct ProgressTracker<'a, R: Runtime> {
     total_phases: usize,
     current_phase: usize,
     current_title: String,
+    current_type: String,
     last_emit_time: RefCell<Option<Instant>>,
 }
 
@@ -26,13 +30,15 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
             total_phases: task_count,
             current_phase: 0,
             current_title: String::from("准备中..."),
+            current_type: String::from(""),
             last_emit_time: RefCell::new(None),
         }
     }
 
     /// 切换阶段，并设置大标题
-    pub fn start_phase(&mut self, title: &str) {
+    pub fn start_phase(&mut self,r#type: &str, title: &str) {
         self.current_title = title.to_string();
+        self.current_type = r#type.to_string();
     }
 
     /// 完成一个阶段
@@ -47,7 +53,7 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
     pub fn update(&self, stage_pct: f64, detail: String) {
         let now = Instant::now();
         let mut last_emit = self.last_emit_time.borrow_mut();
-        
+
         // 节流处理：如果距离上次发送不足 150ms，则跳过
         if let Some(last_time) = *last_emit {
             if now.duration_since(last_time) < Duration::from_millis(150) {
@@ -62,7 +68,9 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
 
         let _ = self.window.emit("install-progress", ProgressPayload {
             title: self.current_title.clone(),
+            r#type: self.current_type.clone(),
             percentage: global_pct,
+            progress: stage_pct,
             detail,
         });
     }

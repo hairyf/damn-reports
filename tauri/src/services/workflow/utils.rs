@@ -1,5 +1,5 @@
 use std::time::Duration;
-use crate::config::n8n_base_url;
+use crate::config::n8n_rest_url;
 use std::net::{TcpStream, SocketAddr};
 
 /// 检查 n8n 是否真正在运行
@@ -15,7 +15,7 @@ pub async fn is_n8n_running() -> bool {
         None => return false,
     };
 
-    let healthz_url = format!("{}/healthz", n8n_base_url());
+    let healthz_url = format!("{}/healthz", n8n_rest_url());
 
     // 发送请求并尝试解析 JSON
     let check_status = async {
