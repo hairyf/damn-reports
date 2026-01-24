@@ -11,6 +11,7 @@ pub const CLICKUP_API_URL: &str = "https://api.clickup.com/api/v2";
 
 pub const N8N_HOST: &str = "http://localhost";
 pub const N8N_PORT: u16 = 5678; // ENV: N8N_PORT
+// pub const N8N_REST_ENDPOINT: &str = "/rest";
 
 pub const APP_SERVER_PORT: u16 = 6789;
 pub const APP_SERVER_BIND_ADDRESS: &str = "0.0.0.0";
