@@ -1,3 +1,5 @@
+use crate::config::{n8n_base_url, N8N_WEBHOOK_ID};
+
 /// 触发 n8n workflow webhook
 /// 
 /// 发送 GET 请求到 n8n webhook URL 以触发工作流执行
@@ -7,10 +9,7 @@
 /// - `Ok(())`: webhook 调用成功
 /// - `Err(String)`: webhook 调用失败，包含错误信息
 pub async fn trigger() -> Result<(), Box<dyn std::error::Error>> {
-  const N8N_BASE_URL: &str = "http://localhost:5678";
-  const WEBHOOK_ID: &str = "adf86697801f";
-  
-  let webhook_url = format!("{}/webhook/{}", N8N_BASE_URL, WEBHOOK_ID);
+  let webhook_url = format!("{}/webhook/{}", n8n_base_url(), N8N_WEBHOOK_ID);
   
   println!("Triggering n8n workflow webhook: {}", webhook_url);
   

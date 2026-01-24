@@ -8,8 +8,8 @@ use sea_orm::DatabaseConnection;
 use std::time::Duration;
 use tauri::{async_runtime::spawn, AppHandle, Manager, State};
 pub mod task;
+use crate::config::{store_dat_setting_collect_time, store_dat_setting_generate_time};
 
-use crate::core::config;
 use tokio::time::{self};
 
 /// 用于控制调度器运行状态的结构体
@@ -60,7 +60,8 @@ async fn scheduler_loop(app_handle: AppHandle, db: DatabaseConnection, running: 
     let mut scheduler = Scheduler::new();
     let mut interval = time::interval(Duration::from_millis(100));
 
-    let (collect_time, generate_time) = config::get_time_from_setting(&app_handle);
+    let collect_time = store_dat_setting_collect_time(&app_handle);
+    let generate_time = store_dat_setting_generate_time(&app_handle);
 
     println!(
         "Scheduler started for collect records time: {}",

@@ -1,4 +1,5 @@
 mod bridge;
+mod config;
 mod core;
 mod services;
 
@@ -10,6 +11,7 @@ use tauri::{
 };
 use tauri_plugin_sql::{Migration, MigrationKind};
 use core::utils::{navigate, show_window};
+use crate::config::{DB_NAME, DB_URL_PREFIX};
 
 // setup app
 fn setup(_app_handle: tauri::AppHandle) {
@@ -119,7 +121,7 @@ fn migrations() -> tauri_plugin_sql::Builder {
     for migration in &migrations {
       println!("Migration: {}", migration.description);
     }
-    tauri_plugin_sql::Builder::default().add_migrations("sqlite:main.db", migrations)
+    tauri_plugin_sql::Builder::default().add_migrations(&format!("{}{}", DB_URL_PREFIX, DB_NAME), migrations)
 }
 
 // configure tauri builder

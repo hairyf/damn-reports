@@ -1,5 +1,6 @@
 use serde::{Deserialize, Serialize};
 use chrono::{FixedOffset, Utc, TimeZone};
+use crate::config::CLICKUP_API_URL;
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct ClickupTask {
@@ -49,7 +50,7 @@ pub async fn daily(
 
     let client = reqwest::Client::new();
     let response = client
-        .get(format!("https://api.clickup.com/api/v2/team/{}/task", team))
+        .get(format!("{}/team/{}/task", CLICKUP_API_URL, team))
         .header("Authorization", token)
         .query(&query_params)
         .send()

@@ -9,6 +9,7 @@ use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 use serde_json::json;
 use crate::bridge::server::routes;
+use crate::config::{app_server_bind_address, app_server_url};
 
 /// Axum 应用状态
 #[derive(Clone)]
@@ -32,16 +33,17 @@ pub async fn start(db: DatabaseConnection, app_handle: tauri::AppHandle) {
     .route("/report", post(routes::report::post))
     .with_state(app_state);
   
-  match TcpListener::bind("0.0.0.0:6789").await {
+  let bind_address = app_server_bind_address();
+  match TcpListener::bind(&bind_address).await {
     Ok(listener) => {
-      println!("✓ Axum Service Started: http://localhost:6789");
-      
+      println!("✓ Axum Service Started: {}", app_server_url());
+
       if let Err(e) = axum::serve(listener, app).await {
         eprintln!("✗ Axum Service Error: {}", e);
       }
     }
     Err(e) => {
-      eprintln!("✗ Failed to Bind Port 6789: {}", e);
+      eprintln!("✗ Failed to Bind {}: {}", bind_address, e);
       eprintln!("  Possible Reasons: Port Occupied or Permission Denied");
     }
   }

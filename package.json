@@ -15,8 +15,7 @@
     "lint": "eslint .",
     "prisma:generate": "prisma generate",
     "prisma:migrate": "prisma migrate dev",
-    "sea:generate": "cd tauri && sea-orm-cli generate entity -u sqlite://./prisma/database/main.db -o src/database/entities",
-    "postinstall": "cd sidecar-app/n8n-process && npm install"
+    "sea:generate": "cd tauri && sea-orm-cli generate entity -u sqlite://./prisma/database/main.db -o src/database/entities"
   },
   "dependencies": {
     "@hairy/react-lib": "^1.46.0",
