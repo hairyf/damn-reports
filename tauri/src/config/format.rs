@@ -23,8 +23,8 @@ pub fn app_server_url() -> String {
   format!("http://localhost:{}", APP_SERVER_PORT)
 }
 
-/// 获取 Node.js 下载 URL
-pub fn node_download_url() -> String {
+/// 获取 Node.js 下载 base URL（不含平台路径）
+pub fn node_download_base_url() -> String {
   format!("{}{}", NODE_BASE_URL, NODE_VERSION)
 }
 

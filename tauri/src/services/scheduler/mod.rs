@@ -8,7 +8,7 @@ use sea_orm::DatabaseConnection;
 use std::time::Duration;
 use tauri::{async_runtime::spawn, AppHandle, Manager, State};
 pub mod task;
-use crate::config::{store_dat_setting_collect_time, store_dat_setting_generate_time};
+use crate::config::{get_store_dat_setting};
 
 use tokio::time::{self};
 
@@ -60,8 +60,8 @@ async fn scheduler_loop(app_handle: AppHandle, db: DatabaseConnection, running: 
     let mut scheduler = Scheduler::new();
     let mut interval = time::interval(Duration::from_millis(100));
 
-    let collect_time = store_dat_setting_collect_time(&app_handle);
-    let generate_time = store_dat_setting_generate_time(&app_handle);
+    let collect_time = get_store_dat_setting(&app_handle).collect_time;
+    let generate_time = get_store_dat_setting(&app_handle).generate_time;
 
     println!(
         "Scheduler started for collect records time: {}",

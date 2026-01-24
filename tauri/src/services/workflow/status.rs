@@ -4,9 +4,8 @@ use std::sync::{Mutex, OnceLock};
 pub enum Status {
     Initial,
     // only for production environment
-    // Downloading,
-    // Unzipping,
-    // Starting,
+    Initializing,
+    Starting,
     Running,
 }
 

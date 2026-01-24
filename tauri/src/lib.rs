@@ -14,8 +14,8 @@ use core::utils::{navigate, show_window};
 use crate::config::{DB_NAME, DB_URL_PREFIX};
 
 // setup app
-fn setup(_app_handle: tauri::AppHandle) {
-    let _ = services::workflow::start();
+fn setup(app_handle: tauri::AppHandle) {
+    let _ = services::workflow::start(app_handle);
 }
 
 // setup tray
