@@ -1,4 +1,4 @@
-use std::cell::RefCell;
+use std::sync::Mutex;
 use std::time::{Duration, Instant};
 use tauri::{Runtime, WebviewWindow, Emitter};
 use serde::Serialize;
@@ -20,7 +20,7 @@ pub struct ProgressTracker<'a, R: Runtime> {
     current_phase: usize,
     current_title: String,
     current_type: String,
-    last_emit_time: RefCell<Option<Instant>>,
+    last_emit_time: Mutex<Option<Instant>>,
 }
 
 impl<'a, R: Runtime> ProgressTracker<'a, R> {
@@ -31,7 +31,7 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
             current_phase: 0,
             current_title: String::from("准备中..."),
             current_type: String::from(""),
-            last_emit_time: RefCell::new(None),
+            last_emit_time: Mutex::new(None),
         }
     }
 
@@ -52,7 +52,7 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
     /// detail: 持续替换的操作内容
     pub fn update(&self, stage_pct: f64, detail: String) {
         let now = Instant::now();
-        let mut last_emit = self.last_emit_time.borrow_mut();
+        let mut last_emit = self.last_emit_time.lock().unwrap();
 
         // 节流处理：如果距离上次发送不足 150ms，则跳过
         if let Some(last_time) = *last_emit {

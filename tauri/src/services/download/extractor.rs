@@ -31,7 +31,9 @@ pub fn extract_zip<'a, R: Runtime>(
         // 3. 打印进度和当前文件名
         tracker.update(
             (i + 1) as f64 / total_files as f64,
-            format!("{:?}", outpath.file_name().unwrap_or_default())
+            outpath.file_name()
+                .map(|n| n.to_string_lossy().to_string())
+                .unwrap_or_default()
         );
 
         // 4. 处理目录或文件
@@ -79,7 +81,9 @@ pub fn extract_tgz<'a, R: Runtime>(
         
         // 打印当前解压的文件名
         // -1.0 表示未知进度(让前端持续增加)
-        tracker.update(-1.0, format!("{:?}", path));
+        tracker.update(-1.0, path.file_name()
+            .map(|n| n.to_string_lossy().to_string())
+            .unwrap_or_else(|| path.to_string_lossy().to_string()));
 
         // 执行解压
         entry.unpack_in(dest).map_err(|e| e.to_string())?;

@@ -1,4 +1,5 @@
 /* eslint-disable react-hooks-extra/no-direct-set-state-in-use-effect */
+import { If } from '@hairy/react-lib'
 import { Icon } from '@iconify/react'
 import clsx from 'clsx'
 import { useStore } from 'valtio-define'
@@ -9,6 +10,8 @@ function useHistory<T>(state: T, limit = 5, reverse = false) {
   const [history, setHistory] = useState<T[]>([])
   useEffect(() => {
     setHistory((prev) => {
+      if (!state)
+        return prev
       if (prev.length >= limit) {
         return [state, ...prev.slice(0, limit - 1)]
       }
@@ -30,20 +33,23 @@ export function Installer() {
           <StepStatus
             icon={<Icon icon="lucide:download" className="text-primary-500 w-8 h-8" />}
             title={title}
-            description={`${type === 'download' ? '下载中' : '解压中'} ${progress}%`}
+            description={`${type === 'download' ? detail : '解压中'} ${progress}%`}
             progress={percentage}
             progressProps={{
               showValueLabel: true,
             }}
+            loading={type === 'download'}
             extra={(
-              <div className="bg-foreground/2 rounded-md p-2 w-full h-[116px] border-1 border-foreground/10 text-left text-foreground/50">
-                {details.map((detail, index) => (
-                  <p key={index} className="text-sm flex items-center gap-1">
-                    <Icon icon="lucide:chevron-right" className="w-4 h-4" />
-                    {detail}
-                  </p>
-                ))}
-              </div>
+              <If cond={type === 'extract'}>
+                <div className="bg-foreground/2 rounded-md p-2 w-full h-[116px] border-1 border-foreground/10 text-left text-foreground/50">
+                  {(details.length ? details : ['']).map((detail, index) => (
+                    <p key={index} className="text-sm flex items-center gap-1">
+                      <Icon icon="lucide:chevron-right" className="w-4 h-4" />
+                      {detail}
+                    </p>
+                  ))}
+                </div>
+              </If>
             )}
           />
         </Main>

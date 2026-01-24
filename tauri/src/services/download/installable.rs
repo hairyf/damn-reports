@@ -4,7 +4,7 @@ use crate::config;
 use async_trait::async_trait;
 
 #[async_trait]
-pub trait Installable {
+pub trait Installable: Send + Sync {
     fn name(&self) -> &str;
     fn check_installed(&self, app: &AppHandle) -> bool;
     fn get_download_url(&self) -> Result<String, String>;
@@ -19,10 +19,7 @@ pub struct Nodejs;
 #[async_trait]
 impl Installable for Nodejs {
     fn name(&self) -> &str { "Node.js" }
-    fn get_download_url(&self) -> Result<String, String> {
-        let url = config::get_node_download_url()?;
-        Ok(config::github_proxy_url(url))
-    }
+    fn get_download_url(&self) -> Result<String, String> { config::get_node_download_url() }
     fn get_install_path(&self, app: &AppHandle) -> PathBuf { config::get_node_install_path(app) }
     fn check_installed(&self, app: &AppHandle) -> bool { config::get_node_binary_path(app).exists() }
 }

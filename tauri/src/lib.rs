@@ -15,7 +15,11 @@ use crate::config::{DB_NAME, DB_URL_PREFIX};
 
 // setup app
 fn setup(app_handle: tauri::AppHandle) {
-    let _ = services::workflow::start(app_handle);
+    tauri::async_runtime::spawn(async move {
+        if let Err(e) = services::workflow::start(app_handle).await {
+            eprintln!("[workflow] start failed: {}", e);
+        }
+    });
 }
 
 // setup tray
