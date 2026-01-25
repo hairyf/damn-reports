@@ -38,17 +38,17 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
 }
 
 pub async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
-    let get_node_binary_path = config::get_node_binary_path(&app_handle);
-    let get_n8n_binary_path = config::get_n8n_binary_path(&app_handle);
-    let get_n8n_data_path = config::get_n8n_data_path(&app_handle);
+    let node_binary_path = config::get_node_binary_path(&app_handle);
+    let n8n_binary_path = config::get_n8n_binary_path(&app_handle);
+    let n8n_data_path = config::get_n8n_data_path(&app_handle);
 
-    log::debug!("Checking Node.js path: {:?}", get_node_binary_path);
-    if !get_node_binary_path.exists() {
+    log::debug!("Checking Node.js path: {:?}", node_binary_path);
+    if !node_binary_path.exists() {
         log::error!("Node.js not installed");
         return Err("NODE_NOT_FOUND: Node.js not installed".to_string());
     }
-    log::debug!("Checking n8n path: {:?}", get_n8n_binary_path);
-    if !get_n8n_binary_path.exists() {
+    log::debug!("Checking n8n path: {:?}", n8n_binary_path);
+    if !n8n_binary_path.exists() {
         log::error!("n8n not installed");
         return Err("N8N_NOT_FOUND: n8n not installed".to_string());
     }
@@ -58,10 +58,10 @@ pub async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
         let _ = Command::new("pkill").arg("-9").arg("node").output();
     }
 
-    let mut cmd = Command::new(&get_node_binary_path);
-    cmd.arg(&get_n8n_binary_path)
+    let mut cmd = Command::new(&node_binary_path);
+    cmd.arg(&n8n_binary_path)
         .arg("start")
-        .env("N8N_USER_FOLDER", get_n8n_data_path.to_str().unwrap())
+        .env("N8N_USER_FOLDER", n8n_data_path.to_str().unwrap())
         // 关键环境变量：禁用交互模式
         .env("N8N_DISABLE_INTERACTIVE_REPL", "true")
         .env("N8N_BLOCK_IFRAME_EMBEDS", "false")
@@ -167,8 +167,14 @@ fn spawn_output_readers(stdout: Option<ChildStdout>, stderr: Option<ChildStderr>
         thread::spawn(move || {
             let reader = BufReader::new(stdout);
             for line in reader.lines() {
-                if let Ok(line) = line {
-                    log::debug!("n8n stdout: {}", line);
+                match line {
+                    Ok(line) => {
+                        log::info!("[n8n::stdout]: {}", line);
+                    }
+                    Err(e) => {
+                        log::error!("Failed to read n8n stdout: {}", e);
+                        break;
+                    }
                 }
             }
         });
@@ -179,8 +185,14 @@ fn spawn_output_readers(stdout: Option<ChildStdout>, stderr: Option<ChildStderr>
         thread::spawn(move || {
             let reader = BufReader::new(stderr);
             for line in reader.lines() {
-                if let Ok(line) = line {
-                    log::warn!("n8n stderr: {}", line);
+                match line {
+                    Ok(line) => {
+                        log::warn!("[n8n::stderr]: {}", line);
+                    }
+                    Err(e) => {
+                        log::error!("Failed to read n8n stderr: {}", e);
+                        break;
+                    }
                 }
             }
         });

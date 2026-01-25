@@ -71,6 +71,7 @@ declare global {
   const StepManualLoginN8n: typeof import('../components/step-manual-login').StepManualLoginN8n
   const StepN8nManualLogin: typeof import('../components/step-n8n-manual-login').StepN8nManualLogin
   const StepStatus: typeof import('../components/step-status').StepStatus
+  const StepStatusChip: typeof import('../components/step-status-chip').StepStatusChip
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const Suspense: typeof import('react').Suspense
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
@@ -235,12 +236,6 @@ declare global {
   // @ts-ignore
   export type { ThemeSwitchProps } from '../components/theme-switch'
   import('../components/theme-switch')
-  // @ts-ignore
-  export type { InvokeCollectClickupParams, ClickupTask, InvokeCollectClickupResult } from '../services/invoke-collect-clickup'
-  import('../services/invoke-collect-clickup')
-  // @ts-ignore
-  export type { InvokeCollectGitParams, GitCommit, FileDiff, InvokeCollectGitResult } from '../services/invoke-collect-git'
-  import('../services/invoke-collect-git')
   // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')

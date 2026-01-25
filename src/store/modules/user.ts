@@ -1,8 +1,10 @@
+/* eslint-disable no-console */
 import type { Selectable } from 'kysely'
 import type { N8nUser } from '@/apis/index.types'
 import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { defineStore } from 'valtio-define'
+import { setting } from './setting'
 
 export enum StartupState {
   UNZIPPING = 'unzipping',
@@ -47,6 +49,7 @@ export const user = defineStore({
       })
     },
     async login() {
+      console.log('start login')
       const result = await getN8nLogin()
       if (result.status === 'error')
         throw new TypeError(result.message)
@@ -54,6 +57,7 @@ export const user = defineStore({
       return result.data!
     },
     async fallbackLogin() {
+      console.log('start fallbackLogin')
       const result = await postN8nLogin({
         emailOrLdapLoginId: this.account.email,
         password: this.account.password,
@@ -64,6 +68,7 @@ export const user = defineStore({
       return result.data
     },
     async register() {
+      console.log('start register')
       const result = await postN8nRegister({
         ...N8N_REGISTER_DATA,
         ...this.account,
@@ -81,6 +86,9 @@ export const user = defineStore({
         .catch(this.register)
         .then(this.survey)
         .catch(this.fallbackLogin)
+
+      if (!setting.ininitialized)
+        setting.ininitialized = true
     },
 
     async createWorkflow(workspace: string) {
@@ -98,7 +106,21 @@ export const user = defineStore({
         throw new TypeError('Failed to create workflow')
       return data
     },
-    async createWorkspace() {
+    async createWorkspacePlaceHolder() {
+      console.log('start createWorkspace')
+      // 先检查是否已经存在 workflow 为 '__workflow__' 的记录
+      const existing = await db
+        .selectFrom('workspace')
+        .selectAll()
+        .where('workflow', '=', '__workflow__')
+        .executeTakeFirst()
+
+      if (existing) {
+        // 如果已存在，返回现有记录的 id
+        return existing.id.toString()
+      }
+
+      // 如果不存在，创建新记录
       const { insertId } = await db.workspace.create({
         name: 'Default Report Workflow',
         workflow: '__workflow__',
@@ -106,6 +128,7 @@ export const user = defineStore({
       return insertId!.toString()
     },
     async createCredential(apiKey: string) {
+      console.log('start createCredential')
       const result = await postN8nCredentials({
         isGlobal: false,
         isResolvable: false,
@@ -122,9 +145,15 @@ export const user = defineStore({
       await db.workspace.update(this.workspace!.toString(), data)
     },
     async initializeWorkflow() {
-      const workspace = await this.createWorkspace()
+      console.log('start initializeWorkflow')
+      const workspace = await this.createWorkspacePlaceHolder()
+      // 更新 workspace 状态
+      this.workspace = Number(workspace)
+      console.log('start createWorkflow')
       const data = await this.createWorkflow(workspace)
       await this.updateWorkspace({ workflow: data.id })
+      // 更新 workflow 状态
+      this.workflow = data.id
     },
 
   },

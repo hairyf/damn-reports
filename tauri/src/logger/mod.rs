@@ -9,7 +9,7 @@ const INFO: u8 = 2;
 const WARN: u8 = 3;
 const ERROR: u8 = 4;
 
-static FILTER_LEVEL: AtomicU8 = AtomicU8::new(INFO);
+static FILTER_LEVEL: AtomicU8 = AtomicU8::new(DEBUG);
 
 /// 自定义日志格式化器
 struct SimpleLogger;

@@ -1,4 +1,3 @@
-import { useWhenever } from '@hairy/react-lib'
 import { Icon } from '@iconify/react'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -14,19 +13,6 @@ export interface RetryOptions {
 
 export function Initiator() {
   const { status } = useStore(store.user)
-
-  useWhenever(
-    status === StartupState.INITIALIZING_ACCOUNT,
-    // 登录重试多一些，避免启动 n8n 端口还未完全启动成功
-    () => retry(store.user.initializeAccount, { retries: 10, delay: 1000 }),
-    { immediate: true },
-  )
-
-  useWhenever(
-    status === StartupState.TEMPLATE_INIT,
-    () => retry(store.user.initializeWorkflow),
-    { immediate: true },
-  )
 
   function renderStatus() {
     switch (status) {

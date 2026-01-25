@@ -18,36 +18,41 @@ export interface DefaultLayoutProps {
 
 export function DefaultLayout(props: DefaultLayoutProps) {
   const { ready } = useStore(store.user)
-  const { installed } = useStore(store.setting)
+  const { installed, ininitialized } = useStore(store.setting)
 
+  const isNeedInitiator = !installed || (!ready && !ininitialized)
   function render(content: React.ReactNode) {
     if (!installed)
       return <Installer />
-    if (!ready)
+    // 如果已经初始化过了，后台静默运行
+    if (isNeedInitiator)
       return <Initiator />
     return content
   }
   return (
-    <AnimatePresence mode="wait">
-      <motion.div
-        key={ready ? 'layout' : 'initiator'}
-        initial={{ opacity: 0, y: 10 }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: -10 }}
-        transition={{ duration: 0.4 }}
-      >
-        {render(
-          <div className={clsx('relative flex min-h-screen', props.classNames?.root)}>
-            <Sidebar />
-            <div className="flex flex-col flex-1">
-              <Navbar />
-              <Main className={props.classNames?.main}>
-                {props.children}
-              </Main>
-            </div>
-          </div>,
-        )}
-      </motion.div>
-    </AnimatePresence>
+    <>
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={isNeedInitiator ? 'initiator' : 'layout'}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.4 }}
+        >
+          {render(
+            <div className={clsx('relative flex min-h-screen', props.classNames?.root)}>
+              <Sidebar />
+              <div className="flex flex-col flex-1">
+                <Navbar />
+                <Main className={props.classNames?.main}>
+                  {props.children}
+                </Main>
+              </div>
+            </div>,
+          )}
+        </motion.div>
+      </AnimatePresence>
+      <StepStatusChip />
+    </>
   )
 }

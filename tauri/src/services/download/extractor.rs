@@ -57,17 +57,18 @@ pub fn extract_zip<'a, R: Runtime>(
                 e.to_string()
             })?;
         } else {
+            // 无条件创建所有父目录（避免竞态条件和路径问题）
             if let Some(p) = outpath.parent() {
-                if !p.exists() {
-                    fs::create_dir_all(&p).map_err(|e| {
-                        log::error!("Failed to create parent directory {:?}: {}", p, e);
-                        e.to_string()
-                    })?;
-                }
+                fs::create_dir_all(&p).map_err(|e| {
+                    log::error!("Failed to create parent directory {:?}: {} (file: {:?})", p, e, outpath);
+                    format!("Failed to create parent directory {:?}: {}", p, e)
+                })?;
             }
             let mut outfile = fs::File::create(&outpath).map_err(|e| {
-                log::error!("Failed to create file {:?}: {}", outpath, e);
-                e.to_string()
+                log::error!("Failed to create file {:?}: {} (parent exists: {})", 
+                    outpath, e, 
+                    outpath.parent().map(|p| p.exists()).unwrap_or(false));
+                format!("Failed to create file {:?}: {}", outpath, e)
             })?;
             copy(&mut file, &mut outfile).map_err(|e| {
                 log::error!("Failed to copy file {:?}: {}", outpath, e);

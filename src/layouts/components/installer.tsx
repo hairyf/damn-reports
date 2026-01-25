@@ -24,7 +24,7 @@ function useHistory<T>(state: T, limit = 5, reverse = false) {
 }
 
 export function Installer() {
-  const { percentage, detail, title, progress, log } = useStore(store.installer)
+  const { percentage, detail, title, log } = useStore(store.installer)
   const logs = useHistory(log, 5)
 
   useMount(() => invoke('install_dependencies'))
@@ -37,7 +37,7 @@ export function Installer() {
           <StepStatus
             icon={<Icon icon="lucide:download" className="text-primary-500 w-8 h-8" />}
             title={title}
-            description={`${detail} ${progress.toFixed(2)}%`}
+            description={detail}
             progress={percentage}
             progressProps={{ showValueLabel: true }}
             extra={(
