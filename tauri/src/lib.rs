@@ -2,7 +2,8 @@ mod bridge;
 mod config;
 mod core;
 mod logger;
-mod services;
+mod service;
+mod task;
 
 use tauri::{
     ipc::Invoke,
@@ -17,7 +18,7 @@ use crate::config::{DB_NAME, DB_URL_PREFIX};
 // setup app
 fn setup(app_handle: tauri::AppHandle) {
     tauri::async_runtime::spawn(async move {
-        if let Err(e) = services::workflow::start(app_handle).await {
+        if let Err(e) = service::workflow::start(app_handle).await {
             log::error!("start failed: {}", e);
         }
     });
@@ -98,7 +99,6 @@ fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         bridge::cmd::database_loaded,
-        bridge::cmd::restart_schedule,
         bridge::cmd::install_dependencies,
         bridge::cmd::get_n8n_status,
         bridge::cmd::collect_daily_records,

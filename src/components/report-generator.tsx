@@ -34,8 +34,6 @@ export function ReportGenerator({ generating, onGeneratingChange }: ReportGenera
   return (
     <Card className="flex-1 relative" shadow="none">
       <CardBody>
-        <ScheduleCountdown className="absolute top-4 right-4" />
-
         <h3 className="text-lg font-semibold">
           今日报告
         </h3>

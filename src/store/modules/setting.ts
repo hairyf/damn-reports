@@ -1,5 +1,3 @@
-import { debounce, delay } from '@hairy/utils'
-import { invoke } from '@tauri-apps/api/core'
 import { listen } from '@tauri-apps/api/event'
 import { defineStore } from 'valtio-define'
 import 'valtio-define/types'
@@ -16,8 +14,6 @@ export const setting = defineStore(
       autoSave: true,
       notifications: true,
       autoCheckUpdate: true,
-      collectTime: '17:45',
-      generateTime: '17:50',
     }),
     persist: {
       key: 'setting',
@@ -25,13 +21,5 @@ export const setting = defineStore(
     },
   },
 )
-
-const restart_schedule = debounce(() => invoke('restart_schedule'), 500)
-
-// 延迟 1 秒后订阅时间变化，避免在组件初始化时触发订阅
-delay(1000).then(() => {
-  setting.$subscribeKey('collectTime', restart_schedule)
-  setting.$subscribeKey('generateTime', restart_schedule)
-})
 
 listen<typeof setting.$state>('setting_updated', event => setting.$patch(event.payload))

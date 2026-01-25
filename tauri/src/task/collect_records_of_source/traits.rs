@@ -9,7 +9,7 @@ pub trait Collectible: Serialize {
   }
 }
 
-impl Collectible for crate::services::collector::git::GitCommit {
+impl Collectible for crate::service::collector::git::GitCommit {
   fn get_id(&self) -> String { self.id.clone() }
   fn get_summary(&self) -> String { self.message.clone() }
   fn get_date(&self) -> i64 {
@@ -18,7 +18,7 @@ impl Collectible for crate::services::collector::git::GitCommit {
   }
 }
 
-impl Collectible for crate::services::collector::clickup::ClickupTask {
+impl Collectible for crate::service::collector::clickup::ClickupTask {
   fn get_id(&self) -> String {
       // 使用组合键：任务ID + 状态
       // 这样同一个任务的状态变更可以创建不同的记录

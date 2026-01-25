@@ -11,8 +11,6 @@ pub struct Setting {
     pub auto_save: bool,
     pub notifications: bool,
     pub auto_check_update: bool,
-    pub collect_time: String,
-    pub generate_time: String,
 }
 
 impl Setting {
@@ -23,8 +21,6 @@ impl Setting {
             auto_save: true,
             notifications: true,
             auto_check_update: true,
-            collect_time: "17:45".to_string(),
-            generate_time: "17:50".to_string(),
         }
     }
 }

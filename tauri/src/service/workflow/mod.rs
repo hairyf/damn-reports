@@ -2,13 +2,13 @@ pub mod status;
 pub mod utils;
 
 use crate::config::{self};
-use crate::services::download;
+use crate::service::download;
 use std::process::{Command, Stdio, ChildStdout, ChildStderr};
 use std::io::{BufRead, BufReader};
 use std::thread;
 use tauri::{Manager};
 use tauri;
-use crate::services::workflow::utils::{is_n8n_running, is_port_in_use};
+use crate::service::workflow::utils::{is_n8n_running, is_port_in_use};
 
 pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
     let setting = config::get_store_dat_setting(&app_handle);

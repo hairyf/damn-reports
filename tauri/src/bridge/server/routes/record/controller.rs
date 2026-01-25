@@ -10,7 +10,7 @@ use serde_json;
 use crate::bridge::server::AppState;
 use crate::bridge::server::routes::record::dtos::{GetRecordsParams, GroupedRecordsResponse};
 use crate::bridge::server::routes::record::service::{get_records, get_summary_prompt};
-use crate::services::scheduler::task;
+use crate::task;
 
 pub async fn post_collect(
   State(state): State<AppState>

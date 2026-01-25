@@ -4,7 +4,7 @@ mod utils;
 
 use crate::core::db::entities::source;
 use sea_orm::{ColumnTrait, DatabaseConnection, EntityTrait, QueryFilter};
-use crate::services::collector;
+use crate::service::collector;
 
 use utils::map_to_active_models;
 use utils::insert_if_not_exists;

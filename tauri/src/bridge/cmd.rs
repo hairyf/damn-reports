@@ -3,13 +3,12 @@ use std::sync::atomic::{AtomicBool, Ordering};
 
 use tauri::{AppHandle, State};
 use sea_orm::DatabaseConnection;
-use crate::services::scheduler::SchedulerHandle;
 use crate::core::db::connection;
 use crate::bridge::server;
-use crate::services::scheduler;
-use crate::services::workflow;
-use crate::services::collector;
-use crate::services::scheduler::task;
+use crate::service::scheduler;
+use crate::service::workflow;
+use crate::service::collector;
+use crate::task;
 use crate::config;
 
 // 全局标志，确保数据库连接成功只运行一次
@@ -24,16 +23,6 @@ pub async fn database_loaded(app_handle: tauri::AppHandle) -> Result<(), String>
   log::info!("Database Connection Successful");
   tauri::async_runtime::spawn(server::start(db.clone(), app_handle.clone()));
   scheduler::start(&app_handle, db.clone());
-  Ok(())
-}
-
-#[tauri::command]
-pub async fn restart_schedule(
-  app_handle: AppHandle,
-  db: State<'_, DatabaseConnection>,
-  handle: State<'_, SchedulerHandle>,
-) -> Result<(), String> {
-  scheduler::restart(app_handle, db, handle).await.map_err(|e| e.to_string())?;
   Ok(())
 }
 

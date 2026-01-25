@@ -2,7 +2,7 @@ use std::fs;
 use std::path::PathBuf;
 use futures_util::StreamExt;
 
-use crate::services::download::ProgressTracker;
+use crate::service::download::ProgressTracker;
 use tauri::Runtime;
 
 /// 下载文件到指定路径

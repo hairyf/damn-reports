@@ -1,4 +1,4 @@
-use crate::services::workflow::{status::{self, Status}, utils as workflow_utils};
+use crate::service::workflow::{status::{self, Status}, utils as workflow_utils};
 use crate::core::utils;
 use tauri::{AppHandle};
 use crate::config::N8N_PORT;

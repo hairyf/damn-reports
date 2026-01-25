@@ -6,7 +6,7 @@ use std::io::{copy};
 
 use tauri::Runtime;
 
-use crate::services::download::ProgressTracker;
+use crate::service::download::ProgressTracker;
 
 pub fn extract_zip<'a, R: Runtime>(
     tracker: &ProgressTracker<'a, R>,
