@@ -1,3 +1,4 @@
+import { If, useWhenever } from '@hairy/react-lib'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useStore } from 'valtio-define'
@@ -29,6 +30,22 @@ export function DefaultLayout(props: DefaultLayoutProps) {
       return <Initiator />
     return content
   }
+
+  // 如果未安装或未初始化，则重置用户状态，避免阻塞启动
+  useWhenever(!installed || !ininitialized, () => {
+    store.user.$patch({
+      n8nDefaultAccountLoginEnabled: true,
+      credentialName: null,
+      info: null,
+      credential: null,
+      workflow: null,
+      workspace: null,
+      deepseekSkip: false,
+      n8nEmail: '',
+      n8nPassword: '',
+    })
+  })
+
   return (
     <>
       <AnimatePresence mode="wait">
@@ -52,7 +69,9 @@ export function DefaultLayout(props: DefaultLayoutProps) {
           )}
         </motion.div>
       </AnimatePresence>
-      <StepStatusChip />
+      <If cond={!isNeedInitiator}>
+        <StepStatusChip />
+      </If>
     </>
   )
 }

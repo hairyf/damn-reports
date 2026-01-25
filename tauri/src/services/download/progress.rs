@@ -56,9 +56,9 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
         let now = Instant::now();
         let mut last_emit = self.last_emit_time.lock().unwrap();
 
-        // 节流处理：如果距离上次发送不足 150ms，则跳过
+        // 节流处理：如果距离上次发送不足 50ms，则跳过
         if let Some(last_time) = *last_emit {
-            if now.duration_since(last_time) < Duration::from_millis(150) {
+            if now.duration_since(last_time) < Duration::from_millis(50) {
                 return;
             }
         }

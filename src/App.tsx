@@ -9,7 +9,6 @@ import { StartupState } from './store/modules/user'
 function App() {
   const navigate = useNavigate()
   const { status } = useStore(store.user)
-  const { installed, ininitialized } = useStore(store.setting)
 
   useMount(() => window.navigate = navigate)
 
@@ -25,21 +24,6 @@ function App() {
     () => retry(store.user.initializeWorkflow),
     { immediate: true },
   )
-
-  // 如果未安装或未初始化，则重置用户状态，避免阻塞启动
-  useWhenever(!installed || !ininitialized, () => {
-    store.user.$patch({
-      n8nDefaultAccountLoginEnabled: true,
-      credentialName: null,
-      info: null,
-      credential: null,
-      workflow: null,
-      workspace: null,
-      deepseekSkip: false,
-      n8nEmail: '',
-      n8nPassword: '',
-    })
-  })
 
   return (
     <layouts.default>
