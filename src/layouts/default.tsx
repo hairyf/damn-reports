@@ -32,7 +32,7 @@ export function DefaultLayout(props: DefaultLayoutProps) {
   }
 
   // 如果未安装或未初始化，则重置用户状态，避免阻塞启动
-  useWhenever(!installed || !ininitialized, () => {
+  useWhenever(isNeedInitiator, () => {
     store.user.$patch({
       n8nDefaultAccountLoginEnabled: true,
       credentialName: null,
@@ -44,7 +44,7 @@ export function DefaultLayout(props: DefaultLayoutProps) {
       n8nEmail: '',
       n8nPassword: '',
     })
-  })
+  }, { immediate: true })
 
   return (
     <>

@@ -87,8 +87,7 @@ export const user = defineStore({
         .then(this.survey)
         .catch(this.fallbackLogin)
 
-      if (!setting.ininitialized)
-        setting.ininitialized = true
+      this.beInitialized()
     },
 
     async createWorkflow(workspace: string) {
@@ -104,6 +103,17 @@ export const user = defineStore({
       const data = await postN8nWorkflow(body)
       if (!data?.id)
         throw new TypeError('Failed to create workflow')
+      if (this.credential) {
+        await postN8nWorkflowWorkflowIdActivate(
+          { workflowId: data.id },
+          {
+            versionId: data.versionId,
+            expectedChecksum: data.checksum,
+            name: `Version ${data.versionId.split('-')[0]}`,
+            description: '',
+          },
+        )
+      }
       return data
     },
     async createWorkspacePlaceHolder() {
@@ -156,8 +166,13 @@ export const user = defineStore({
       await this.updateWorkspace({ workflow: data.id })
       // 更新 workflow 状态
       this.workflow = data.id
+      this.beInitialized()
     },
-
+    async beInitialized() {
+      if (!this.workflow || setting.ininitialized)
+        return
+      setting.ininitialized = true
+    },
   },
   getters: {
     ready() {
