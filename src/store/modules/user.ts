@@ -37,10 +37,11 @@ export const user = defineStore({
     n8nPassword: '',
   }),
   actions: {
-    async syncN8nStatus() {
+    async invokeN8nStatus() {
       const status = await invoke<any>('get_n8n_status')
       this.n8nprocessStatus = status.toLowerCase()
     },
+
     async survey() {
       await postN8nMeSurvey({
         version: 'v4',
@@ -48,6 +49,7 @@ export const user = defineStore({
         personalization_survey_n8n_version: 'v4',
       })
     },
+
     async login() {
       console.log('start login')
       const result = await getN8nLogin()
@@ -56,8 +58,9 @@ export const user = defineStore({
       this.loggedIn = true
       return result.data!
     },
-    async fallbackLogin() {
-      console.log('start fallbackLogin')
+
+    async loginWithPassword() {
+      console.log('start loginWithPassword')
       const result = await postN8nLogin({
         emailOrLdapLoginId: this.account.email,
         password: this.account.password,
@@ -67,6 +70,7 @@ export const user = defineStore({
       this.loggedIn = true
       return result.data
     },
+
     async register() {
       console.log('start register')
       const result = await postN8nRegister({
@@ -85,7 +89,7 @@ export const user = defineStore({
       await this.login()
         .catch(this.register)
         .then(this.survey)
-        .catch(this.fallbackLogin)
+        .catch(this.loginWithPassword)
 
       this.beInitialized()
     },
@@ -94,7 +98,6 @@ export const user = defineStore({
       const deepSeekApi = this.credential
         ? { id: this.credential!, name: this.credentialName! }
         : undefined
-
       const body = getReportWorkflowData({
         workflowId: Number(workspace),
         name: 'Default Report Workflow',
@@ -103,6 +106,7 @@ export const user = defineStore({
       const data = await postN8nWorkflow(body)
       if (!data?.id)
         throw new TypeError('Failed to create workflow')
+
       if (this.credential) {
         await postN8nWorkflowWorkflowIdActivate(
           { workflowId: data.id },
@@ -116,27 +120,7 @@ export const user = defineStore({
       }
       return data
     },
-    async createWorkspacePlaceHolder() {
-      console.log('start createWorkspace')
-      // 先检查是否已经存在 workflow 为 '__workflow__' 的记录
-      const existing = await db
-        .selectFrom('workspace')
-        .selectAll()
-        .where('workflow', '=', '__workflow__')
-        .executeTakeFirst()
 
-      if (existing) {
-        // 如果已存在，返回现有记录的 id
-        return existing.id.toString()
-      }
-
-      // 如果不存在，创建新记录
-      const { insertId } = await db.workspace.create({
-        name: 'Default Report Workflow',
-        workflow: '__workflow__',
-      })
-      return insertId!.toString()
-    },
     async createCredential(apiKey: string) {
       console.log('start createCredential')
       const result = await postN8nCredentials({
@@ -146,19 +130,19 @@ export const user = defineStore({
         name: 'DeepSeek account',
         type: 'deepSeekApi',
       })
-      store.user.$patch({
-        credential: result.data.id,
-        credentialName: result.data.name,
-      })
+      this.credential = result.data.id
+      this.credentialName = result.data.name
     },
+
     async updateWorkspace(data: Partial<Selectable<Workspace>>) {
       await db.workspace.update(this.workspace!.toString(), data)
     },
+
     async initializeWorkflow() {
       if (this.workflow)
         return
       console.log('start initializeWorkflow')
-      const workspace = await this.createWorkspacePlaceHolder()
+      const workspace = await db.workspace.getOrCreatePlaceHolder()
       // 更新 workspace 状态
       this.workspace = Number(workspace)
       console.log('start createWorkflow')
@@ -168,6 +152,7 @@ export const user = defineStore({
       this.workflow = data.id
       this.beInitialized()
     },
+
     async beInitialized() {
       if (!this.workflow || setting.ininitialized)
         return
@@ -218,5 +203,5 @@ export const user = defineStore({
   },
 })
 
-listen('n8n-status-updated', user.syncN8nStatus)
-user.syncN8nStatus()
+listen('n8n-status-updated', user.invokeN8nStatus)
+user.invokeN8nStatus()

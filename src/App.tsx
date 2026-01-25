@@ -25,20 +25,6 @@ function App() {
     { immediate: true },
   )
 
-  // 检测工作流是否真实存在，不存在则清除状态
-  useWhenever(user.workflow, async () => {
-    const detail = await getN8nWorkflow(user.workflow!)
-    if (!detail)
-      store.user.$patch({ workflow: null })
-  })
-
-  // 检测凭证是否真实存在，不存在则清除状态
-  useWhenever(user.credential, async () => {
-    const detail = await getN8nCredentialsId(user.workflow!)
-    if (!detail)
-      store.user.$patch({ credential: null, credentialName: null })
-  })
-
   return (
     <layouts.default>
       <Suspense fallback={<p>Loading...</p>}>

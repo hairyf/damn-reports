@@ -134,3 +134,9 @@ export interface GetN8nCredentialsIdResult {
   resolvableAllowFallback: boolean
   scopes: string[]
 }
+
+export interface GetN8nCredentialsResult {
+  code?: number
+  data: GetN8nCredentialsIdResult[]
+  message?: string
+}

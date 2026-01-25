@@ -7,7 +7,7 @@ export const installer = defineStore({
     type: 'extract' as 'download' | 'extract' | null,
     percentage: 0,
     progress: 0,
-    detail: '',
+    detail: '请稍后...',
     log: '',
   }),
 })
