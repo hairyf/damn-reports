@@ -46,7 +46,7 @@ pub fn extract_zip<'a, R: Runtime>(
         let progress_pct = ((i + 1) as f64 / total_files as f64) * 100.0;
         tracker.update(
             progress_pct,
-            format!("Extracted {:.1}%", progress_pct),
+            format!("已解压 {:.1}%", progress_pct),
             format!("Extract {}", relative_path)
         );
 
@@ -123,7 +123,11 @@ pub fn extract_tgz<'a, R: Runtime>(
         let relative_path = path.to_string_lossy().replace('\\', "/");
         // 对于 TGZ，由于无法提前知道文件总数，使用文件计数来估算进度
         let estimated_pct = (file_count as f64 / (file_count + 1) as f64) * 100.0;
-        tracker.update(-1.0, format!("Extracted {:.1}%", estimated_pct), format!("Extract {}", relative_path));
+        tracker.update(
+          -1.0, 
+          format!("已解压 {:.1}%", estimated_pct), 
+          format!("Extract {}", relative_path)
+        );
 
         // 执行解压
         entry.unpack_in(dest).map_err(|e| {

@@ -151,7 +151,11 @@ pub async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
     }
 
     log::info!("All installation tasks completed");
-    tracker.update(100.0, "All tasks completed".into(), "All tasks completed".into());
+    tracker.update(
+      100.0, 
+      format!("依赖已安装完毕"), 
+       "All tasks completed".into()
+    );
 
     Ok(())
 }

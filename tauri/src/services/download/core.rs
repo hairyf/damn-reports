@@ -53,9 +53,7 @@ pub async fn download_file<'a, R: Runtime>(
         let progress_pct = (downloaded as f64 / total_size as f64) * 100.0;
         tracker.update(
             progress_pct,
-            format!("Downloaded {:.1} MB / {:.1} MB", 
-                downloaded as f64 / 1_000_000.0,
-                total_size as f64 / 1_000_000.0),
+            format!("已下载 {:.1} MB / {:.1} MB", downloaded as f64 / 1_000_000.0, total_size as f64 / 1_000_000.0),
             format!("Download {}", url)
         );
     }
@@ -103,7 +101,11 @@ pub fn ensure_extract<'a, R: Runtime>(
             log::error!("Failed to write file: {}", e);
             e.to_string()
         })?;
-        tracker.update(100.0, format!("File written: {}", dest.display()), format!("File written: {}", dest.display()));
+        tracker.update(
+          100.0, 
+          format!("已写入: {}", "100%"), 
+          format!("File written: {}", dest.display())
+        );
         log::info!("File write completed: {}", dest.display());
         return Ok(());
     }
@@ -155,7 +157,11 @@ pub fn ensure_extract<'a, R: Runtime>(
         }
     }
 
-    tracker.update(100.0, format!("File extracted: {}", dest.display()), format!("File extracted: {}", dest.display()));
+    tracker.update(
+      100.0, 
+      format!("已解压: {}", dest.display()), 
+      format!("Extract {}", dest.display())
+    );
     log::info!("Extraction completed: {}", dest.display());
     Ok(())
 }
