@@ -142,18 +142,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
           ],
         ],
       },
-      'When chat message received': {
-        main: [
-          [
-            {
-              node: 'Get Records',
-              type: 'main',
-              index: 0,
-            },
-          ],
-        ],
-      },
-      'HTTP Request': {
+      'Get Records': {
         main: [
           [
             {

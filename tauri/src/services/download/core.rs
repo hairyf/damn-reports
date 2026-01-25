@@ -159,8 +159,8 @@ pub fn ensure_extract<'a, R: Runtime>(
 
     tracker.update(
       100.0, 
-      format!("已解压: {}", dest.display()), 
-      format!("Extract {}", dest.display())
+      format!("已解压: {}", "100%"), 
+      format!("Extract {}", "100%")
     );
     log::info!("Extraction completed: {}", dest.display());
     Ok(())

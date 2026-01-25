@@ -9,7 +9,7 @@ use sea_orm::DatabaseConnection;
 use std::sync::Arc;
 use serde_json::json;
 use crate::bridge::server::routes;
-use crate::config::{app_server_bind_address, app_server_url};
+use crate::config::{app_server_bind_address, APP_SERVER_PORT};
 
 /// Axum 应用状态
 #[derive(Clone)]
@@ -34,18 +34,36 @@ pub async fn start(db: DatabaseConnection, app_handle: tauri::AppHandle) {
     .with_state(app_state);
   
   let bind_address = app_server_bind_address();
-  match TcpListener::bind(&bind_address).await {
+  
+  // 使用 [::] 可以同时监听 IPv4 和 IPv6（在支持双栈的系统上）
+  // 这样可以解决 n8n 连接 IPv6 localhost (::1) 的问题
+  let bind_address_v6 = format!("[::]:{}", APP_SERVER_PORT);
+  
+  // 尝试绑定 IPv6 地址（在支持双栈的系统上，这会同时监听 IPv4 和 IPv6）
+  let listener = match TcpListener::bind(&bind_address_v6).await {
     Ok(listener) => {
-      log::info!("Axum Service Started: {}", app_server_url());
-
-      if let Err(e) = axum::serve(listener, app).await {
-        log::error!("Axum Service Error: {}", e);
-      }
+      log::info!("Axum Service Started on [::]:{} (dual-stack)", APP_SERVER_PORT);
+      listener
     }
     Err(e) => {
-      log::error!("Failed to Bind {}: {}", bind_address, e);
-      log::error!("Possible Reasons: Port Occupied or Permission Denied");
+      log::warn!("Failed to bind IPv6 [::]:{}, trying IPv4: {}", APP_SERVER_PORT, e);
+      // 如果 IPv6 绑定失败，回退到 IPv4
+      match TcpListener::bind(&bind_address).await {
+        Ok(listener) => {
+          log::info!("Axum Service Started on {} (IPv4 only)", bind_address);
+          listener
+        }
+        Err(e) => {
+          log::error!("Failed to Bind {}: {}", bind_address, e);
+          log::error!("Possible Reasons: Port Occupied or Permission Denied");
+          return;
+        }
+      }
     }
+  };
+
+  if let Err(e) = axum::serve(listener, app).await {
+    log::error!("Axum Service Error: {}", e);
   }
 }
 
