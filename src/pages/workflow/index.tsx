@@ -2,13 +2,13 @@ import { Card } from '@heroui/react'
 import { useStore } from 'valtio-define'
 
 function Page() {
-  const { n8nEmail, n8nPassword, workflowId } = useStore(store.user)
+  const { n8nEmail, n8nPassword, workflow } = useStore(store.user)
   const params = new URLSearchParams([
     ['email', n8nEmail || N8N_LOGIN_DATA.emailOrLdapLoginId],
     ['password', n8nPassword || N8N_LOGIN_DATA.password],
     ['hideUI', 'true'], // 通过 URL 参数告诉 n8n 隐藏 UI 元素
   ])
-  const n8nUrl = `http://localhost:5678/workflow/${workflowId}?${params.toString()}`
+  const n8nUrl = `http://localhost:5678/workflow/${workflow}?${params.toString()}`
 
   return (
     <Card className="flex-1 relative opacity-80" shadow="none">

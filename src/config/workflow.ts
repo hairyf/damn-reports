@@ -168,7 +168,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
         main: [
           [
             {
-              node: 'HTTP Request',
+              node: 'Get Records',
               type: 'main',
               index: 0,
             },

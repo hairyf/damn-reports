@@ -145,6 +145,8 @@ export const user = defineStore({
       await db.workspace.update(this.workspace!.toString(), data)
     },
     async initializeWorkflow() {
+      if (this.workflow)
+        return
       console.log('start initializeWorkflow')
       const workspace = await this.createWorkspacePlaceHolder()
       // 更新 workspace 状态
