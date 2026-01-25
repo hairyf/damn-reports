@@ -35,7 +35,7 @@ export function StepDeepSeekApiKey() {
           <div className="p-4 border rounded-xl bg-yellow-50 dark:bg-yellow-500/10 border-yellow-500/20">
             <p className="text-xs flex items-start text-yellow-700 dark:text-yellow-200/80">
               <span className="mr-2">💡</span>
-              Tip：点击 Skip 跳过，需要在自动化页面单独设置模型配置。
+              Tip：点击 Skip 跳过，Workflow 将不会自动发布，你需要在自动化页面单独设置模型配置，并手动发布。
             </p>
           </div>
           <div className="flex space-x-3">

@@ -111,3 +111,26 @@ export interface PostN8nWorkflowResult {
   name: string
   [key: string]: any
 }
+
+export interface GetN8nWorkflowResult {
+  updatedAt: string
+  createdAt: string
+  id: string
+  name: string
+  [key: string]: any
+}
+
+export interface GetN8nCredentialsIdResult {
+  updatedAt: string
+  name: string
+  data: string
+  type: string
+  isManaged: boolean
+  isResolvable: boolean
+  id: string
+  resolverId: string | null
+  createdAt: string
+  isGlobal: boolean
+  resolvableAllowFallback: boolean
+  scopes: string[]
+}

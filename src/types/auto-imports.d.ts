@@ -101,8 +101,10 @@ declare global {
   const getDatabaseItemById: typeof import('../utils/mock-db').getDatabaseItemById
   const getKysely: typeof import('../database').getKysely
   const getN8nCredentials: typeof import('../apis/index').getN8nCredentials
+  const getN8nCredentialsId: typeof import('../apis/index').getN8nCredentialsId
   const getN8nLogin: typeof import('../apis/index').getN8nLogin
   const getN8nWebhook: typeof import('../apis/index').getN8nWebhook
+  const getN8nWorkflow: typeof import('../apis/index').getN8nWorkflow
   const getReportById: typeof import('../utils/mock-db').getReportById
   const getReportWorkflowData: typeof import('../config/workflow').getReportWorkflowData
   const getSetting: typeof import('../utils/setting-store').getSetting
@@ -240,6 +242,6 @@ declare global {
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
   // @ts-ignore
-  export type { N8nUser, PostN8nCredentialsBody, PostN8nCredentialsResult, PatchN8nMeBody, PatchN8nMeResult, PostN8nLoginBody, PostN8nLoginResult, GetN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nWorkflowWorkflowIdActivateBody, PostN8nRegisterResult, PostN8nWorkflowResult } from '../apis/index.types'
+  export type { N8nUser, PostN8nCredentialsBody, PostN8nCredentialsResult, PatchN8nMeBody, PatchN8nMeResult, PostN8nLoginBody, PostN8nLoginResult, GetN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nWorkflowWorkflowIdActivateBody, PostN8nRegisterResult, PostN8nWorkflowResult, GetN8nWorkflowResult, GetN8nCredentialsIdResult } from '../apis/index.types'
   import('../apis/index.types')
 }

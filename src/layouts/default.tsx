@@ -31,21 +31,6 @@ export function DefaultLayout(props: DefaultLayoutProps) {
     return content
   }
 
-  // 如果未安装或未初始化，则重置用户状态，避免阻塞启动
-  useWhenever(isNeedInitiator, () => {
-    store.user.$patch({
-      n8nDefaultAccountLoginEnabled: true,
-      credentialName: null,
-      info: null,
-      credential: null,
-      workflow: null,
-      workspace: null,
-      deepseekSkip: false,
-      n8nEmail: '',
-      n8nPassword: '',
-    })
-  }, { immediate: true })
-
   return (
     <>
       <AnimatePresence mode="wait">
@@ -55,9 +40,10 @@ export function DefaultLayout(props: DefaultLayoutProps) {
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: -10 }}
           transition={{ duration: 0.4 }}
+          className="w-full h-screen"
         >
           {render(
-            <div className={clsx('relative flex min-h-screen', props.classNames?.root)}>
+            <div className={clsx('relative flex w-full h-screen', props.classNames?.root)}>
               <Sidebar />
               <div className="flex flex-col flex-1">
                 <Navbar />

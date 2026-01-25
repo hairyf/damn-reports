@@ -8,22 +8,36 @@ import { StartupState } from './store/modules/user'
 
 function App() {
   const navigate = useNavigate()
-  const { status } = useStore(store.user)
+  const user = useStore(store.user)
 
   useMount(() => window.navigate = navigate)
 
   useWhenever(
-    status === StartupState.INITIALIZING_ACCOUNT,
+    user.status === StartupState.INITIALIZING_ACCOUNT,
     // 登录重试多一些，避免启动 n8n 端口还未完全启动成功
     () => retry(store.user.initializeAccount, { retries: 10, delay: 1000 }),
     { immediate: true },
   )
 
   useWhenever(
-    status === StartupState.TEMPLATE_INIT,
+    user.status === StartupState.TEMPLATE_INIT,
     () => retry(store.user.initializeWorkflow),
     { immediate: true },
   )
+
+  // 检测工作流是否真实存在，不存在则清除状态
+  useWhenever(user.workflow, async () => {
+    const detail = await getN8nWorkflow(user.workflow!)
+    if (!detail)
+      store.user.$patch({ workflow: null })
+  })
+
+  // 检测凭证是否真实存在，不存在则清除状态
+  useWhenever(user.credential, async () => {
+    const detail = await getN8nCredentialsId(user.workflow!)
+    if (!detail)
+      store.user.$patch({ credential: null, credentialName: null })
+  })
 
   return (
     <layouts.default>

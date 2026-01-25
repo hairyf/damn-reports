@@ -8,6 +8,12 @@ export async function getN8nCredentials() {
   return response.json()
 }
 
+export async function getN8nCredentialsId(credentialsId: string) {
+  return fetch(`${N8N_API_URL}/rest/credentials/${credentialsId}`, { method: 'GET' })
+    .then(response => response.json())
+    .then(data => data?.data as Types.GetN8nCredentialsIdResult | null)
+}
+
 export async function postN8nCredentials(body: Types.PostN8nCredentialsBody) {
   const response = await fetch(`${N8N_API_URL}/rest/credentials`, {
     headers: { 'Content-Type': 'application/json' },
@@ -60,6 +66,12 @@ export async function postN8nMeSurvey(params: Types.PostN8nMeSurveyParams) {
     body: JSON.stringify(params),
   })
   return response.json()
+}
+
+export async function getN8nWorkflow(workflowId: string) {
+  return fetch(`${N8N_API_URL}/rest/workflows/${workflowId}`, { method: 'GET' })
+    .then(response => response.json())
+    .then(data => data?.data as Types.GetN8nWorkflowResult | null)
 }
 
 export async function postN8nWorkflow(params: any) {

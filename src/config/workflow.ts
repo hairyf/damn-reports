@@ -45,7 +45,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
       {
         parameters: {
           method: 'POST',
-          url: 'http://localhost:6789/report',
+          url: 'http://[::1]:6789/report',
           sendHeaders: true,
           headerParameters: {
             parameters: [
@@ -73,7 +73,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
         type: 'n8n-nodes-base.httpRequest',
         typeVersion: 4.3,
         position: [
-          704,
+          736,
           0,
         ],
         id: '7cfc9ea1-4866-4fcc-8e11-a7cb2dd49ac4',
@@ -81,7 +81,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
       },
       {
         parameters: {
-          url: 'http://localhost:6789/record/summary',
+          url: 'http://[::1]:6789/record/summary',
           sendQuery: true,
           queryParameters: {
             parameters: [
@@ -96,11 +96,46 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
         type: 'n8n-nodes-base.httpRequest',
         typeVersion: 4.3,
         position: [
-          256,
+          224,
           0,
         ],
         id: '23ad93af-29f1-4bbd-ad88-38ae8d4b24b5',
         name: 'Get Records',
+      },
+      {
+        parameters: {
+          rule: {
+            interval: [
+              {
+                triggerAtHour: 17,
+                triggerAtMinute: 45,
+              },
+            ],
+          },
+        },
+        type: 'n8n-nodes-base.scheduleTrigger',
+        typeVersion: 1.3,
+        position: [
+          32,
+          -240,
+        ],
+        id: '171c796b-9250-4ef2-8fe2-e1abef156101',
+        name: 'Schedule Trigger',
+      },
+      {
+        parameters: {
+          method: 'POST',
+          url: 'http://[::1]:6789/record/collect',
+          options: {},
+        },
+        type: 'n8n-nodes-base.httpRequest',
+        typeVersion: 4.3,
+        position: [
+          224,
+          -240,
+        ],
+        id: '5a99775f-8db1-448e-9f26-8bbb39cdca45',
+        name: 'Collect data',
       },
       {
         parameters: {
@@ -110,33 +145,47 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
         type: 'n8n-nodes-base.webhook',
         typeVersion: 2.1,
         position: [
-          80,
+          32,
           0,
         ],
         id: '7b831986-1874-4ff6-ba43-c76fe7e3b3c1',
-        name: 'Webhook',
+        name: 'Software Trigger',
         webhookId: 'adf86697801f',
       },
-    ],
-    pinData: {},
-    connections: {
-      'DeepSeek Chat Model': {
-        ai_languageModel: [
-          [
-            {
-              node: 'AI Agent',
-              type: 'ai_languageModel',
-              index: 0,
-            },
-          ],
+      {
+        parameters: {
+          amount: 2,
+          unit: 'minutes',
+        },
+        type: 'n8n-nodes-base.wait',
+        typeVersion: 1.1,
+        position: [
+          432,
+          -240,
         ],
+        id: 'c00ef0ea-a9e4-4a31-8913-34d8caea019e',
+        name: 'Waiting to obtain',
+        webhookId: '26f28e92-fbdd-4d22-8c13-97b311ac1ebf',
       },
+    ],
+    connections: {
       'AI Agent': {
         main: [
           [
             {
               node: 'Save Report',
               type: 'main',
+              index: 0,
+            },
+          ],
+        ],
+      },
+      'DeepSeek Chat Model': {
+        ai_languageModel: [
+          [
+            {
+              node: 'AI Agent',
+              type: 'ai_languageModel',
               index: 0,
             },
           ],
@@ -153,7 +202,40 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
           ],
         ],
       },
-      'Webhook': {
+      'Schedule Trigger': {
+        main: [
+          [
+            {
+              node: 'Collect data',
+              type: 'main',
+              index: 0,
+            },
+          ],
+        ],
+      },
+      'Collect data': {
+        main: [
+          [
+            {
+              node: 'Waiting to obtain',
+              type: 'main',
+              index: 0,
+            },
+          ],
+        ],
+      },
+      'Software Trigger': {
+        main: [
+          [
+            {
+              node: 'Get Records',
+              type: 'main',
+              index: 0,
+            },
+          ],
+        ],
+      },
+      'Waiting to obtain': {
         main: [
           [
             {
@@ -166,13 +248,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
       },
     },
     active: false,
-    settings: {
-      executionOrder: 'v1',
-      availableInMCP: false,
-    },
-    meta: {
-      templateCredsSetupCompleted: true,
-    },
-    tags: [],
+    pinData: {},
+    meta: { templateCredsSetupCompleted: true },
   }
 }

@@ -59,7 +59,7 @@ export function Sidebar() {
   return (
     <aside
       className="h-screen order-divider relative flex-shrink-0"
-      style={{ width: `${width}px` }}
+      style={{ width: `${width}px`, minWidth: `${width}px`, maxWidth: `${width}px` }}
     >
       <div className="absolute h-[64px] w-full" data-tauri-drag-region />
 
