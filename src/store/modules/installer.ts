@@ -8,9 +8,13 @@ export const installer = defineStore({
     percentage: 0,
     progress: 0,
     detail: '',
+    log: '',
   }),
 })
 
 listen<typeof installer.$state>('install-progress', (event) => {
-  installer.$patch(event.payload)
+  // 只在进度前进时更新
+  if (event.payload.percentage >= installer.percentage) {
+    installer.$patch(event.payload)
+  }
 })

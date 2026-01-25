@@ -127,7 +127,7 @@ pub async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
         log::info!("Task {} not installed, starting installation", index + 1);
 
         // 2. 下载
-        tracker.start_phase("download", &format!("Downloading {}", task.title()));
+        tracker.start_phase("download", &format!("正在下载 {}", task.title()));
         let url = task.get_download_url()?;
         log::debug!("Download URL: {}", url);
         let name = url.split('/').last().unwrap().to_string();
@@ -137,7 +137,7 @@ pub async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
         tracker.end_phase();
 
         // 3. 解压
-        tracker.start_phase("extract", &format!("Extracting {}", task.title()));
+        tracker.start_phase("extract", &format!("正在解压 {}", task.title()));
         let dest = task.get_install_path(app_handle);
         log::debug!("Installation path: {:?}", dest);
         download::ensure_extract(
@@ -151,7 +151,7 @@ pub async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
     }
 
     log::info!("All installation tasks completed");
-    tracker.update(100.0, "All tasks completed".into());
+    tracker.update(100.0, "All tasks completed".into(), "All tasks completed".into());
 
     Ok(())
 }

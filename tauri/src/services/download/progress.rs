@@ -8,6 +8,7 @@ use serde::Serialize;
 pub struct ProgressPayload {
     pub title: String,
     pub detail: String,
+    pub log: String,
     pub r#type: String,
     pub percentage: f64,
     // 子任务进度
@@ -49,8 +50,9 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
     }
 
     /// stage_pct: 当前子任务的进度 (0.0 - 100.0)
-    /// detail: 持续替换的操作内容
-    pub fn update(&self, stage_pct: f64, detail: String) {
+    /// detail: 用于显示的主要信息 (如 "Downloaded xx MB / xx MB" 或 "Extracted 30%")
+    /// log: 用于在 log 窗口显示的文字 (如 "Downloading http://..." 或 "Extract xx/xx/xx")
+    pub fn update(&self, stage_pct: f64, detail: String, log: String) {
         let now = Instant::now();
         let mut last_emit = self.last_emit_time.lock().unwrap();
 
@@ -72,6 +74,7 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
             percentage: global_pct,
             progress: stage_pct,
             detail,
+            log,
         });
     }
 

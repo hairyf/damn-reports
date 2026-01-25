@@ -43,10 +43,11 @@ pub fn extract_zip<'a, R: Runtime>(
                     .map(|n| n.to_string_lossy().to_string())
                     .unwrap_or_default()
             });
-        let display_text = format!("Extract {}", relative_path);
+        let progress_pct = ((i + 1) as f64 / total_files as f64) * 100.0;
         tracker.update(
-            ((i + 1) as f64 / total_files as f64) * 100.0,
-            display_text
+            progress_pct,
+            format!("Extracted {:.1}%", progress_pct),
+            format!("Extract {}", relative_path)
         );
 
         // 4. 处理目录或文件
@@ -119,8 +120,9 @@ pub fn extract_tgz<'a, R: Runtime>(
         // 打印当前解压的文件名（格式：Extract 路径/文件）
         // -1.0 表示未知进度(让前端持续增加)
         let relative_path = path.to_string_lossy().replace('\\', "/");
-        let display_text = format!("Extract {}", relative_path);
-        tracker.update(-1.0, display_text);
+        // 对于 TGZ，由于无法提前知道文件总数，使用文件计数来估算进度
+        let estimated_pct = (file_count as f64 / (file_count + 1) as f64) * 100.0;
+        tracker.update(-1.0, format!("Extracted {:.1}%", estimated_pct), format!("Extract {}", relative_path));
 
         // 执行解压
         entry.unpack_in(dest).map_err(|e| {
