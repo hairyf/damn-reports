@@ -5,10 +5,35 @@ use axum::{
   response::Response,
   body::Body,
 };
+use serde_json;
 
 use crate::bridge::server::AppState;
 use crate::bridge::server::routes::record::dtos::{GetRecordsParams, GroupedRecordsResponse};
 use crate::bridge::server::routes::record::service::{get_records, get_summary_prompt};
+use crate::services::scheduler::task;
+
+pub async fn post_collect(
+  State(state): State<AppState>
+) -> (StatusCode, Json<serde_json::Value>) {
+  let db_clone = (*state.db).clone();
+  // 在后台执行收集任务，避免阻塞 HTTP 请求
+  tokio::spawn(async move {
+    match task::collect_records_of_source::trigger(db_clone).await {
+      Ok(count) => {
+        log::info!("Background collect task completed successfully, collected {} records", count);
+      }
+      Err(e) => {
+        log::error!("Background collect task failed: {}", e);
+      }
+    }
+  });
+  
+  // 立即返回，表示任务已启动
+  (StatusCode::ACCEPTED, Json(serde_json::json!({
+    "message": "Collect task started",
+    "status": "accepted"
+  })))
+}
 
 pub async fn get(
   State(state): State<AppState>,
