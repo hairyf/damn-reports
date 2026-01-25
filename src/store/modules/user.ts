@@ -58,7 +58,6 @@ export const user = defineStore({
         emailOrLdapLoginId: this.account.email,
         password: this.account.password,
       })
-      
       if (typeof result.code === 'number')
         throw new TypeError(result.message)
       this.loggedIn = true

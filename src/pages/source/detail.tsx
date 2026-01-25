@@ -77,7 +77,7 @@ function Page() {
     else {
       await db.source.create({
         updatedAt: new Date().toISOString(),
-        workspaceId: user.workspaceId!,
+        workspaceId: user.workspace!,
         enabled: true,
         name: data.name,
         description: data.description,

@@ -51,7 +51,7 @@ pub async fn download_file<'a, R: Runtime>(
         buffer.extend_from_slice(&chunk);
         downloaded += chunk.len() as u64;
         tracker.update(
-            downloaded as f64 / total_size as f64, 
+            (downloaded as f64 / total_size as f64) * 100.0, 
             format!("Downloaded {:.1} MB / {:.1} MB", 
                 downloaded as f64 / 1_000_000.0,
                 total_size as f64 / 1_000_000.0)

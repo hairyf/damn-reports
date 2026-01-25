@@ -45,7 +45,7 @@ pub fn extract_zip<'a, R: Runtime>(
             });
         let display_text = format!("Extract {}", relative_path);
         tracker.update(
-            (i + 1) as f64 / total_files as f64,
+            ((i + 1) as f64 / total_files as f64) * 100.0,
             display_text
         );
 
