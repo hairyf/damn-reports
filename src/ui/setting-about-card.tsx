@@ -3,10 +3,11 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Divider,
   Switch,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { useQuery } from '@tanstack/react-query'
+import { getVersion } from '@tauri-apps/api/app'
 import { sendNotification } from '@tauri-apps/plugin-notification'
 import { useState } from 'react'
 import { useStore } from 'valtio-define'
@@ -15,6 +16,12 @@ import { store } from '@/store'
 export function SettingAboutCard() {
   const setting = useStore(store.setting)
   const [checkingUpdate, setCheckingUpdate] = useState(false)
+
+  // 获取应用版本号
+  const { data: appVersion = '' } = useQuery({
+    queryKey: ['appVersion'],
+    queryFn: async () => getVersion(),
+  })
 
   // 更新自动检查更新设置
   function handleAutoCheckUpdateChange(value: boolean) {
@@ -68,25 +75,21 @@ export function SettingAboutCard() {
 
   return (
     <Card shadow="none">
-      <CardHeader className="flex gap-3">
+      <CardHeader className="flex gap-3 py-4">
         <Icon icon="lucide:info" className="w-5 h-5" />
-        <div className="flex flex-col">
-          <p className="text-md font-semibold">关于</p>
-          <p className="text-small text-default-500">应用信息</p>
-        </div>
+        <p className="text-md font-semibold">关于</p>
       </CardHeader>
-      <Divider />
-      <CardBody className="gap-4 p-5">
+      <CardBody className="gap-4 pt-0">
         <div className="flex flex-col gap-2 text-sm">
           <div className="flex items-center gap-2">
             <Icon icon="lucide:package" className="w-4 h-4 text-default-500" />
             <span className="text-default-600">名称：</span>
-            <span className="text-default-900">Damn Daily Reports</span>
+            <span className="text-default-900">Damn Reports</span>
           </div>
           <div className="flex items-center gap-2">
             <Icon icon="lucide:tag" className="w-4 h-4 text-default-500" />
             <span className="text-default-600">版本：</span>
-            <span className="text-default-900">0.1.0</span>
+            <span className="text-default-900">{appVersion || '加载中...'}</span>
           </div>
         </div>
 

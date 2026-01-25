@@ -3,7 +3,6 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Divider,
   Select,
   SelectItem,
 } from '@heroui/react'
@@ -28,15 +27,11 @@ export function SettingUserInterfaceCard() {
 
   return (
     <Card shadow="none">
-      <CardHeader className="flex gap-3">
+      <CardHeader className="flex gap-3 py-4">
         <Icon icon="lucide:palette" className="w-5 h-5" />
-        <div className="flex flex-col">
-          <p className="text-md font-semibold">用户界面</p>
-          <p className="text-small text-default-500">自定义应用的外观和语言</p>
-        </div>
+        <p className="text-md font-semibold">用户界面</p>
       </CardHeader>
-      <Divider />
-      <CardBody className="gap-4 p-5">
+      <CardBody className="gap-4 pt-0">
         {/* 语言设置 */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">

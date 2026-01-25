@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, CardHeader, Divider, Switch } from '@heroui/react'
+import { Button, Card, CardBody, CardHeader, Switch } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { N8NIcon } from '@/components/icons'
 
@@ -10,15 +10,14 @@ export function SettingN8nCard() {
 
   return (
     <Card shadow="none">
-      <CardHeader className="flex gap-3">
-        <N8NIcon className="w-5 h-5" />
-        <div className="flex flex-col">
-          <p className="text-md font-semibold">N8N</p>
-          <p className="text-small text-default-500">N8N 进程管理</p>
+      <CardHeader className="flex gap-3 items-center justify-between py-4">
+        <div className="flex items-center gap-3">
+          <N8NIcon className="w-5 h-5" />
+          <p className="text-md font-semibold">N8N 核心</p>
         </div>
+        <span className="text-sm">v2.4.6</span>
       </CardHeader>
-      <Divider />
-      <CardBody className="gap-4 p-5">
+      <CardBody className="gap-4 pt-0">
         {/* 运行状态(文字加 dot) */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
@@ -78,6 +77,15 @@ export function SettingN8nCard() {
               重置账号
             </Button>
           </div>
+        </div>
+
+        <div className="flex gap-2">
+          <Button variant="bordered" radius="full">
+            重启进程
+          </Button>
+          <Button color="primary" variant="flat" radius="full">
+            检查更新
+          </Button>
         </div>
       </CardBody>
     </Card>

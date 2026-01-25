@@ -2,7 +2,6 @@ import {
   Card,
   CardBody,
   CardHeader,
-  Divider,
   Switch,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
@@ -31,15 +30,11 @@ export function SettingOtherCard() {
 
   return (
     <Card shadow="none">
-      <CardHeader className="flex gap-3">
+      <CardHeader className="flex gap-3 py-4">
         <Icon icon="lucide:settings" className="w-5 h-5" />
-        <div className="flex flex-col">
-          <p className="text-md font-semibold">其他设置</p>
-          <p className="text-small text-default-500">应用行为和偏好设置</p>
-        </div>
+        <p className="text-md font-semibold">其他设置</p>
       </CardHeader>
-      <Divider />
-      <CardBody className="gap-4 p-5">
+      <CardBody className="gap-4 pt-0">
         {/* 自动保存 */}
         <div className="flex items-center justify-between">
           <div className="flex flex-col gap-1">
