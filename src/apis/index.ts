@@ -17,13 +17,20 @@ export async function postN8nCredentials(body: Types.PostN8nCredentialsBody) {
   return response.json() as Promise<Types.PostN8nCredentialsResult>
 }
 
-export async function postN8nLogin(body?: Types.PostN8nLoginBody) {
+export async function postN8nLogin(body: Types.PostN8nLoginBody) {
   const response = await fetch(`${N8N_API_URL}/rest/login`, {
-    headers: { 'Content-Type': 'application/json' },
+    headers: body ? { 'Content-Type': 'application/json' } : undefined,
     body: body ? JSON.stringify(body) : undefined,
     method: 'POST',
   })
-  return response.json() as Promise<Types.PostN8nLoginResult>
+  return await response.json() as Promise<Types.PostN8nLoginResult>
+}
+
+export async function getN8nLogin() {
+  const response = await fetch(`${N8N_API_URL}/rest/login`, {
+    method: 'GET',
+  })
+  return response.json() as Promise<Types.GetN8nLoginResult>
 }
 
 export async function patchN8nMe(body: Types.PatchN8nMeBody) {

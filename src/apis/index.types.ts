@@ -68,6 +68,12 @@ export interface PostN8nLoginResult {
   data: N8nUser
 }
 
+export interface GetN8nLoginResult {
+  status?: 'error'
+  message?: 'Unauthorized'
+  data?: N8nUser
+}
+
 export interface PostN8nMeSurveyParams {
   version: string
   personalization_survey_submitted_at: string

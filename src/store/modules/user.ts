@@ -47,17 +47,18 @@ export const user = defineStore({
       })
     },
     async login() {
-      const result = await postN8nLogin()
-      if (typeof result.code === 'number')
+      const result = await getN8nLogin()
+      if (result.status === 'error')
         throw new TypeError(result.message)
       this.loggedIn = true
-      return result.data
+      return result.data!
     },
     async fallbackLogin() {
       const result = await postN8nLogin({
         emailOrLdapLoginId: this.account.email,
         password: this.account.password,
       })
+      
       if (typeof result.code === 'number')
         throw new TypeError(result.message)
       this.loggedIn = true
@@ -106,7 +107,7 @@ export const user = defineStore({
       return insertId!.toString()
     },
     async createCredential(apiKey: string) {
-      const { data } = await postN8nCredentials({
+      const result = await postN8nCredentials({
         isGlobal: false,
         isResolvable: false,
         data: { apiKey },
@@ -114,8 +115,8 @@ export const user = defineStore({
         type: 'deepSeekApi',
       })
       store.user.$patch({
-        credential: data.id,
-        credentialName: data.name,
+        credential: result.data.id,
+        credentialName: result.data.name,
       })
     },
     async updateWorkspace(data: Partial<Selectable<Workspace>>) {
