@@ -3,7 +3,7 @@ use axum::{extract::State, http::StatusCode, Json};
 use crate::bridge::server::routes::report::dtos::ReportCreateInput;
 use crate::bridge::server::routes::report::service::create_report;
 use crate::bridge::server::AppState;
-use crate::config::setting::get_store_dat_setting;
+use crate::config;
 use crate::core::db::entities::report;
 
 pub async fn post(
@@ -13,7 +13,7 @@ pub async fn post(
     match create_report(state.db.clone(), input).await {
         Ok(report) => {
             // 检查通知设置，只有启用通知时才发送
-            let setting = get_store_dat_setting(&state.app_handle);
+            let setting = config::get_store_dat_setting(&state.app_handle);
             if setting.notifications {
                 let app_handle = state.app_handle.clone();
                 let report_name = report.name.clone();
