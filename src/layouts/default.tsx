@@ -1,4 +1,3 @@
-import { If } from '@hairy/react-lib'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useStore } from 'valtio-define'
@@ -55,9 +54,7 @@ export function DefaultLayout(props: DefaultLayoutProps) {
           )}
         </motion.div>
       </AnimatePresence>
-      <If cond={!isNeedInitiator}>
-        <StepStatusChip />
-      </If>
+      <CornerActions />
     </>
   )
 }

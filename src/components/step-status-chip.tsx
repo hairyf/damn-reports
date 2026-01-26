@@ -1,3 +1,5 @@
+/* eslint-disable react-refresh/only-export-components */
+import { If } from '@hairy/react-lib'
 import { Chip } from '@heroui/react'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
@@ -9,6 +11,7 @@ export function StepStatusChip() {
   const { status } = useStore(store.user)
   const [isVisible, setIsVisible] = useState(true)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
+  const isNeedInitiator = useIsNeedInitiator()
 
   useEffect(() => {
     const update = () => setIsVisible(status !== StartupState.COMPLETED)
@@ -43,7 +46,7 @@ export function StepStatusChip() {
   }
 
   return (
-    <AnimatePresence>
+    <If as={AnimatePresence} cond={!isNeedInitiator}>
       {isVisible && (
         <motion.div
           // --- 橡皮筋拖拽核心配置 ---
@@ -56,8 +59,6 @@ export function StepStatusChip() {
           initial={{ opacity: 0, scale: 0.8, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           exit={{ opacity: 0, scale: 0.8, transition: { duration: 0.2 } }}
-          layout
-          className="fixed bottom-4 right-4 z-50 cursor-pointer" // touch-none 防止移动端拖拽冲突
         >
           <Chip
             color={
@@ -88,6 +89,12 @@ export function StepStatusChip() {
           </Chip>
         </motion.div>
       )}
-    </AnimatePresence>
+    </If>
   )
+}
+
+export function useIsNeedInitiator() {
+  const { ready } = useStore(store.user)
+  const { installed, ininitialized } = useStore(store.setting)
+  return !installed || (!ready && !ininitialized)
 }

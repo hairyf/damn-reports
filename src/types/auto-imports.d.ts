@@ -11,6 +11,7 @@ declare global {
   const AlimailIcon: typeof import('../components/icons').AlimailIcon
   const Button: typeof import('../components/button').Button
   const ClickupIcon: typeof import('../components/icons').ClickupIcon
+  const CornerActions: typeof import('../components/corner-actions').CornerActions
   const DEFAULT_N8N_LOGIN_DATA: typeof import('../config/constants').DEFAULT_N8N_LOGIN_DATA
   const DEFAULT_N8N_REGISTER_DATA: typeof import('../config/constants').DEFAULT_N8N_REGISTER_DATA
   const DeleteReportModal: typeof import('../components/delete-report-modal').DeleteReportModal
@@ -36,6 +37,7 @@ declare global {
   const Link: typeof import('react-router-dom').Link
   const Logo: typeof import('../components/icons').Logo
   const ManualLoginN8n: typeof import('../components/step-manual-login').ManualLoginN8n
+  const Modal: typeof import('../components/modal').Modal
   const Model: typeof import('../database/model').Model
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
   const N8NIcon: typeof import('../components/icons').N8NIcon
@@ -72,12 +74,14 @@ declare global {
   const StepN8nManualLogin: typeof import('../components/step-n8n-manual-login').StepN8nManualLogin
   const StepStatus: typeof import('../components/step-status').StepStatus
   const StepStatusChip: typeof import('../components/step-status-chip').StepStatusChip
+  const StepStatusChipContent: typeof import('../components/step-status-chip').StepStatusChipContent
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const Suspense: typeof import('react').Suspense
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
   const Titlebar: typeof import('../components/titlebar').Titlebar
   const TrendCard: typeof import('../components/trend-card').TrendCard
   const TwitterIcon: typeof import('../components/icons').TwitterIcon
+  const UpdateStatus: typeof import('../components/update-status').UpdateStatus
   const buttonVariants: typeof import('../components/button').buttonVariants
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
@@ -124,6 +128,7 @@ declare global {
   const main: typeof import('../database').main
   const memo: typeof import('react').memo
   const mitt: typeof import('../config/mitt').mitt
+  const modal: typeof import('../components/modal').default
   const params: typeof import('../services/post-n8n-workflow.params.mock').params
   const patchN8nMe: typeof import('../apis/index').patchN8nMe
   const postN8nApiKey: typeof import('../services/post-n8n-api-key').postN8nApiKey
@@ -172,6 +177,7 @@ declare global {
   const useImperativeHandle: typeof import('react').useImperativeHandle
   const useInRouterContext: typeof import('react-router-dom').useInRouterContext
   const useInsertionEffect: typeof import('react').useInsertionEffect
+  const useIsNeedInitiator: typeof import('../components/step-status-chip').useIsNeedInitiator
   const useLayoutEffect: typeof import('react').useLayoutEffect
   const useLinkClickHandler: typeof import('react-router-dom').useLinkClickHandler
   const useLocation: typeof import('react-router-dom').useLocation
@@ -220,6 +226,9 @@ declare global {
   // @ts-ignore
   export type { IconSvgProps } from '../components/icons'
   import('../components/icons')
+  // @ts-ignore
+  export type { ModalProps } from '../components/modal'
+  import('../components/modal')
   // @ts-ignore
   export type { ReportEditorProps } from '../components/report-editor'
   import('../components/report-editor')
