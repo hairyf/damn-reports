@@ -31,8 +31,10 @@ pub fn flatten_directory(dest: &PathBuf) -> Result<(), String> {
         .filter_map(|e| e.ok())
         .map(|e| e.path())
         .filter(|path| {
-            if !path.is_dir() { return false; }
-            
+            if !path.is_dir() {
+                return false;
+            }
+
             // 检查文件名（过滤隐藏文件和保留目录）
             path.file_name()
                 .and_then(|n| n.to_str())

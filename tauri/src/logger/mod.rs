@@ -31,14 +31,10 @@ impl log::Log for SimpleLogger {
         if self.enabled(record.metadata()) {
             // 从模块路径中提取模块名
             let module_path = record.module_path().unwrap_or("unknown");
-            
+
             // 格式化输出: [Module]: content
-            let output = format!(
-                "[{}]: {}\n",
-                module_path,
-                record.args()
-            );
-            
+            let output = format!("[{}]: {}\n", module_path, record.args());
+
             // 输出到 stderr (错误级别) 或 stdout (其他级别)
             match record.level() {
                 Level::Error => {
@@ -64,7 +60,7 @@ impl log::Log for SimpleLogger {
 static LOGGER: SimpleLogger = SimpleLogger;
 
 /// 初始化日志系统
-/// 
+///
 /// 默认日志级别为 Info，可以通过环境变量 RUST_LOG 控制
 /// 例如: RUST_LOG=debug 或 RUST_LOG=services::workflow=debug
 pub fn init() {
@@ -72,7 +68,7 @@ pub fn init() {
     let log_level = std::env::var("RUST_LOG")
         .unwrap_or_else(|_| "info".to_string())
         .to_lowercase();
-    
+
     let filter = match log_level.as_str() {
         "trace" => TRACE,
         "debug" => DEBUG,

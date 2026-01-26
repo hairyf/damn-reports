@@ -3,12 +3,12 @@ pub mod utils;
 
 use crate::config::{self};
 use crate::service::download;
-use std::process::{Command, Stdio, ChildStdout, ChildStderr};
-use std::io::{BufRead, BufReader};
-use std::thread;
-use tauri::{Manager};
-use tauri;
 use crate::service::workflow::utils::{is_n8n_running, is_port_in_use};
+use std::io::{BufRead, BufReader};
+use std::process::{ChildStderr, ChildStdout, Command, Stdio};
+use std::thread;
+use tauri;
+use tauri::Manager;
 
 pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
     let setting = config::get_store_dat_setting(&app_handle);
@@ -92,7 +92,7 @@ pub async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
             let stdout = child.stdout.take();
             let stderr = child.stderr.take();
             spawn_output_readers(stdout, stderr);
-            
+
             Ok(())
         }
         Err(e) => {
@@ -110,10 +110,8 @@ pub async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
         .ok_or("Failed to get main window")?;
     log::debug!("Main window obtained");
     let mut tracker = download::ProgressTracker::new(&window, 4);
-    let tasks: Vec<Box<dyn download::Installable>> = vec![
-        Box::new(download::Nodejs), 
-        Box::new(download::N8n)
-    ];
+    let tasks: Vec<Box<dyn download::Installable>> =
+        vec![Box::new(download::Nodejs), Box::new(download::N8n)];
     log::info!("Task list created, {} tasks total", tasks.len());
 
     for (index, task) in tasks.iter().enumerate() {
@@ -140,28 +138,23 @@ pub async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
         tracker.start_phase("extract", &format!("正在解压 {}", task.title()));
         let dest = task.get_install_path(app_handle);
         log::debug!("Installation path: {:?}", dest);
-        download::ensure_extract(
-            &tracker, 
-            name, 
-            buffer,
-            dest
-        )?;
+        download::ensure_extract(&tracker, name, buffer, dest)?;
         log::info!("Extraction completed");
         tracker.end_phase();
     }
 
     log::info!("All installation tasks completed");
     tracker.update(
-      100.0, 
-      format!("依赖已安装完毕"), 
-       "All tasks completed".into()
+        100.0,
+        format!("依赖已安装完毕"),
+        "All tasks completed".into(),
     );
 
     Ok(())
 }
 
 /// 在独立线程中读取子进程的输出
-/// 
+///
 /// # 参数
 /// - `stdout`: 子进程的标准输出
 /// - `stderr`: 子进程的标准错误输出
@@ -183,7 +176,7 @@ fn spawn_output_readers(stdout: Option<ChildStdout>, stderr: Option<ChildStderr>
             }
         });
     }
-    
+
     // 在独立线程中读取 stderr
     if let Some(stderr) = stderr {
         thread::spawn(move || {

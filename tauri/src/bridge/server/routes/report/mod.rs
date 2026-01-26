@@ -1,5 +1,5 @@
 pub mod controller;
-pub mod service;
 pub mod dtos;
+pub mod service;
 
 pub use controller::post;

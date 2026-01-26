@@ -1,7 +1,7 @@
+use serde::Serialize;
 use std::sync::Mutex;
 use std::time::{Duration, Instant};
-use tauri::{Runtime, WebviewWindow, Emitter};
-use serde::Serialize;
+use tauri::{Emitter, Runtime, WebviewWindow};
 
 #[derive(Clone, Serialize)]
 #[serde(rename_all = "camelCase")]
@@ -37,7 +37,7 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
     }
 
     /// 切换阶段，并设置大标题
-    pub fn start_phase(&mut self,r#type: &str, title: &str) {
+    pub fn start_phase(&mut self, r#type: &str, title: &str) {
         self.current_title = title.to_string();
         self.current_type = r#type.to_string();
     }
@@ -62,20 +62,24 @@ impl<'a, R: Runtime> ProgressTracker<'a, R> {
                 return;
             }
         }
-        
-        *last_emit = Some(now);
-        
-        let phase_weight = 100.0 / self.total_phases as f64;
-        let global_pct = (self.current_phase as f64 * phase_weight) + (stage_pct * phase_weight / 100.0);
 
-        let _ = self.window.emit("install-progress", ProgressPayload {
-            title: self.current_title.clone(),
-            r#type: self.current_type.clone(),
-            percentage: global_pct,
-            progress: stage_pct,
-            detail,
-            log,
-        });
+        *last_emit = Some(now);
+
+        let phase_weight = 100.0 / self.total_phases as f64;
+        let global_pct =
+            (self.current_phase as f64 * phase_weight) + (stage_pct * phase_weight / 100.0);
+
+        let _ = self.window.emit(
+            "install-progress",
+            ProgressPayload {
+                title: self.current_title.clone(),
+                r#type: self.current_type.clone(),
+                percentage: global_pct,
+                progress: stage_pct,
+                detail,
+                log,
+            },
+        );
     }
 
     /// 跳过指定数量的阶段

@@ -12,9 +12,11 @@ pub fn start(app_handle: &AppHandle, _db: sea_orm::DatabaseConnection) {
 
 async fn scheduler_permanent_loop(app_handle: AppHandle) {
     let mut interval = time::interval(Duration::from_secs(1));
-    
+
     loop {
-        crate::task::tick_check_n8n_process::trigger(app_handle.clone()).await.unwrap();
+        crate::task::tick_check_n8n_process::trigger(app_handle.clone())
+            .await
+            .unwrap();
         interval.tick().await;
     }
 }

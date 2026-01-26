@@ -5,6 +5,8 @@ mod logger;
 mod service;
 mod task;
 
+use crate::config::{DB_NAME, DB_URL_PREFIX};
+use core::utils::{navigate, show_window};
 use tauri::{
     ipc::Invoke,
     menu::{Menu, MenuEvent, MenuItem},
@@ -12,8 +14,6 @@ use tauri::{
     Manager, Runtime, Wry,
 };
 use tauri_plugin_sql::{Migration, MigrationKind};
-use core::utils::{navigate, show_window};
-use crate::config::{DB_NAME, DB_URL_PREFIX};
 
 // setup app
 fn setup(app_handle: tauri::AppHandle) {
@@ -125,14 +125,16 @@ fn migrations() -> tauri_plugin_sql::Builder {
         },
     ];
     for migration in &migrations {
-      log::info!("Migration: {}", migration.description);
+        log::info!("Migration: {}", migration.description);
     }
-    tauri_plugin_sql::Builder::default().add_migrations(&format!("{}{}", DB_URL_PREFIX, DB_NAME), migrations)
+    tauri_plugin_sql::Builder::default()
+        .add_migrations(&format!("{}{}", DB_URL_PREFIX, DB_NAME), migrations)
 }
 
 // configure tauri builder
 fn builder() -> tauri::Builder<tauri::Wry> {
     tauri::Builder::default()
+        .plugin(tauri_plugin_updater::Builder::new().build())
         // Simple Store plugin
         .plugin(tauri_plugin_store::Builder::new().build())
         // Sql store plugin
@@ -155,7 +157,7 @@ fn builder() -> tauri::Builder<tauri::Wry> {
 pub fn run() {
     // 初始化日志系统
     logger::init();
-    
+
     builder()
         .setup(|app| {
             tray(&app.handle()).unwrap();

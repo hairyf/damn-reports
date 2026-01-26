@@ -1,21 +1,21 @@
+use futures_util::StreamExt;
 use std::fs;
 use std::path::PathBuf;
-use futures_util::StreamExt;
 
 use crate::service::download::ProgressTracker;
 use tauri::Runtime;
 
 /// 下载文件到指定路径
-/// 
+///
 /// # 参数
 /// - `url`: 要下载的文件 URL
 /// - `dest`: 目标文件路径
-/// 
+///
 /// # 返回
 /// 成功返回 `Ok(())`，失败返回错误信息
 pub async fn download_file<'a, R: Runtime>(
     tracker: &'a ProgressTracker<'a, R>,
-    url: String
+    url: String,
 ) -> Result<Vec<u8>, String> {
     log::info!("Starting file download: {}", url);
     // 创建具备 User-Agent 的客户端
@@ -31,7 +31,7 @@ pub async fn download_file<'a, R: Runtime>(
         log::error!("Download request failed: {}", e);
         e.to_string()
     })?;
-    
+
     if !res.status().is_success() {
         log::error!("Download failed with HTTP status: {}", res.status());
         return Err(format!("Download failed: HTTP {}", res.status()));
@@ -53,23 +53,27 @@ pub async fn download_file<'a, R: Runtime>(
         let progress_pct = (downloaded as f64 / total_size as f64) * 100.0;
         tracker.update(
             progress_pct,
-            format!("已下载 {:.1} MB / {:.1} MB", downloaded as f64 / 1_000_000.0, total_size as f64 / 1_000_000.0),
-            format!("Download {}", url)
+            format!(
+                "已下载 {:.1} MB / {:.1} MB",
+                downloaded as f64 / 1_000_000.0,
+                total_size as f64 / 1_000_000.0
+            ),
+            format!("Download {}", url),
         );
     }
-  
+
     log::info!("Download completed, {} bytes total", downloaded);
     Ok(buffer)
 }
 
 /// 确保解压文件 or 文件到指定目录
-/// 
+///
 /// # 参数
 /// - `tracker`: 进度追踪器
 /// - `name`: 文件名
 /// - `buffer`: 压缩文件内容
 /// - `dest`: 解压目标目录
-/// 
+///
 /// # 返回
 /// 成功返回 `Ok(())`，失败返回错误信息
 pub fn ensure_extract<'a, R: Runtime>(
@@ -79,7 +83,7 @@ pub fn ensure_extract<'a, R: Runtime>(
     dest: PathBuf,
 ) -> Result<(), String> {
     log::info!("Starting file extraction: {} -> {:?}", name, dest);
-    use super::extractor::{extract_zip, extract_tgz};
+    use super::extractor::{extract_tgz, extract_zip};
     use super::utils::flatten_directory;
 
     // 判断文件类型
@@ -102,9 +106,9 @@ pub fn ensure_extract<'a, R: Runtime>(
             e.to_string()
         })?;
         tracker.update(
-          100.0, 
-          format!("已写入: {}", "100%"), 
-          format!("File written: {}", dest.display())
+            100.0,
+            format!("已写入: {}", "100%"),
+            format!("File written: {}", dest.display()),
         );
         log::info!("File write completed: {}", dest.display());
         return Ok(());
@@ -146,7 +150,7 @@ pub fn ensure_extract<'a, R: Runtime>(
             log::error!("Failed to fix permissions: {}", e);
             format!("Failed to fix permissions: {}", e)
         })?;
-        
+
         // 如果是 macOS，移除 Quarantine 属性，防止系统拦截二进制文件执行
         #[cfg(target_os = "macos")]
         {
@@ -158,9 +162,9 @@ pub fn ensure_extract<'a, R: Runtime>(
     }
 
     tracker.update(
-      100.0, 
-      format!("已解压: {}", "100%"), 
-      format!("Extract {}", "100%")
+        100.0,
+        format!("已解压: {}", "100%"),
+        format!("Extract {}", "100%"),
     );
     log::info!("Extraction completed: {}", dest.display());
     Ok(())

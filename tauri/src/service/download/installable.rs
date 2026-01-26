@@ -1,7 +1,7 @@
-use tauri::{AppHandle};
-use std::path::PathBuf;
 use crate::config;
 use async_trait::async_trait;
+use std::path::PathBuf;
+use tauri::AppHandle;
 
 #[async_trait]
 pub trait Installable: Send + Sync {
@@ -15,18 +15,34 @@ pub trait Installable: Send + Sync {
 pub struct Nodejs;
 #[async_trait]
 impl Installable for Nodejs {
-    fn title(&self) -> &str { "运行环境" }
-    fn get_download_url(&self) -> Result<String, String> { config::get_node_download_url() }
-    fn get_install_path(&self, app: &AppHandle) -> PathBuf { config::get_node_install_path(app) }
-    fn check_installed(&self, app: &AppHandle) -> bool { config::get_node_binary_path(app).exists() }
+    fn title(&self) -> &str {
+        "运行环境"
+    }
+    fn get_download_url(&self) -> Result<String, String> {
+        config::get_node_download_url()
+    }
+    fn get_install_path(&self, app: &AppHandle) -> PathBuf {
+        config::get_node_install_path(app)
+    }
+    fn check_installed(&self, app: &AppHandle) -> bool {
+        config::get_node_binary_path(app).exists()
+    }
 }
 
 // --- n8n 实现 ---
 pub struct N8n;
 #[async_trait]
 impl Installable for N8n {
-    fn title(&self) -> &str { "N8N 核心" }
-    fn get_download_url(&self) -> Result<String, String> { config::get_n8n_download_url() }
-    fn get_install_path(&self, app: &AppHandle) -> PathBuf { config::get_n8n_install_path(app) }
-    fn check_installed(&self, app: &AppHandle) -> bool { config::get_n8n_binary_path(app).exists() }
+    fn title(&self) -> &str {
+        "N8N 核心"
+    }
+    fn get_download_url(&self) -> Result<String, String> {
+        config::get_n8n_download_url()
+    }
+    fn get_install_path(&self, app: &AppHandle) -> PathBuf {
+        config::get_n8n_install_path(app)
+    }
+    fn check_installed(&self, app: &AppHandle) -> bool {
+        config::get_n8n_binary_path(app).exists()
+    }
 }

@@ -1,10 +1,10 @@
-use tauri::{Manager};
 use std::path::PathBuf;
+use tauri::Manager;
 
 use std::env;
 
-use super::utils::search_node_binary;
 use super::constants::*;
+use super::utils::search_node_binary;
 
 pub fn db_url(app_handle: &tauri::AppHandle) -> String {
     let db_path = app_handle
@@ -47,8 +47,8 @@ pub fn get_node_download_url() -> Result<String, String> {
 pub fn get_n8n_download_url() -> Result<String, String> {
     let platform = match env::consts::OS {
         "windows" => "windows",
-        "macos"   => "macos",
-        "linux"   => "linux",
+        "macos" => "macos",
+        "linux" => "linux",
         _ => return Err(format!("Unsupported platform: {}", env::consts::OS)),
     };
     let file_name = format!("n8n-pkg-{}.zip", platform);

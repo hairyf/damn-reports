@@ -2,7 +2,7 @@ use std::io::Cursor;
 use std::path::PathBuf;
 
 use std::fs;
-use std::io::{copy};
+use std::io::copy;
 
 use tauri::Runtime;
 
@@ -14,11 +14,10 @@ pub fn extract_zip<'a, R: Runtime>(
     dest: &PathBuf,
 ) -> Result<(), String> {
     log::debug!("Starting ZIP extraction to: {:?}", dest);
-    let mut archive = zip::ZipArchive::new(Cursor::new(buffer))
-        .map_err(|e| {
-            log::error!("Invalid ZIP format: {}", e);
-            format!("Invalid ZIP format: {}", e)
-        })?;
+    let mut archive = zip::ZipArchive::new(Cursor::new(buffer)).map_err(|e| {
+        log::error!("Invalid ZIP format: {}", e);
+        format!("Invalid ZIP format: {}", e)
+    })?;
 
     let total_files = archive.len();
     log::debug!("ZIP file contains {} files", total_files);
@@ -26,7 +25,7 @@ pub fn extract_zip<'a, R: Runtime>(
     for i in 0..total_files {
         // 1. 获取当前文件
         let mut file = archive.by_index(i).map_err(|e| e.to_string())?;
-        
+
         // 2. 获取并清理输出路径（防止路径穿越漏洞）
         let outpath = match file.enclosed_name() {
             Some(path) => dest.join(path),
@@ -34,12 +33,14 @@ pub fn extract_zip<'a, R: Runtime>(
         };
 
         // 3. 打印进度和当前文件名（格式：Extract 路径/文件）
-        let relative_path = outpath.strip_prefix(dest)
+        let relative_path = outpath
+            .strip_prefix(dest)
             .ok()
             .and_then(|p| p.to_str())
             .map(|s| s.replace('\\', "/"))
             .unwrap_or_else(|| {
-                outpath.file_name()
+                outpath
+                    .file_name()
                     .map(|n| n.to_string_lossy().to_string())
                     .unwrap_or_default()
             });
@@ -47,7 +48,7 @@ pub fn extract_zip<'a, R: Runtime>(
         tracker.update(
             progress_pct,
             format!("已解压 {:.1}%", progress_pct),
-            format!("Extract {}", relative_path)
+            format!("Extract {}", relative_path),
         );
 
         // 4. 处理目录或文件
@@ -60,14 +61,22 @@ pub fn extract_zip<'a, R: Runtime>(
             // 无条件创建所有父目录（避免竞态条件和路径问题）
             if let Some(p) = outpath.parent() {
                 fs::create_dir_all(&p).map_err(|e| {
-                    log::error!("Failed to create parent directory {:?}: {} (file: {:?})", p, e, outpath);
+                    log::error!(
+                        "Failed to create parent directory {:?}: {} (file: {:?})",
+                        p,
+                        e,
+                        outpath
+                    );
                     format!("Failed to create parent directory {:?}: {}", p, e)
                 })?;
             }
             let mut outfile = fs::File::create(&outpath).map_err(|e| {
-                log::error!("Failed to create file {:?}: {} (parent exists: {})", 
-                    outpath, e, 
-                    outpath.parent().map(|p| p.exists()).unwrap_or(false));
+                log::error!(
+                    "Failed to create file {:?}: {} (parent exists: {})",
+                    outpath,
+                    e,
+                    outpath.parent().map(|p| p.exists()).unwrap_or(false)
+                );
                 format!("Failed to create file {:?}: {}", outpath, e)
             })?;
             copy(&mut file, &mut outfile).map_err(|e| {
@@ -117,16 +126,16 @@ pub fn extract_tgz<'a, R: Runtime>(
             log::error!("Failed to get entry path: {}", e);
             e.to_string()
         })?;
-        
+
         // 打印当前解压的文件名（格式：Extract 路径/文件）
         // -1.0 表示未知进度(让前端持续增加)
         let relative_path = path.to_string_lossy().replace('\\', "/");
         // 对于 TGZ，由于无法提前知道文件总数，使用文件计数来估算进度
         let estimated_pct = (file_count as f64 / (file_count + 1) as f64) * 100.0;
         tracker.update(
-          -1.0, 
-          format!("已解压 {:.1}%", estimated_pct), 
-          format!("Extract {}", relative_path)
+            -1.0,
+            format!("已解压 {:.1}%", estimated_pct),
+            format!("Extract {}", relative_path),
         );
 
         // 执行解压

@@ -1,8 +1,8 @@
-use serde::Serialize;
-use serde::Deserialize;
-use tauri_plugin_store::StoreExt;
 use super::constants::*;
+use serde::Deserialize;
+use serde::Serialize;
 use tauri::Emitter;
+use tauri_plugin_store::StoreExt;
 #[derive(Serialize, Deserialize)]
 #[serde(rename_all = "camelCase")]
 pub struct Setting {
@@ -31,10 +31,9 @@ pub fn set_store_dat_setting(app_handle: &tauri::AppHandle, setting: Setting) {
         .expect("Failed to load store");
     store.set(STORE_SETTING_KEY, serde_json::to_value(&setting).unwrap());
     store.save().expect("Failed to save store");
-    app_handle.emit(
-        "setting_updated",
-        &serde_json::to_value(&setting).unwrap()
-    ).expect("Failed to emit event");
+    app_handle
+        .emit("setting_updated", &serde_json::to_value(&setting).unwrap())
+        .expect("Failed to emit event");
 }
 
 pub fn get_store_dat_setting(app_handle: &tauri::AppHandle) -> Setting {
