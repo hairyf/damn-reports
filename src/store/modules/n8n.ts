@@ -206,4 +206,12 @@ export const n8n = defineStore({
 })
 
 listen('n8n-status-updated', n8n.invokeN8nStatus)
-n8n.invokeN8nStatus()
+
+// 延迟执行 IPC 调用，确保 Tauri 后端已完全初始化
+// 使用 setTimeout 确保在下一个事件循环中执行
+setTimeout(() => {
+  n8n.invokeN8nStatus().catch((err) => {
+    // 静默处理初始调用失败，应用启动时后端可能还未完全就绪
+    console.debug('Initial n8n status check failed (expected during app startup):', err)
+  })
+}, 100)
