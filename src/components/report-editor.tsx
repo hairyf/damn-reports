@@ -15,9 +15,11 @@ import StarterKit from '@tiptap/starter-kit'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
 import { useMemo, useState } from 'react'
-import { useKey } from 'react-use'
+import { useInterval, useKey } from 'react-use'
 import { Markdown } from 'tiptap-markdown'
+import { useStore } from 'valtio-define'
 import { Dialog } from '@/components/dialog'
+import { store } from '@/store'
 
 dayjs.extend(relativeTime)
 
@@ -32,6 +34,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
   const queryClient = useQueryClient()
   const openDialog = useOverlay(Dialog)
   const [text, setText] = useState('')
+  const setting = useStore(store.setting)
 
   const editor = useEditor({
     extensions: [
@@ -141,6 +144,12 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
       }
     },
     { event: 'keydown' },
+  )
+
+  // 自动保存功能：每5秒检查一次，如果启用自动保存且有未保存的更改，则自动保存
+  useInterval(
+    () => isUnsaved && !saveMutation.isPending && saveMutation.mutate(),
+    setting.autoSave ? 5000 : null, // 启用自动保存时每5秒执行一次，否则暂停
   )
 
   return (

@@ -3,6 +3,7 @@ use axum::{extract::State, http::StatusCode, Json};
 use crate::bridge::server::routes::report::dtos::ReportCreateInput;
 use crate::bridge::server::routes::report::service::create_report;
 use crate::bridge::server::AppState;
+use crate::config::setting::get_store_dat_setting;
 use crate::core::db::entities::report;
 
 pub async fn post(
@@ -11,34 +12,39 @@ pub async fn post(
 ) -> (StatusCode, Json<report::Model>) {
     match create_report(state.db.clone(), input).await {
         Ok(report) => {
-            // 发送通知
-            let app_handle = state.app_handle.clone();
-            let report_name = report.name.clone();
+            // 检查通知设置，只有启用通知时才发送
+            let setting = get_store_dat_setting(&state.app_handle);
+            if setting.notifications {
+                let app_handle = state.app_handle.clone();
+                let report_name = report.name.clone();
 
-            log::debug!(
-                "Attempting to send notification for report: {}",
-                report_name
-            );
-
-            // 发送通知
-            use tauri_plugin_notification::NotificationExt;
-            let notification_result = app_handle
-                .notification()
-                .builder()
-                .title("Report Generated")
-                .body(&format!(
-                    "Report \"{}\" generated successfully",
+                log::debug!(
+                    "Attempting to send notification for report: {}",
                     report_name
-                ))
-                .show();
+                );
 
-            match notification_result {
-                Ok(_) => {
-                    log::info!("Notification sent successfully for report: {}", report_name);
+                // 发送通知
+                use tauri_plugin_notification::NotificationExt;
+                let notification_result = app_handle
+                    .notification()
+                    .builder()
+                    .title("Report Generated")
+                    .body(&format!(
+                        "Report \"{}\" generated successfully",
+                        report_name
+                    ))
+                    .show();
+
+                match notification_result {
+                    Ok(_) => {
+                        log::info!("Notification sent successfully for report: {}", report_name);
+                    }
+                    Err(e) => {
+                        log::warn!("Failed to send notification: {:?}", e);
+                    }
                 }
-                Err(e) => {
-                    log::warn!("Failed to send notification: {:?}", e);
-                }
+            } else {
+                log::debug!("Notifications are disabled, skipping notification for report: {}", report.name);
             }
 
             (StatusCode::OK, Json(report))

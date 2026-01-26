@@ -14,12 +14,12 @@ export function SettingOtherCard() {
 
   // 更新自动保存
   function handleAutoSaveChange(value: boolean) {
-    store.setting.$state.autoSave = value
+    store.setting.autoSave = value
   }
 
   // 更新通知
   function handleNotificationsChange(value: boolean) {
-    store.setting.$state.notifications = value
+    store.setting.notifications = value
     if (value) {
       sendNotification({
         title: '设置已更新',

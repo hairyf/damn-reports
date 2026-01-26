@@ -1,3 +1,4 @@
+import { Else, If, Then } from '@hairy/react-lib'
 import {
   Button,
   Card,
@@ -15,6 +16,7 @@ import { store } from '@/store'
 
 export function SettingAboutCard() {
   const setting = useStore(store.setting)
+  const updater = useStore(store.updater)
   const openModal = useOverlay(Modal)
   // 获取应用版本号
   const { data: appVersion = '' } = useQuery({
@@ -44,9 +46,17 @@ export function SettingAboutCard() {
 
   return (
     <Card shadow="none">
-      <CardHeader className="flex gap-3 py-4">
-        <Icon icon="lucide:info" className="w-5 h-5" />
-        <p className="text-md font-semibold">关于</p>
+      <CardHeader className="flex gap-3 py-4 items-center justify-between">
+        <div className="flex items-center gap-3">
+          <Icon icon="lucide:info" className="w-5 h-5" />
+          <p className="text-md font-semibold">关于</p>
+        </div>
+        <If cond={updater.isNewVersion}>
+          <div className="flex items-center gap-2 text-sm text-default-500">
+            <Icon icon="tabler:sparkles" className="w-4 h-4" />
+            <span>新版本可用</span>
+          </div>
+        </If>
       </CardHeader>
       <CardBody className="gap-4 pt-0">
         <div className="flex flex-col gap-2 text-sm">
@@ -81,19 +91,36 @@ export function SettingAboutCard() {
 
         {/* 检查更新按钮 */}
         <div className="flex gap-4">
-          <Button
-            color="primary"
-            variant="flat"
-            className="flex-1"
-            radius="full"
-            onPress={() => checkForUpdate()}
-            isLoading={checkingUpdate}
-            startContent={
-              !checkingUpdate && <Icon icon="lucide:search" className="w-4 h-4" />
-            }
-          >
-            {checkingUpdate ? '检查中...' : '立即检查'}
-          </Button>
+          <If cond={updater.isNewVersion}>
+            <Then>
+              <Button
+                color="primary"
+                variant="flat"
+                className="flex-1"
+                radius="full"
+                onPress={() => checkForUpdate()}
+                isLoading={checkingUpdate}
+                startContent={<Icon icon="lucide:download" className="w-4 h-4" />}
+              >
+                立即更新
+              </Button>
+            </Then>
+            <Else>
+              <Button
+                color="primary"
+                variant="flat"
+                className="flex-1"
+                radius="full"
+                onPress={() => checkForUpdate()}
+                isLoading={checkingUpdate}
+                startContent={
+                  !checkingUpdate && <Icon icon="lucide:search" className="w-4 h-4" />
+                }
+              >
+                {checkingUpdate ? '检查中...' : '立即检查'}
+              </Button>
+            </Else>
+          </If>
           <Button
             color="danger"
             variant="flat"

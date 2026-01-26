@@ -22,7 +22,7 @@ export function SettingUserInterfaceCard() {
 
   // 更新语言
   function handleLanguageChange(value: Language) {
-    store.setting.$state.language = value
+    store.setting.language = value
   }
 
   return (
