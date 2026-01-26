@@ -10,6 +10,9 @@ function Page() {
   ])
   const n8nUrl = `http://localhost:5678/workflow/${workflow}?${params.toString()}`
 
+  // eslint-disable-next-line no-console
+  console.log('N8N URL:', n8nUrl)
+
   return (
     <Card className="flex-1 relative opacity-80" shadow="none">
       <iframe

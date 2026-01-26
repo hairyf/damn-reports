@@ -8,10 +8,6 @@ on:
 permissions:
   contents: write
 
-env:
-  TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-  TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
-
 jobs:
   publish:
     permissions:
@@ -44,7 +40,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '20'
+          node-version: lts/*
           cache: 'pnpm'
           cache-dependency-path: 'pnpm-lock.yaml'
 
@@ -70,12 +66,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # 强制 Linux 只打 AppImage
           TAURI_BUNDLE_TARGETS: ${{ matrix.platform == 'ubuntu-latest' && 'appimage' || 'all' }}
+          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+          # TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Damn Reports ${{ github.ref_name }}'
           releaseBody: |
             Damn Reports ${{ github.ref_name }} release！
-            
             - **macOS (M1/M2/M3)**: download  `aarch64.dmg`
             - **macOS (Intel)**: download `x64.dmg`
             - **Windows**: download `.exe`
