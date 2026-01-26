@@ -11,9 +11,18 @@ use tauri::Manager;
 /// 检测并启动 n8n 服务
 pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
     let setting = config::get_store_dat_setting(&app_handle);
+    let node_binary_path = config::get_node_binary_path(&app_handle);
+    let n8n_binary_path = config::get_n8n_binary_path(&app_handle);
     if !setting.installed {
         log::debug!("n8n not installed, skipping startup");
         return Ok(());
+    }
+    if !node_binary_path.exists() || !n8n_binary_path.exists() {
+      let mut setting = config::get_store_dat_setting(&app_handle);
+      setting.installed = false;
+      config::set_store_dat_setting(&app_handle, setting);
+      log::debug!("n8n not installed, skipping startup");
+      return Ok(());
     }
 
     log::debug!("Checking n8n running status");
@@ -167,10 +176,6 @@ pub async fn stop(app_handle: tauri::AppHandle) -> Result<(), String> {
 
 /// 安装环境
 pub async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
-    if status::get_status() == status::Status::Installing {
-      log::info!("Installation process already running, skipping");
-      return Ok(());
-    }
     log::info!("Starting installation process");
     let window = app_handle
         .get_webview_window("main")

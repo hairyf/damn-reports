@@ -36,6 +36,10 @@ pub async fn install_dependencies(app_handle: AppHandle) -> Result<(), String> {
         log::debug!("Already installed, skipping installation");
         return Ok(());
     }
+    if workflow::status::get_status() == workflow::status::Status::Installing {
+      log::info!("Installation process already running, skipping");
+      return Ok(());
+    }
     log::debug!("Not installed detected, starting installation process");
     workflow::status::set_status(workflow::status::Status::Installing);
     workflow::status::emit_status(&app_handle);

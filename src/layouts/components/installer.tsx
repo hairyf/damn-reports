@@ -27,14 +27,7 @@ export function Installer() {
   const { percentage, detail, title, log } = useStore(store.installer)
   const logs = useHistory(log, 5)
 
-  useMount(() => {
-    // 延迟执行 IPC 调用，确保 Tauri 后端已完全初始化
-    setTimeout(() => {
-      invoke('install_dependencies').catch((err) => {
-        console.error('Failed to invoke install_dependencies:', err)
-      })
-    }, 100)
-  })
+  useMount(() => invoke('install_dependencies'))
 
   return (
     <div className={clsx('relative flex min-h-screen border-none')}>

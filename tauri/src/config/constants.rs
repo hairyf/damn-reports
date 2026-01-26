@@ -5,7 +5,7 @@ pub const NODE_BASE_URL: &str = "https://nodejs.org/dist/";
 
 pub const GITHUB_PROXY_PREFIX: &str = "https://gh-proxy.com/";
 
-pub const N8N_CORE_URL: &str = "https://github.com/hairyf/n8n-pkg/releases/latest/download";
+pub const N8N_CORE_URL: &str = "https://github.com/hairyf/n8n-pkg/releases/latest/download/";
 pub const CLICKUP_API_URL: &str = "https://api.clickup.com/api/v2";
 
 pub const N8N_HOST: &str = "http://localhost";
