@@ -26,7 +26,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
-    "category": "Tools",
+    "category": "DeveloperTool",
     "copyright": "Copyright © 2026 Damn Reports",
     "shortDescription": "Desktop application for generating reports",
     "longDescription": "A native desktop application for running n8n workflow and generating reports",

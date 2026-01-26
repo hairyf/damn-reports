@@ -67,7 +67,7 @@ jobs:
         run: |
           # 在 macOS 上使用系统自带的 sips 工具将图标转换为 RGBA 格式
           # Tauri 构建要求图标必须是 RGBA 格式（带 alpha 通道的 PNG）
-          cd tauri/static
+          cd tauri/icons
           for icon in 32x32.png 128x128.png 128x128@2x.png; do
             if [ -f "$icon" ]; then
               echo "Converting $icon to RGBA format using sips..."
