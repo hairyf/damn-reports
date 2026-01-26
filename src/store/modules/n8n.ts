@@ -20,7 +20,7 @@ export const n8n = defineStore({
   state: () => ({
     userInfo: null as N8nUser | null,
     // 状态分类：运行状态
-    process: 'initial' as 'initial' | 'installing' | 'starting' | 'running',
+    process: 'initial' as 'initial' | 'installing' | 'starting' | 'running' | 'stopped',
 
     // 状态分类：业务配置
     defaultLoginEnabled: true,

@@ -8,6 +8,7 @@ use crate::service::scheduler;
 use crate::service::workflow;
 use crate::task;
 use sea_orm::DatabaseConnection;
+use serde_json::Value;
 use tauri::{AppHandle, State};
 
 // 全局标志，确保数据库连接成功只运行一次
@@ -47,8 +48,23 @@ pub async fn install_dependencies(app_handle: AppHandle) -> Result<(), String> {
 }
 
 #[tauri::command]
+pub async fn restart_n8n(app_handle: AppHandle) -> Result<(), String> {
+    workflow::restart(app_handle).await?;
+    Ok(())
+}
+
+#[tauri::command]
 pub fn get_n8n_status() -> workflow::status::Status {
     workflow::status::get_status()
+}
+
+#[tauri::command]
+pub async fn get_n8n_version(app_handle: AppHandle) -> Result<String, String> {
+  let package_json_path = config::get_n8n_package_json_path(&app_handle);
+  let package_json: Value = std::fs::read_to_string(package_json_path)
+      .map_err(|e| e.to_string())
+      .and_then(|c| serde_json::from_str(&c).map_err(|e| e.to_string()))?;
+  package_json["version"].as_str().map(|s| s.to_string()).ok_or_else(|| "-".to_string())
 }
 
 #[tauri::command]

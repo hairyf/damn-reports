@@ -1,98 +1,96 @@
-use std::path::PathBuf;
+use std::path::{PathBuf};
 use tauri::Manager;
-
 use std::env;
 
 use super::constants::*;
 use super::utils::search_node_binary;
 
+/// 获取 App Data 基础目录，处理潜在的错误
+fn get_base_dir(app_handle: &tauri::AppHandle) -> PathBuf {
+    app_handle
+        .path()
+        .app_data_dir()
+        .expect("Failed to resolve app data directory")
+}
+
 pub fn db_url(app_handle: &tauri::AppHandle) -> String {
     let db_path = app_handle
         .path()
         .app_config_dir()
-        .expect("No App path was found!")
-        .join(DB_NAME)
-        .to_string_lossy()
-        .replace("\\", "/");
+        .expect("No App config path was found!")
+        .join(DB_NAME);
 
-    format!("{}{}", DB_URL_PREFIX, db_path)
+    // 数据库 URL 通常需要标准化路径分隔符为 '/'
+    let normalized_path = db_path.to_string_lossy().replace('\\', "/");
+    format!("{}{}", DB_URL_PREFIX, normalized_path)
 }
 
 pub fn get_node_download_url() -> Result<String, String> {
-    // n8n requires Node.js >=20.19 <= 24.x
-    // Using Node.js 20.19.0 which is the minimum supported version
-    let version = NODE_VERSION;
-    let base_url = NODE_BASE_URL;
-    match (env::consts::OS, env::consts::ARCH) {
-        ("macos", "aarch64") => Ok(format!(
-            "{}/{}/node-{}-darwin-arm64.tar.gz",
-            base_url, version, version
-        )),
-        ("macos", "x86_64") => Ok(format!(
-            "{}/{}/node-{}-darwin-x64.tar.gz",
-            base_url, version, version
-        )),
-        ("windows", _) => Ok(format!(
-            "{}/{}/node-{}-win-x64.zip",
-            base_url, version, version
-        )),
-        _ => Err(format!(
-            "Unsupported platform: {} {}",
-            env::consts::OS,
-            env::consts::ARCH
-        )),
-    }
+    let arch = env::consts::ARCH;
+    let os = env::consts::OS;
+    
+    // 抽象文件名逻辑
+    let filename = match (os, arch) {
+        ("macos", "aarch64") => format!("node-{}-darwin-arm64.tar.gz", NODE_VERSION),
+        ("macos", "x86_64")  => format!("node-{}-darwin-x64.tar.gz", NODE_VERSION),
+        ("windows", _)       => format!("node-{}-win-x64.zip", NODE_VERSION),
+        _ => return Err(format!("Unsupported platform: {} {}", os, arch)),
+    };
+
+    Ok(format!("{}/{}/{}", NODE_BASE_URL, NODE_VERSION, filename))
 }
 
 pub fn get_n8n_download_url() -> Result<String, String> {
     let platform = match env::consts::OS {
-        "windows" => "windows",
-        "macos" => "macos",
-        "linux" => "linux",
+        "windows" | "macos" | "linux" => env::consts::OS,
         _ => return Err(format!("Unsupported platform: {}", env::consts::OS)),
     };
-    let file_name = format!("n8n-pkg-{}.zip", platform);
-    let url = format!("{}{}/{}", GITHUB_PROXY_PREFIX, N8N_CORE_URL, file_name);
-    Ok(url)
+    
+    Ok(format!("{}{}n8n-pkg-{}.zip", GITHUB_PROXY_PREFIX, N8N_CORE_URL, platform))
 }
 
 pub fn get_node_binary_path(app_handle: &tauri::AppHandle) -> PathBuf {
     let runtime_dir = get_node_install_path(app_handle);
-    if cfg!(target_os = "windows") {
-        // 对于 Windows，先尝试直接路径，然后搜索
-        let direct_path = runtime_dir.join("node.exe");
-        if direct_path.exists() {
-            return direct_path;
-        }
-        // 搜索嵌套目录中的 node.exe
-        search_node_binary(&runtime_dir, "node.exe").unwrap_or(direct_path)
+    // 使用 cfg 宏在编译时确定文件名，更高效
+    let (rel_path, bin_name) = if cfg!(windows) {
+        ("", "node.exe")
     } else {
-        // MacOS/Linux: 先尝试直接路径 bin/node
-        let direct_path = runtime_dir.join("bin/node");
-        if direct_path.exists() {
-            return direct_path;
-        }
-        // 搜索嵌套目录中的 bin/node
-        search_node_binary(&runtime_dir, "bin/node").unwrap_or(direct_path)
+        ("bin", "node")
+    };
+    let direct_path = runtime_dir.join(rel_path).join(bin_name);
+    if direct_path.exists() {
+        direct_path
+    } else {
+        // 只有在直接路径不存在时才进行开销较大的递归搜索
+        search_node_binary(&runtime_dir, bin_name)
+            .unwrap_or(direct_path)
     }
 }
 
-pub fn get_n8n_binary_path(app_handle: &tauri::AppHandle) -> PathBuf {
-    let app_path = app_handle.path().app_data_dir().unwrap();
-    app_path.join("n8n-pkg/node_modules/n8n/bin/n8n")
-}
-
 pub fn get_node_install_path(app_handle: &tauri::AppHandle) -> PathBuf {
-    let app_data = app_handle.path().app_data_dir().unwrap();
-    app_data.join("runtime")
+    get_base_dir(app_handle).join("runtime")
 }
 
 pub fn get_n8n_install_path(app_handle: &tauri::AppHandle) -> PathBuf {
-    let app_data = app_handle.path().app_data_dir().unwrap();
-    app_data.join("n8n-pkg")
+    get_base_dir(app_handle).join("n8n-pkg")
+}
+
+pub fn get_n8n_binary_path(app_handle: &tauri::AppHandle) -> PathBuf {
+    // 组合路径建议使用 join 以确保跨平台兼容性
+    get_n8n_install_path(app_handle)
+        .join("node_modules")
+        .join("n8n")
+        .join("bin")
+        .join("n8n")
+}
+
+pub fn get_n8n_package_json_path(app_handle: &tauri::AppHandle) -> PathBuf {
+    get_n8n_install_path(app_handle)
+        .join("node_modules")
+        .join("n8n")
+        .join("package.json")
 }
 
 pub fn get_n8n_data_path(app_handle: &tauri::AppHandle) -> PathBuf {
-    let app_data = app_handle.path().app_data_dir().unwrap();
-    app_data.join("data/n8n")
+    get_base_dir(app_handle).join("data").join("n8n")
 }

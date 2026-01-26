@@ -5,7 +5,6 @@ mod logger;
 mod service;
 mod task;
 
-use crate::config::{DB_NAME, DB_URL_PREFIX};
 use core::utils::{navigate, show_window};
 use tauri::{
     ipc::Invoke,
@@ -100,11 +99,13 @@ fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         bridge::cmd::database_loaded,
         bridge::cmd::install_dependencies,
+        bridge::cmd::restart_n8n,
         bridge::cmd::get_n8n_status,
         bridge::cmd::collect_daily_records,
         bridge::cmd::generate_daily_report,
         bridge::cmd::collect_daily_clickup,
         bridge::cmd::collect_daily_git,
+        bridge::cmd::get_n8n_version,
     ]
 }
 
@@ -128,7 +129,7 @@ fn migrations() -> tauri_plugin_sql::Builder {
         log::info!("Migration: {}", migration.description);
     }
     tauri_plugin_sql::Builder::default()
-        .add_migrations(&format!("{}{}", DB_URL_PREFIX, DB_NAME), migrations)
+        .add_migrations(&format!("{}{}", config::DB_URL_PREFIX, config::DB_NAME), migrations)
 }
 
 // configure tauri builder

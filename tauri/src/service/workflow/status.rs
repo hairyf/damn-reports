@@ -8,6 +8,7 @@ pub enum Status {
     Installing,
     Starting,
     Running,
+    Stopped,
 }
 
 // 使用静态变量在模块内部管理状态

@@ -7,11 +7,11 @@ import { useStore } from 'valtio-define'
 dayjs.extend(duration)
 
 export function ReportCountdown({ className }: { className?: string }) {
-  const user = useStore(store.user)
+  const n8n = useStore(store.n8n)
   const { data: workflow } = useQuery({
     queryKey: ['workflow'],
-    queryFn: () => getN8nWorkflow(user.workflow!),
-    enabled: !!user.workflow,
+    queryFn: () => getN8nWorkflow(n8n.workflow!),
+    enabled: !!n8n.workflow,
   })
   const generateTime = useMemo(() => {
     const node = workflow?.nodes.find(node => node.type === 'n8n-nodes-base.scheduleTrigger')

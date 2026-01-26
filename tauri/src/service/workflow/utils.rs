@@ -1,4 +1,7 @@
+use std::io::{BufRead, BufReader};
 use std::net::{SocketAddr, TcpStream};
+use std::process::{ChildStderr, ChildStdout};
+use std::thread;
 use std::time::Duration;
 
 /// 检查 n8n 是否真正在运行
@@ -45,5 +48,48 @@ pub fn is_port_in_use(port: u16) -> bool {
     match TcpStream::connect_timeout(&addr, Duration::from_millis(100)) {
         Ok(_) => true,   // 连接成功，端口被占用（有服务在监听）
         Err(_) => false, // 连接失败或超时，端口未被占用
+    }
+}
+
+/// 在独立线程中读取子进程的输出
+///
+/// # 参数
+/// - `stdout`: 子进程的标准输出
+/// - `stderr`: 子进程的标准错误输出
+pub fn spawn_output_readers(stdout: Option<ChildStdout>, stderr: Option<ChildStderr>) {
+    // 在独立线程中读取 stdout
+    if let Some(stdout) = stdout {
+        thread::spawn(move || {
+            let reader = BufReader::new(stdout);
+            for line in reader.lines() {
+                match line {
+                    Ok(line) => {
+                        log::info!("[n8n::stdout]: {}", line);
+                    }
+                    Err(e) => {
+                        log::error!("Failed to read n8n stdout: {}", e);
+                        break;
+                    }
+                }
+            }
+        });
+    }
+
+    // 在独立线程中读取 stderr
+    if let Some(stderr) = stderr {
+        thread::spawn(move || {
+            let reader = BufReader::new(stderr);
+            for line in reader.lines() {
+                match line {
+                    Ok(line) => {
+                        log::warn!("[n8n::stderr]: {}", line);
+                    }
+                    Err(e) => {
+                        log::error!("Failed to read n8n stderr: {}", e);
+                        break;
+                    }
+                }
+            }
+        });
     }
 }
