@@ -16,11 +16,9 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          # 分开 macOS - Apple Silicon (ARM)
           - platform: 'macos-latest'
             args: '--target aarch64-apple-darwin'
             arch: 'aarch64'
-          # 分开 macOS - Intel (x86_64)
           - platform: 'macos-latest'
             args: '--target x86_64-apple-darwin'
             arch: 'x86_64'
@@ -33,7 +31,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-
+      # 使用自动化工具生成 Changelog
+      - name: Generate Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
@@ -48,7 +52,6 @@ jobs:
         uses: dtolnay/rust-toolchain@stable
         with:
           toolchain: stable
-          # 关键：根据当前矩阵安装对应的 Target
           targets: ${{ matrix.platform == 'macos-latest' && (matrix.arch == 'aarch64' && 'aarch64-apple-darwin' || 'x86_64-apple-darwin') || '' }}
 
       - name: Install dependencies (Ubuntu only)
@@ -61,22 +64,23 @@ jobs:
         run: pnpm install --no-frozen-lockfile
 
       - name: Build and Release
-        uses: tauri-apps/tauri-action@v0
+        uses: tauri-apps/tauri-action@v0.6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          # 强制 Linux 只打 AppImage
+          TAURI_SIGNING_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
           TAURI_BUNDLE_TARGETS: ${{ matrix.platform == 'ubuntu-latest' && 'appimage' || 'all' }}
-          TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
-          # TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Damn Reports ${{ github.ref_name }}'
           releaseBody: |
-            Damn Reports ${{ github.ref_name }} release！
-            - **macOS (M1/M2/M3)**: download  `aarch64.dmg`
+            ${${{ steps.github_release.outputs.changelog }}}
+            
+            ### 📦 Artifacts
+            - **macOS (M1/M2/M3)**: download `aarch64.dmg`
             - **macOS (Intel)**: download `x64.dmg`
             - **Windows**: download `.exe`
             - **Linux**: download `.AppImage`
           releaseDraft: false
           prerelease: false
+          includeUpdaterJson: true
           args: ${{ matrix.args }}
