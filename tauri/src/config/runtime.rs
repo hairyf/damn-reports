@@ -13,6 +13,16 @@ fn get_base_dir(app_handle: &tauri::AppHandle) -> PathBuf {
         .expect("Failed to resolve app data directory")
 }
 
+/// 获取应用安装目录（可执行文件所在目录）
+// fn get_app_dir(_app_handle: &tauri::AppHandle) -> PathBuf {
+//     // 使用标准库获取可执行文件所在目录
+//     std::env::current_exe()
+//         .expect("Failed to get current executable path")
+//         .parent()
+//         .expect("Failed to get parent directory")
+//         .to_path_buf()
+// }
+
 pub fn db_url(app_handle: &tauri::AppHandle) -> String {
     let db_path = app_handle
         .path()
@@ -68,11 +78,11 @@ pub fn get_node_binary_path(app_handle: &tauri::AppHandle) -> PathBuf {
 }
 
 pub fn get_node_install_path(app_handle: &tauri::AppHandle) -> PathBuf {
-    get_base_dir(app_handle).join("runtime")
+  get_base_dir(app_handle).join("runtime")
 }
 
 pub fn get_n8n_install_path(app_handle: &tauri::AppHandle) -> PathBuf {
-    get_base_dir(app_handle).join("n8n-pkg")
+  get_base_dir(app_handle).join("dependencies").join("n8n")
 }
 
 pub fn get_n8n_binary_path(app_handle: &tauri::AppHandle) -> PathBuf {
