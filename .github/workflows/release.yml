@@ -1,0 +1,85 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+env:
+  TAURI_PRIVATE_KEY: ${{ secrets.TAURI_PRIVATE_KEY }}
+  TAURI_KEY_PASSWORD: ${{ secrets.TAURI_KEY_PASSWORD }}
+
+jobs:
+  publish:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # 分开 macOS - Apple Silicon (ARM)
+          - platform: 'macos-latest'
+            args: '--target aarch64-apple-darwin'
+            arch: 'aarch64'
+          # 分开 macOS - Intel (x86_64)
+          - platform: 'macos-latest'
+            args: '--target x86_64-apple-darwin'
+            arch: 'x86_64'
+          - platform: 'windows-latest'
+            args: ''
+          - platform: 'ubuntu-latest'
+            args: ''
+
+    runs-on: ${{ matrix.platform }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+          cache-dependency-path: 'pnpm-lock.yaml'
+
+      - name: Install Rust stable
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          toolchain: stable
+          # 关键：根据当前矩阵安装对应的 Target
+          targets: ${{ matrix.platform == 'macos-latest' && (matrix.arch == 'aarch64' && 'aarch64-apple-darwin' || 'x86_64-apple-darwin') || '' }}
+
+      - name: Install dependencies (Ubuntu only)
+        if: matrix.platform == 'ubuntu-latest'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libwebkit2gtk-4.1-dev libappindicator3-dev librsvg2-dev patchelf
+
+      - name: Install frontend dependencies
+        run: pnpm install --no-frozen-lockfile
+
+      - name: Build and Release
+        uses: tauri-apps/tauri-action@v0
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          # 强制 Linux 只打 AppImage
+          TAURI_BUNDLE_TARGETS: ${{ matrix.platform == 'ubuntu-latest' && 'appimage' || 'all' }}
+        with:
+          tagName: ${{ github.ref_name }}
+          releaseName: 'Damn Reports ${{ github.ref_name }}'
+          releaseBody: |
+            Damn Reports ${{ github.ref_name }} release！
+            
+            - **macOS (M1/M2/M3)**: download  `aarch64.dmg`
+            - **macOS (Intel)**: download `x64.dmg`
+            - **Windows**: download `.exe`
+            - **Linux**: download `.AppImage`
+          releaseDraft: false
+          prerelease: false
+          args: ${{ matrix.args }}

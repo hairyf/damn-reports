@@ -40,5 +40,18 @@
     "resources": [
       "prisma/migrations/"
     ]
+  },
+  "plugins": {
+    "updater": {
+      "active": true,
+      "endpoints": [
+        "https://github.com/hairyf/damn-reports/releases/latest/download/latest.json"
+      ],
+      "dialog": true,
+      "pubkey": "YOUR_PUBLIC_KEY_HERE"
+    },
+    "store": {
+      "active": true
+    }
   }
 }
