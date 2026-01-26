@@ -62,6 +62,25 @@ jobs:
       - name: Install frontend dependencies
         run: pnpm install --no-frozen-lockfile
 
+      - name: Convert icons to RGBA format (macOS)
+        if: matrix.platform == 'macos-latest'
+        run: |
+          # 在 macOS 上使用系统自带的 sips 工具将图标转换为 RGBA 格式
+          # Tauri 构建要求图标必须是 RGBA 格式（带 alpha 通道的 PNG）
+          cd tauri/static
+          for icon in 32x32.png 128x128.png 128x128@2x.png; do
+            if [ -f "$icon" ]; then
+              echo "Converting $icon to RGBA format using sips..."
+              sips -s format png -s formatOptions rgba "$icon" --out "$icon.tmp" > /dev/null 2>&1
+              if [ -f "$icon.tmp" ]; then
+                mv "$icon.tmp" "$icon"
+                echo "✓ $icon converted successfully"
+              else
+                echo "⚠ Warning: Failed to convert $icon"
+              fi
+            fi
+          done
+
       - name: Build and Release
         uses: tauri-apps/tauri-action@v0
         env:
