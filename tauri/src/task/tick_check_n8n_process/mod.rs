@@ -44,7 +44,7 @@ pub async fn trigger(app_handle: AppHandle) -> Result<(), Box<dyn std::error::Er
     let new_status = current_status.update_based_checks(is_port_in_use, is_http_ok);
 
     // 如果状态发生变化，就更新状态
-    if new_status != current_status {
+    if new_status != current_status && new_status != Status::Stopped {
         log::info!(
             "N8N status changed: {:?} -> {:?}",
             current_status,

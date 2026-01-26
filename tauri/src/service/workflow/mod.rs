@@ -122,8 +122,6 @@ pub async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
 /// 停止 n8n 服务
 pub async fn stop(app_handle: tauri::AppHandle) -> Result<(), String> {
   log::info!("Stopping n8n service...");
-  status::set_status(status::Status::Stopped);
-  status::emit_status(&app_handle);
 
   let port = config::N8N_PORT;
 
@@ -159,6 +157,9 @@ pub async fn stop(app_handle: tauri::AppHandle) -> Result<(), String> {
           Err(e) => log::error!("Failed to execute taskkill: {}", e),
       }
   }
+
+  status::set_status(status::Status::Stopped);
+  status::emit_status(&app_handle);
 
   log::info!("n8n stop command executed");
   Ok(())
