@@ -167,6 +167,10 @@ pub async fn stop(app_handle: tauri::AppHandle) -> Result<(), String> {
 
 /// 安装环境
 pub async fn install(app_handle: &tauri::AppHandle) -> Result<(), String> {
+    if status::get_status() == status::Status::Installing {
+      log::info!("Installation process already running, skipping");
+      return Ok(());
+    }
     log::info!("Starting installation process");
     let window = app_handle
         .get_webview_window("main")
