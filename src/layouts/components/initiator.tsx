@@ -2,7 +2,7 @@ import { Icon } from '@iconify/react'
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useStore } from 'valtio-define'
-import { StartupState } from '@/store/modules/user'
+import { StartupState } from '@/store/modules/n8n'
 import { Main } from './main'
 import { Navbar } from './navbar'
 
@@ -12,7 +12,7 @@ export interface RetryOptions {
 }
 
 export function Initiator() {
-  const { status } = useStore(store.user)
+  const { status } = useStore(store.n8n)
 
   function renderStatus() {
     switch (status) {

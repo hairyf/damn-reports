@@ -24,7 +24,7 @@ function Page() {
       config: {},
     },
   })
-  const user = useStore(store.user)
+  const n8n = useStore(store.n8n)
 
   const source = form.watch('type')
   const config = form.watch('config')
@@ -77,7 +77,7 @@ function Page() {
     else {
       await db.source.create({
         updatedAt: new Date().toISOString(),
-        workspaceId: user.workspace!,
+        workspaceId: n8n.workspace!,
         enabled: true,
         name: data.name,
         description: data.description,

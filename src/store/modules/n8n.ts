@@ -16,15 +16,14 @@ export enum StartupState {
   COMPLETED = 'completed',
 }
 
-export const user = defineStore({
+export const n8n = defineStore({
   state: () => ({
-    info: null as N8nUser | null,
+    userInfo: null as N8nUser | null,
     // 状态分类：运行状态
-    n8nprocessStatus: 'initial' as 'initial' | 'installing' | 'starting' | 'running',
-    loggedIn: false,
+    process: 'initial' as 'initial' | 'installing' | 'starting' | 'running',
 
     // 状态分类：业务配置
-    n8nDefaultAccountLoginEnabled: true,
+    defaultLoginEnabled: true,
     credentialName: null as string | null,
     deepseekSkip: false,
 
@@ -33,13 +32,13 @@ export const user = defineStore({
     workspace: null as number | null,
 
     // 敏感信息（建议不要持久化，或加密存储）
-    n8nEmail: '',
-    n8nPassword: '',
+    email: '',
+    password: '',
   }),
   actions: {
     async invokeN8nStatus() {
       const status = await invoke<any>('get_n8n_status')
-      this.n8nprocessStatus = status.toLowerCase()
+      this.process = status.toLowerCase()
     },
 
     async survey() {
@@ -55,7 +54,7 @@ export const user = defineStore({
       const result = await getN8nLogin()
       if (result.status === 'error')
         throw new TypeError(result.message)
-      this.loggedIn = true
+      this.userInfo = result.data!
       return result.data!
     },
 
@@ -67,7 +66,7 @@ export const user = defineStore({
       })
       if (typeof result.code === 'number')
         throw new TypeError(result.message)
-      this.loggedIn = true
+      this.userInfo = result.data!
       return result.data
     },
 
@@ -81,7 +80,7 @@ export const user = defineStore({
         throw new TypeError(result.message)
       if (!result)
         throw new TypeError('Failed to register n8n account')
-      this.loggedIn = true
+      this.userInfo = result.data!
       return result.data
     },
 
@@ -162,17 +161,20 @@ export const user = defineStore({
   getters: {
     ready() {
       return (
-        !!(this.n8nprocessStatus === 'running'
-          && this.loggedIn
+        !!(this.process === 'running'
+          && this.userInfo
           && (this.credential || this.deepseekSkip)
           && this.workflow)
       )
     },
+    loggedIn() {
+      return !!this.userInfo
+    },
     status() {
-      if (['initial', 'installing', 'starting'].includes(this.n8nprocessStatus))
+      if (['initial', 'installing', 'starting'].includes(this.process))
         return StartupState.STARTING_SERVICE
-      if (!this.loggedIn) {
-        return this.n8nDefaultAccountLoginEnabled ? StartupState.INITIALIZING_ACCOUNT : StartupState.MANUAL_LOGIN
+      if (!this.userInfo) {
+        return this.defaultLoginEnabled ? StartupState.INITIALIZING_ACCOUNT : StartupState.MANUAL_LOGIN
       }
       if (!this.credential && !this.deepseekSkip)
         return StartupState.DEEPSEEK_CONFIG
@@ -182,8 +184,8 @@ export const user = defineStore({
     },
     account() {
       return {
-        email: this.n8nEmail || N8N_REGISTER_DATA.email,
-        password: this.n8nPassword || N8N_REGISTER_DATA.password,
+        email: this.email || N8N_REGISTER_DATA.email,
+        password: this.password || N8N_REGISTER_DATA.password,
       }
     },
   },
@@ -194,14 +196,14 @@ export const user = defineStore({
       'credentialName',
       'workflow',
       'deepseekSkip',
-      'n8nEmail',
-      'n8nPassword',
-      'info',
+      'email',
+      'password',
+      'userInfo',
       'workspace',
       'workflow',
     ],
   },
 })
 
-listen('n8n-status-updated', user.invokeN8nStatus)
-user.invokeN8nStatus()
+listen('n8n-status-updated', n8n.invokeN8nStatus)
+n8n.invokeN8nStatus()

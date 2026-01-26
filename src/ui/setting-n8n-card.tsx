@@ -1,10 +1,11 @@
 import { Button, Card, CardBody, CardHeader, Switch } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { useStore } from 'valtio-define'
 import { N8NIcon } from '@/components/icons'
 
 export function SettingN8nCard() {
+  const { ready } = useStore(store.n8n)
   // 静态数据，暂时不接真实数据
-  const isRunning = true // 运行状态
   const isBackground = false // 常驻后台
   const accountEmail = 'user@example.com' // 账号邮箱
 
@@ -31,10 +32,10 @@ export function SettingN8nCard() {
           </div>
           <div className="flex items-center gap-2">
             <div
-              className={`w-2 h-2 rounded-full ${isRunning ? 'bg-success' : 'bg-default-300'}`}
+              className={`w-2 h-2 rounded-full ${ready ? 'bg-success' : 'bg-default-300'}`}
             />
             <span className="text-sm text-default-600">
-              {isRunning ? '运行中' : '已停止'}
+              {ready ? '运行中' : '状态异常'}
             </span>
           </div>
         </div>

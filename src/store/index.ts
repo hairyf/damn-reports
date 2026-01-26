@@ -1,10 +1,10 @@
 import { installer } from './modules/installer'
+import { n8n } from './modules/n8n'
 import { setting } from './modules/setting'
 import { updater } from './modules/updater'
-import { user } from './modules/user'
 
 export const store = {
-  user,
+  n8n,
   setting,
   installer,
   updater,

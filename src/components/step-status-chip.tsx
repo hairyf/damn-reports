@@ -5,10 +5,10 @@ import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useEffect, useRef, useState } from 'react'
 import { useStore } from 'valtio-define'
-import { StartupState } from '@/store/modules/user'
+import { StartupState } from '@/store/modules/n8n'
 
 export function StepStatusChip() {
-  const { status } = useStore(store.user)
+  const { status } = useStore(store.n8n)
   const [isVisible, setIsVisible] = useState(true)
   const timerRef = useRef<NodeJS.Timeout | null>(null)
   const isNeedInitiator = useIsNeedInitiator()
@@ -94,7 +94,7 @@ export function StepStatusChip() {
 }
 
 export function useIsNeedInitiator() {
-  const { ready } = useStore(store.user)
+  const { ready } = useStore(store.n8n)
   const { installed, ininitialized } = useStore(store.setting)
   return !installed || (!ready && !ininitialized)
 }

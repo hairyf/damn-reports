@@ -5,7 +5,7 @@ export function StepDeepSeekApiKey() {
   const [apiKey, setApiKey] = useState('')
 
   function onSkip() {
-    store.user.deepseekSkip = true
+    store.n8n.deepseekSkip = true
   }
 
   return (
@@ -45,7 +45,7 @@ export function StepDeepSeekApiKey() {
               Skip
             </Button>
             <Button
-              onPress={() => store.user.createCredential(apiKey)}
+              onPress={() => store.n8n.createCredential(apiKey)}
               color="primary"
               className="flex-1"
               disabled={!apiKey}
