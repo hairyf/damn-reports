@@ -6,72 +6,41 @@ import {
   Switch,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useQuery } from '@tanstack/react-query'
+import { useOverlay } from '@overlastic/react'
+import { useMutation, useQuery } from '@tanstack/react-query'
 import { getVersion } from '@tauri-apps/api/app'
-import { sendNotification } from '@tauri-apps/plugin-notification'
-import { useState } from 'react'
+import { useMount } from 'react-use'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
 export function SettingAboutCard() {
   const setting = useStore(store.setting)
-  const [checkingUpdate, setCheckingUpdate] = useState(false)
-
+  const openModal = useOverlay(Modal)
   // 获取应用版本号
   const { data: appVersion = '' } = useQuery({
     queryKey: ['appVersion'],
     queryFn: async () => getVersion(),
   })
 
-  // 更新自动检查更新设置
-  function handleAutoCheckUpdateChange(value: boolean) {
-    store.setting.$state.autoCheckUpdate = value
-  }
+  const { mutate: checkForUpdate, isPending: checkingUpdate } = useMutation({
+    mutationFn: () => store.updater.check(),
+  })
 
-  // 检查更新
-  async function checkForUpdate() {
-    setCheckingUpdate(true)
+  const { mutate: reset, isPending: resetting } = useMutation({
+    mutationFn: async () => {
+      await openModal({
+        title: '重置数据',
+        content: '确定要重置数据吗？此操作将删除所有数据，并重置所有设置。',
+        confirmText: '确定',
+        cancelText: '取消',
+      })
 
-    try {
-      // 这里可以调用实际的更新检查 API
-      // 例如：const response = await fetch('https://api.example.com/check-update')
-      // 现在使用模拟逻辑
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      // TODO
+    },
 
-      // 模拟检查结果（实际应该从 API 获取）
-      const currentVersion = '0.1.0'
-      const latestVersion = '0.1.0' // 可以从 API 获取
+  })
 
-      if (latestVersion > currentVersion) {
-        if (setting.notifications) {
-          sendNotification({
-            title: '发现新版本',
-            body: `新版本 ${latestVersion} 可用`,
-          })
-        }
-      }
-      else {
-        if (setting.notifications) {
-          sendNotification({
-            title: '检查完成',
-            body: '您使用的是最新版本',
-          })
-        }
-      }
-    }
-    catch (error) {
-      console.error('检查更新失败:', error)
-      if (setting.notifications) {
-        sendNotification({
-          title: '检查更新失败',
-          body: '请稍后重试',
-        })
-      }
-    }
-    finally {
-      setCheckingUpdate(false)
-    }
-  }
+  useMount(store.updater.check)
 
   return (
     <Card shadow="none">
@@ -106,7 +75,7 @@ export function SettingAboutCard() {
           </div>
           <Switch
             isSelected={setting.autoCheckUpdate}
-            onValueChange={handleAutoCheckUpdateChange}
+            onValueChange={value => store.setting.autoCheckUpdate = value}
           />
         </div>
 
@@ -117,7 +86,7 @@ export function SettingAboutCard() {
             variant="flat"
             className="flex-1"
             radius="full"
-            onPress={checkForUpdate}
+            onPress={() => checkForUpdate()}
             isLoading={checkingUpdate}
             startContent={
               !checkingUpdate && <Icon icon="lucide:search" className="w-4 h-4" />
@@ -130,7 +99,8 @@ export function SettingAboutCard() {
             variant="flat"
             radius="full"
             startContent={<Icon icon="lucide:refresh-cw" className="w-4 h-4" />}
-
+            onPress={() => reset()}
+            isLoading={resetting}
           >
             重置数据
           </Button>

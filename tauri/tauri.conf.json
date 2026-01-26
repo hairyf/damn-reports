@@ -26,6 +26,7 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "createUpdaterArtifacts": true,
     "category": "DeveloperTool",
     "copyright": "Copyright © 2026 Damn Reports",
     "shortDescription": "Desktop application for generating reports",
@@ -48,7 +49,7 @@
         "https://github.com/hairyf/damn-reports/releases/download/latest/latest.json"
       ],
       "dialog": true,
-      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDFFNTEwMjRDMzU1NDk4MzUKUldRMW1GUTFUQUpSSGwwQnVhclBRN3lXbnp6d29VNk84dEtoSDdWeFYyQlE1ZnZENnZjVFQ2LzYK"
+      "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDUzNzVCOTkyOUQ5OTM2QUMKUldTc05wbWRrcmwxVTYxQmswM0p6TDFXZ091K3U4LzlNVWdOMktSRUVHYi9IT0l6bWpHbis2MFAK"
     }
   }
 }

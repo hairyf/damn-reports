@@ -23,6 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .pkg-cache
+.tauri
 
 tauri/prisma/database
-n8n/main.js
