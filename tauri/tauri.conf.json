@@ -26,6 +26,10 @@
   "bundle": {
     "active": true,
     "targets": "all",
+    "category": "Tools",
+    "copyright": "Copyright © 2026 Damn Reports",
+    "shortDescription": "Desktop application for generating reports",
+    "longDescription": "A native desktop application for running n8n workflow and generating reports",
     "icon": [
       "static/32x32.png",
       "static/128x128.png",

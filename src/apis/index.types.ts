@@ -109,6 +109,18 @@ export interface PostN8nWorkflowResult {
   createdAt: string
   id: string
   name: string
+  nodes: {
+    parameters: any
+    type: string
+    [key: string]: any
+  }[]
+  connections: {
+    [key: string]: {
+      main: {
+        [key: string]: any
+      }[]
+    }
+  }
   [key: string]: any
 }
 
@@ -117,6 +129,18 @@ export interface GetN8nWorkflowResult {
   createdAt: string
   id: string
   name: string
+  nodes: {
+    parameters: any
+    type: string
+    [key: string]: any
+  }[]
+  connections: {
+    [key: string]: {
+      main: {
+        [key: string]: any
+      }[]
+    }
+  }
   [key: string]: any
 }
 

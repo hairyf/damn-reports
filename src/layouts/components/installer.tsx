@@ -42,7 +42,7 @@ export function Installer() {
             progressProps={{ showValueLabel: true }}
             extra={(
               <div className="bg-foreground/2 rounded-md p-2 w-full h-[116px] border-1 border-foreground/10 text-left text-foreground/50">
-                {(logs.length ? logs : ['']).map((logItem, index) => (
+                {(logs.length ? logs : ['Waiting for logs...']).map((logItem, index) => (
                   <p key={index} className="text-sm flex items-center gap-1 whitespace-nowrap overflow-hidden text-ellipsis">
                     <Icon icon="lucide:chevron-right" className="w-4 h-4 flex-shrink-0" />
                     <span className="truncate">{logItem}</span>

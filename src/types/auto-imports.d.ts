@@ -47,6 +47,7 @@ declare global {
   const Navbar: typeof import('../layouts/components/navbar').Navbar
   const Navigate: typeof import('react-router-dom').Navigate
   const Outlet: typeof import('react-router-dom').Outlet
+  const ReportCountdown: typeof import('../components/report-countdown').ReportCountdown
   const ReportEditor: typeof import('../components/report-editor').ReportEditor
   const ReportGenerator: typeof import('../components/report-generator').ReportGenerator
   const ReportNot: typeof import('../components/report-not').ReportNot

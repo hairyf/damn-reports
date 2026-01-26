@@ -68,7 +68,7 @@ function Page() {
               <div className="flex flex-col items-center justify-center gap-2">
                 <Icon icon="lucide:file-text" className="w-18 h-18 text-default-400" />
                 <p className="text-default-500 text-center">
-                  暂无数据，点击按钮进行生成
+                  暂无数据，点击按钮添加数据源
                 </p>
               </div>
               <Button
