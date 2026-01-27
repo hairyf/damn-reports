@@ -13,6 +13,10 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
     let setting = config::get_store_dat_setting(&app_handle);
     let node_binary_path = config::get_node_binary_path(&app_handle);
     let n8n_binary_path = config::get_n8n_binary_path(&app_handle);
+
+    // 无论如何都先停止服务，避免 n8n 服务不稳定导致应用异常
+    stop(app_handle.clone()).await?;
+
     if !setting.installed {
         log::debug!("n8n not installed, skipping startup");
         return Ok(());
@@ -35,8 +39,6 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
         status::emit_status(&app_handle);
         return Ok(());
     }
-    // 提前停止，避免端口占用，但服务却不可用
-    stop(app_handle.clone()).await?;
 
     log::info!("Starting n8n service");
     status::set_status(status::Status::Starting);
