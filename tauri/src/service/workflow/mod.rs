@@ -158,9 +158,14 @@ pub async fn stop(app_handle: tauri::AppHandle) -> Result<(), String> {
           port
       );
       
-      let output = Command::new("powershell")
-          .args(["-Command", &ps_cmd])
-          .output();
+      let mut cmd = Command::new("powershell");
+      cmd.args(["-Command", &ps_cmd]);
+      
+      // 隐藏 PowerShell 窗口，避免弹出黑色控制台窗口
+      use std::os::windows::process::CommandExt;
+      cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
+      
+      let output = cmd.output();
 
       if let Err(e) = output {
           log::error!("Windows stop error: {}", e);
