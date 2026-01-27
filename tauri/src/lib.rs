@@ -136,6 +136,8 @@ fn migrations() -> tauri_plugin_sql::Builder {
 fn builder() -> tauri::Builder<tauri::Wry> {
     tauri::Builder::default()
         .plugin(tauri_plugin_updater::Builder::new().build())
+        // Opener plugin
+        .plugin(tauri_plugin_opener::init())
         // Simple Store plugin
         .plugin(tauri_plugin_store::Builder::new().build())
         // Sql store plugin

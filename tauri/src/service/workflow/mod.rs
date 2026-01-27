@@ -35,6 +35,8 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
         status::emit_status(&app_handle);
         return Ok(());
     }
+    // 提前停止，避免端口占用，但服务却不可用
+    stop(app_handle.clone()).await?;
 
     log::info!("Starting n8n service");
     status::set_status(status::Status::Starting);
@@ -131,46 +133,43 @@ pub async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
 /// 停止 n8n 服务
 pub async fn stop(app_handle: tauri::AppHandle) -> Result<(), String> {
   log::info!("Stopping n8n service...");
-
   let port = config::N8N_PORT;
 
   #[cfg(unix)]
   {
-      // Unix/macOS: 使用 lsof 找到 PID 并 kill
-      // -t 仅返回 PID，-i:{port} 指定端口
-      let shell_cmd = format!("lsof -ti:{} | xargs kill -9", port);
-      let output = Command::new("sh")
+      // 使用 pkill 直接针对进程名杀号，通常比 lsof 更暴力有效
+      // 或者保留 lsof，但增加强制检查
+      let _ = Command::new("sh")
           .arg("-c")
-          .arg(&shell_cmd)
+          .arg(format!("lsof -ti:{} | xargs kill -9", port))
           .output();
-          
-      match output {
-          Ok(_) => log::info!("Unix: Port {} cleared", port),
-          Err(e) => log::error!("Failed to execute kill command: {}", e),
-      }
   }
 
   #[cfg(windows)]
   {
-      // Windows: 使用 netstat 找到 PID 并用 taskkill 结束
-      let shell_cmd = format!(
-          "for /f \"tokens=5\" %a in ('netstat -aon ^| findstr :{}') do taskkill /f /pid %a",
+      // 方案 A: 强制清理所有 node 进程（如果你的 App 只运行这一个 node 服务）
+      // let _ = Command::new("taskkill").args(["/F", "/IM", "node.exe", "/T"]).output();
+
+      // 方案 B: 修正后的端口清理逻辑 (使用 powershell 更稳定)
+      let ps_cmd = format!(
+          "Get-NetTCPConnection -LocalPort {} -ErrorAction SilentlyContinue | ForEach-Object {{ Stop-Process -Id $_.OwningProcess -Force }}",
           port
       );
-      let output = Command::new("cmd")
-          .args(["/C", &shell_cmd])
+      
+      let output = Command::new("powershell")
+          .args(["-Command", &ps_cmd])
           .output();
 
-      match output {
-          Ok(_) => log::info!("Windows: Port {} cleared", port),
-          Err(e) => log::error!("Failed to execute taskkill: {}", e),
+      if let Err(e) = output {
+          log::error!("Windows stop error: {}", e);
       }
   }
 
+  // 给系统一点时间释放端口 (重要！)
+  tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+
   status::set_status(status::Status::Stopped);
   status::emit_status(&app_handle);
-
-  log::info!("n8n stop command executed");
   Ok(())
 }
 

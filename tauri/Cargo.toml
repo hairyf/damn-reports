@@ -25,7 +25,8 @@ tauri-build = { version = "2", features = [] }
 tauri = { version = "2", features = [
   "tray-icon",
   "image-png",
-  "devtools"
+  "devtools",
+  "unstable"
 ] }
 tauri-plugin-http = "2.5.6"
 tauri-plugin-process = "2.0.0"

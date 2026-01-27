@@ -78,7 +78,12 @@ export function Sidebar() {
             return (
               <Button
                 key={item.href}
-                onPress={() => navigate(item.href)}
+                onPress={() => {
+                  if (item.onClick)
+                    item.onClick()
+                  else
+                    navigate(item.href)
+                }}
                 variant={isActive ? 'solid' : 'light'}
                 color={isActive ? 'primary' : 'default'}
                 size="lg"
