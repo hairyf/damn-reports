@@ -8,6 +8,7 @@ use axum::{
 use sea_orm::DatabaseConnection;
 use serde_json::json;
 use std::sync::Arc;
+use tower_http::cors::{Any, CorsLayer};
 
 /// Axum 应用状态
 #[derive(Clone)]
@@ -23,6 +24,12 @@ pub async fn start(db: DatabaseConnection, app_handle: tauri::AppHandle) {
         app_handle,
     };
 
+    // 配置 CORS 中间件，允许所有来源
+    let cors = CorsLayer::new()
+        .allow_origin(Any)
+        .allow_methods(Any)
+        .allow_headers(Any);
+
     let app = Router::new()
         .route("/", get(root))
         .route("/health", get(health))
@@ -30,6 +37,7 @@ pub async fn start(db: DatabaseConnection, app_handle: tauri::AppHandle) {
         .route("/record/collect", post(routes::record::post_collect))
         .route("/record/summary", get(routes::record::get_summary))
         .route("/report", post(routes::report::post))
+        .layer(cors)
         .with_state(app_state);
 
     let listener = utils::listen().await.unwrap();

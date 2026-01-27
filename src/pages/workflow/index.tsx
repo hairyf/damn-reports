@@ -19,7 +19,6 @@ function Page() {
         src={n8nUrl}
         className="w-full h-full border-0"
         title="n8n 工作流编辑器"
-        allow="clipboard-read; clipboard-write"
       />
     </Card>
   )
