@@ -1,9 +1,9 @@
+use crate::bridge::server::routes::report::dtos::{ReportCreateInput, ReportType};
+use crate::core::db::entities::report;
 use chrono::Utc;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, Set};
 use std::sync::Arc;
 use tauri::Emitter;
-use crate::bridge::server::routes::report::dtos::{ReportCreateInput, ReportType};
-use crate::core::db::entities::report;
 
 pub async fn create_report(
     db: Arc<DatabaseConnection>,

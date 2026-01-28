@@ -16,11 +16,7 @@ pub async fn listen() -> Result<TcpListener, String> {
             Ok(listener)
         }
         Err(e) => {
-            log::warn!(
-                "Failed to bind IPv4 {}, trying IPv6: {}",
-                bind_address,
-                e
-            );
+            log::warn!("Failed to bind IPv4 {}, trying IPv6: {}", bind_address, e);
             // 如果 IPv4 绑定失败，尝试 IPv6 双栈绑定
             match TcpListener::bind(&bind_address_v6).await {
                 Ok(listener) => {

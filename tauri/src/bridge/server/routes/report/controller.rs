@@ -44,7 +44,10 @@ pub async fn post(
                     }
                 }
             } else {
-                log::debug!("Notifications are disabled, skipping notification for report: {}", report.name);
+                log::debug!(
+                    "Notifications are disabled, skipping notification for report: {}",
+                    report.name
+                );
             }
 
             (StatusCode::OK, Json(report))

@@ -13,7 +13,7 @@ pub const N8N_PORT: u16 = 5678; // ENV: N8N_PORT
                                 // pub const N8N_REST_ENDPOINT: &str = "/rest";
 
 pub const APP_SERVER_PORT: u16 = 6789;
-pub const APP_SERVER_BIND_ADDRESS: &str = "0.0.0.0";
+pub const APP_SERVER_BIND_ADDRESS: &str = "localhost";
 
 pub const STORE_DAT_FILE: &str = ".store.dat";
 

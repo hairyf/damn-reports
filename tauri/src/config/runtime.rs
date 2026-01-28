@@ -1,6 +1,6 @@
-use std::path::{PathBuf};
-use tauri::Manager;
 use std::env;
+use std::path::PathBuf;
+use tauri::Manager;
 
 use super::constants::*;
 use super::utils::search_node_binary;
@@ -38,12 +38,12 @@ pub fn db_url(app_handle: &tauri::AppHandle) -> String {
 pub fn get_node_download_url() -> Result<String, String> {
     let arch = env::consts::ARCH;
     let os = env::consts::OS;
-    
+
     // 抽象文件名逻辑
     let filename = match (os, arch) {
         ("macos", "aarch64") => format!("node-{}-darwin-arm64.tar.gz", NODE_VERSION),
-        ("macos", "x86_64")  => format!("node-{}-darwin-x64.tar.gz", NODE_VERSION),
-        ("windows", _)       => format!("node-{}-win-x64.zip", NODE_VERSION),
+        ("macos", "x86_64") => format!("node-{}-darwin-x64.tar.gz", NODE_VERSION),
+        ("windows", _) => format!("node-{}-win-x64.zip", NODE_VERSION),
         _ => return Err(format!("Unsupported platform: {} {}", os, arch)),
     };
 
@@ -53,7 +53,7 @@ pub fn get_node_download_url() -> Result<String, String> {
 pub fn get_n8n_download_url() -> Result<String, String> {
     let arch = env::consts::ARCH;
     let os = env::consts::OS;
-    
+
     // 根据平台和架构生成文件名
     let filename = match (os, arch) {
         ("windows", _) => "n8n-pkg-windows.zip".to_string(),
@@ -62,8 +62,11 @@ pub fn get_n8n_download_url() -> Result<String, String> {
         ("linux", _) => "n8n-pkg-linux.zip".to_string(),
         _ => return Err(format!("Unsupported platform: {} {}", os, arch)),
     };
-    
-    Ok(format!("{}{}{}", GITHUB_PROXY_PREFIX, N8N_CORE_URL, filename))
+
+    Ok(format!(
+        "{}{}{}",
+        GITHUB_PROXY_PREFIX, N8N_CORE_URL, filename
+    ))
 }
 
 pub fn get_node_binary_path(app_handle: &tauri::AppHandle) -> PathBuf {
@@ -79,17 +82,16 @@ pub fn get_node_binary_path(app_handle: &tauri::AppHandle) -> PathBuf {
         direct_path
     } else {
         // 只有在直接路径不存在时才进行开销较大的递归搜索
-        search_node_binary(&runtime_dir, bin_name)
-            .unwrap_or(direct_path)
+        search_node_binary(&runtime_dir, bin_name).unwrap_or(direct_path)
     }
 }
 
 pub fn get_node_install_path(app_handle: &tauri::AppHandle) -> PathBuf {
-  get_base_dir(app_handle).join("runtime")
+    get_base_dir(app_handle).join("runtime")
 }
 
 pub fn get_n8n_install_path(app_handle: &tauri::AppHandle) -> PathBuf {
-  get_base_dir(app_handle).join("dependencies").join("n8n")
+    get_base_dir(app_handle).join("dependencies").join("n8n")
 }
 
 pub fn get_n8n_binary_path(app_handle: &tauri::AppHandle) -> PathBuf {

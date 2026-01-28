@@ -4,7 +4,6 @@ use crate::service::workflow::{
 };
 use tauri::AppHandle;
 
-
 /// 检测 n8n 进程状态并更新
 ///
 /// 同时使用端口检测和 HTTP 请求检测：
@@ -16,10 +15,7 @@ pub async fn trigger(app_handle: AppHandle) -> Result<(), Box<dyn std::error::Er
 
     // 先快速检测端口
     let is_n8n_running = workflow_utils::is_n8n_running().await;
-    log::trace!(
-        "N8N status check: n8n_running={}",
-        is_n8n_running
-    );
+    log::trace!("N8N status check: n8n_running={}", is_n8n_running);
 
     // 只有当当前状态为运行中时，才更新状态
     if is_n8n_running && current_status != Status::Running {

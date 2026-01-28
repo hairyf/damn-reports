@@ -128,13 +128,16 @@ fn migrations() -> tauri_plugin_sql::Builder {
     for migration in &migrations {
         log::info!("Migration: {}", migration.description);
     }
-    tauri_plugin_sql::Builder::default()
-        .add_migrations(&format!("{}{}", config::DB_URL_PREFIX, config::DB_NAME), migrations)
+    tauri_plugin_sql::Builder::default().add_migrations(
+        &format!("{}{}", config::DB_URL_PREFIX, config::DB_NAME),
+        migrations,
+    )
 }
 
 // configure tauri builder
 fn builder() -> tauri::Builder<tauri::Wry> {
     tauri::Builder::default()
+        .plugin(tauri_plugin_localhost::Builder::new(config::APP_SERVER_PORT).build())
         .plugin(tauri_plugin_updater::Builder::new().build())
         // Opener plugin
         .plugin(tauri_plugin_opener::init())

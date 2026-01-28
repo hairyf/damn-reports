@@ -60,6 +60,7 @@ tar = "0.4.44"
 sha2 = "0.10"
 async-trait = "0.1.89"
 log = "0.4"
+tauri-plugin-localhost = "2"
 
 [dependencies.tauri-plugin-sql]
 features = [ "sqlite" ] # or "postgres", or "mysql"

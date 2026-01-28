@@ -19,11 +19,11 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
         return Ok(());
     }
     if !node_binary_path.exists() || !n8n_binary_path.exists() {
-      let mut setting = config::get_store_dat_setting(&app_handle);
-      setting.installed = false;
-      config::set_store_dat_setting(&app_handle, setting);
-      log::debug!("n8n not installed, skipping startup");
-      return Ok(());
+        let mut setting = config::get_store_dat_setting(&app_handle);
+        setting.installed = false;
+        config::set_store_dat_setting(&app_handle, setting);
+        log::debug!("n8n not installed, skipping startup");
+        return Ok(());
     }
 
     log::debug!("Checking n8n running status");
@@ -31,9 +31,9 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
     let n8n_running = is_n8n_running().await;
 
     if port_in_use && !n8n_running {
-      log::info!("n8n is not running, but port is in use, stopping n8n");
-      stop(app_handle.clone()).await?;
-      return Ok(());
+        log::info!("n8n is not running, but port is in use, stopping n8n");
+        stop(app_handle.clone()).await?;
+        return Ok(());
     }
 
     if n8n_running {
@@ -54,141 +54,145 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
 
 /// 重启 n8n 服务
 pub async fn restart(app_handle: tauri::AppHandle) -> Result<(), String> {
-  log::info!("Restarting n8n service");
-  
-  // 1. 停止现有服务
-  stop(app_handle.clone()).await?;
-  
-  // 2. 重新启动
-  start(app_handle).await?;
-  
-  Ok(())
+    log::info!("Restarting n8n service");
+
+    // 1. 停止现有服务
+    stop(app_handle.clone()).await?;
+
+    // 2. 重新启动
+    start(app_handle).await?;
+
+    Ok(())
 }
 
 /// 启动 n8n 服务
 pub async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
-  let node_binary_path = config::get_node_binary_path(&app_handle);
-  let n8n_binary_path = config::get_n8n_binary_path(&app_handle);
-  let n8n_data_path = config::get_n8n_data_path(&app_handle);
+    let node_binary_path = config::get_node_binary_path(&app_handle);
+    let n8n_binary_path = config::get_n8n_binary_path(&app_handle);
+    let n8n_data_path = config::get_n8n_data_path(&app_handle);
 
-  log::debug!("Checking Node.js path: {:?}", node_binary_path);
-  if !node_binary_path.exists() {
-      log::error!("Node.js not installed");
-      return Err("NODE_NOT_FOUND: Node.js not installed".to_string());
-  }
-  log::debug!("Checking n8n path: {:?}", n8n_binary_path);
-  if !n8n_binary_path.exists() {
-      log::error!("n8n not installed");
-      return Err("N8N_NOT_FOUND: n8n not installed".to_string());
-  }
+    log::debug!("Checking Node.js path: {:?}", node_binary_path);
+    if !node_binary_path.exists() {
+        log::error!("Node.js not installed");
+        return Err("NODE_NOT_FOUND: Node.js not installed".to_string());
+    }
+    log::debug!("Checking n8n path: {:?}", n8n_binary_path);
+    if !n8n_binary_path.exists() {
+        log::error!("n8n not installed");
+        return Err("N8N_NOT_FOUND: n8n not installed".to_string());
+    }
 
-  #[cfg(unix)]
-  {
-      let _ = Command::new("pkill").arg("-9").arg("node").output();
-  }
+    #[cfg(unix)]
+    {
+        let _ = Command::new("pkill").arg("-9").arg("node").output();
+    }
 
-  let mut cmd = Command::new(&node_binary_path);
-  cmd.arg(&n8n_binary_path)
-      .arg("start")
-      .env("N8N_USER_FOLDER", n8n_data_path.to_str().unwrap())
-      // 关键环境变量：禁用交互模式
-      .env("N8N_DISABLE_INTERACTIVE_REPL", "true")
-      .env("N8N_BLOCK_IFRAME_EMBEDS", "false")
-      .env("N8N_USE_SAMESITE_COOKIE_STRICT", "false")
-      .env("N8N_CORS_ALLOWED_ORIGINS", "*")
-      .env("N8N_SECURE_COOKIE", "false")
-      .env("N8N_USER_MANAGEMENT_DISABLED", "true")
-      .env("SKIP_SETUP", "true")
-      .env("N8N_PORT", "5678")
-      .env("N8N_HOST", "127.0.0.1")
-      .env("N8N_CONTENT_SECURITY_POLICY", "{ \"default-src\": [\"*\"], \"frame-ancestors\": [\"*\"] }")
-      // 核心修正：提供一个空的 stdin 防止 setRawMode 报错
-      .stdin(Stdio::null())
-      // 使用管道捕获输出，以便在子线程中读取
-      .stdout(Stdio::piped())
-      .stderr(Stdio::piped());
+    let mut cmd = Command::new(&node_binary_path);
+    cmd.arg(&n8n_binary_path)
+        .arg("start")
+        .env("N8N_USER_FOLDER", n8n_data_path.to_str().unwrap())
+        // 关键环境变量：禁用交互模式
+        .env("N8N_DISABLE_INTERACTIVE_REPL", "true")
+        .env("N8N_BLOCK_IFRAME_EMBEDS", "false")
+        .env("N8N_USE_SAMESITE_COOKIE_STRICT", "false")
+        .env("N8N_CORS_ALLOWED_ORIGINS", "*")
+        .env("N8N_SECURE_COOKIE", "false")
+        .env("N8N_USER_MANAGEMENT_DISABLED", "true")
+        .env("SKIP_SETUP", "true")
+        .env("N8N_PORT", "5678")
+        .env("N8N_HOST", "127.0.0.1")
+        .env(
+            "N8N_CONTENT_SECURITY_POLICY",
+            "{ \"default-src\": [\"*\"], \"frame-ancestors\": [\"*\"] }",
+        )
+        // 核心修正：提供一个空的 stdin 防止 setRawMode 报错
+        .stdin(Stdio::null())
+        // 使用管道捕获输出，以便在子线程中读取
+        .stdout(Stdio::piped())
+        .stderr(Stdio::piped());
 
-  #[cfg(windows)]
-  {
-      use std::os::windows::process::CommandExt;
-      cmd.creation_flags(0x08000000);
-  }
+    #[cfg(windows)]
+    {
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(0x08000000);
+    }
 
-  log::info!("Starting n8n process");
-  match cmd.spawn() {
-      Ok(mut child) => {
-          log::info!("N8N process started successfully");
-          // 获取 stdout 和 stderr，并启动读取线程
-          let stdout = child.stdout.take();
-          let stderr = child.stderr.take();
-          spawn_output_readers(stdout, stderr);
+    log::info!("Starting n8n process");
+    match cmd.spawn() {
+        Ok(mut child) => {
+            log::info!("N8N process started successfully");
+            // 获取 stdout 和 stderr，并启动读取线程
+            let stdout = child.stdout.take();
+            let stderr = child.stderr.take();
+            spawn_output_readers(stdout, stderr);
 
-          Ok(())
-      }
-      Err(e) => {
-          log::error!("Failed to start process: {}", e);
-          Err(format!("Failed to start process: {}", e))
-      }
-  }
+            Ok(())
+        }
+        Err(e) => {
+            log::error!("Failed to start process: {}", e);
+            Err(format!("Failed to start process: {}", e))
+        }
+    }
 }
-
 
 /// 停止 n8n 服务
 pub async fn stop(app_handle: tauri::AppHandle) -> Result<(), String> {
-  log::info!("Stopping n8n service...");
-  let port = config::N8N_PORT;
+    log::info!("Stopping n8n service...");
+    let port = config::N8N_PORT;
 
-  #[cfg(unix)]
-  {
-      // 使用 pkill 直接针对进程名杀号，通常比 lsof 更暴力有效
-      // 或者保留 lsof，但增加强制检查
-      let _ = Command::new("sh")
-          .arg("-c")
-          .arg(format!("lsof -ti:{} | xargs kill -9", port))
-          .output();
-  }
+    #[cfg(unix)]
+    {
+        // 使用 pkill 直接针对进程名杀号，通常比 lsof 更暴力有效
+        // 或者保留 lsof，但增加强制检查
+        let _ = Command::new("sh")
+            .arg("-c")
+            .arg(format!("lsof -ti:{} | xargs kill -9", port))
+            .output();
+    }
 
-  #[cfg(windows)]
-  {
-      // 方案 A: 强制清理所有 node 进程（如果你的 App 只运行这一个 node 服务）
-      // let _ = Command::new("taskkill").args(["/F", "/IM", "node.exe", "/T"]).output();
+    #[cfg(windows)]
+    {
+        // 方案 A: 强制清理所有 node 进程（如果你的 App 只运行这一个 node 服务）
+        // let _ = Command::new("taskkill").args(["/F", "/IM", "node.exe", "/T"]).output();
 
-      // 方案 B: 修正后的端口清理逻辑 (使用 powershell 更稳定)
-      let ps_cmd = format!(
+        // 方案 B: 修正后的端口清理逻辑 (使用 powershell 更稳定)
+        let ps_cmd = format!(
           "Get-NetTCPConnection -LocalPort {} -ErrorAction SilentlyContinue | ForEach-Object {{ Stop-Process -Id $_.OwningProcess -Force }}",
           port
       );
-      
-      let mut cmd = Command::new("powershell");
-      // 使用 -WindowStyle Hidden 和 -NoProfile -NonInteractive 确保不显示窗口
-      cmd.args([
-          "-NoProfile",
-          "-NonInteractive",
-          "-WindowStyle", "Hidden",
-          "-Command", &ps_cmd
-      ]);
-      
-      // 隐藏 PowerShell 窗口，避免弹出黑色控制台窗口
-      use std::os::windows::process::CommandExt;
-      cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
-      
-      // 重定向 stdout 和 stderr 到空，进一步确保不显示窗口
-      cmd.stdout(Stdio::null());
-      cmd.stderr(Stdio::null());
-      
-      let output = cmd.output();
 
-      if let Err(e) = output {
-          log::error!("Windows stop error: {}", e);
-      }
-  }
+        let mut cmd = Command::new("powershell");
+        // 使用 -WindowStyle Hidden 和 -NoProfile -NonInteractive 确保不显示窗口
+        cmd.args([
+            "-NoProfile",
+            "-NonInteractive",
+            "-WindowStyle",
+            "Hidden",
+            "-Command",
+            &ps_cmd,
+        ]);
 
-  // 给系统一点时间释放端口 (重要！)
-  tokio::time::sleep(std::time::Duration::from_millis(800)).await;
+        // 隐藏 PowerShell 窗口，避免弹出黑色控制台窗口
+        use std::os::windows::process::CommandExt;
+        cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
 
-  status::set_status(status::Status::Stopped);
-  status::emit_status(&app_handle);
-  Ok(())
+        // 重定向 stdout 和 stderr 到空，进一步确保不显示窗口
+        cmd.stdout(Stdio::null());
+        cmd.stderr(Stdio::null());
+
+        let output = cmd.output();
+
+        if let Err(e) = output {
+            log::error!("Windows stop error: {}", e);
+        }
+    }
+
+    // 给系统一点时间释放端口 (重要！)
+    tokio::time::sleep(std::time::Duration::from_millis(800)).await;
+
+    status::set_status(status::Status::Stopped);
+    status::emit_status(&app_handle);
+    Ok(())
 }
 
 /// 安装环境

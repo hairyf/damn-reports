@@ -45,7 +45,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
       {
         parameters: {
           method: 'POST',
-          url: 'http://127.0.0.1:6789/report',
+          url: 'http://localhost:6789/report',
           sendHeaders: true,
           headerParameters: {
             parameters: [
@@ -81,7 +81,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
       },
       {
         parameters: {
-          url: 'http://127.0.0.1:6789/record/summary',
+          url: 'http://localhost:6789/record/summary',
           sendQuery: true,
           queryParameters: {
             parameters: [
@@ -125,7 +125,7 @@ export function getReportWorkflowData(options: ReportWorkflowOptions) {
       {
         parameters: {
           method: 'POST',
-          url: 'http://127.0.0.1:6789/record/collect',
+          url: 'http://localhost:6789/record/collect',
           options: {},
         },
         type: 'n8n-nodes-base.httpRequest',
