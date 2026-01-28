@@ -103,6 +103,7 @@ export const n8n = defineStore({
         credentials: { deepSeekApi },
       })
       const data = await postN8nWorkflow(body)
+      console.log('createWorkflow data', data)
       if (!data?.id)
         throw new TypeError('Failed to create workflow')
 

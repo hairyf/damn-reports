@@ -1,6 +1,7 @@
 import { Else, If, Then } from '@hairy/react-lib'
 import { closeAll } from '@heroui/react'
 import { useQuery } from '@tanstack/react-query'
+import { listen } from '@tauri-apps/api/event'
 import { useLocalStorage } from 'react-use'
 
 function Page() {
@@ -59,5 +60,10 @@ function Page() {
     </div>
   )
 }
+
+listen('report_generated', () => {
+  queryClient.invalidateQueries({ queryKey: ['reports'] })
+  queryClient.invalidateQueries({ queryKey: ['records'] })
+})
 
 export default Page

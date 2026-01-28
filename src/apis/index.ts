@@ -81,7 +81,9 @@ export async function postN8nWorkflow(params: any) {
     body: JSON.stringify(params),
   })
     .then(response => response.json())
-    .then(data => data?.data as Types.PostN8nWorkflowResult | null)
+    .then((data) => {
+      return data?.data as Types.PostN8nWorkflowResult | null
+    })
 }
 
 export async function postN8nWorkflowWorkflowIdActivate(paths: { workflowId: string }, body: Types.PostN8nWorkflowWorkflowIdActivateBody) {

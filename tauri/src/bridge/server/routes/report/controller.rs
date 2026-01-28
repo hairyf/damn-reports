@@ -10,7 +10,7 @@ pub async fn post(
     State(state): State<AppState>,
     Json(input): Json<ReportCreateInput>,
 ) -> (StatusCode, Json<report::Model>) {
-    match create_report(state.db.clone(), input).await {
+    match create_report(state.db.clone(), state.app_handle.clone(), input).await {
         Ok(report) => {
             // 检查通知设置，只有启用通知时才发送
             let setting = config::get_store_dat_setting(&state.app_handle);

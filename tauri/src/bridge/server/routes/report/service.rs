@@ -1,12 +1,13 @@
 use chrono::Utc;
 use sea_orm::{ActiveModelTrait, DatabaseConnection, Set};
 use std::sync::Arc;
-
+use tauri::Emitter;
 use crate::bridge::server::routes::report::dtos::{ReportCreateInput, ReportType};
 use crate::core::db::entities::report;
 
 pub async fn create_report(
     db: Arc<DatabaseConnection>,
+    app_handle: tauri::AppHandle,
     input: ReportCreateInput,
 ) -> Result<report::Model, sea_orm::DbErr> {
     log::info!("Creating report: workspace_id={}", input.workspace_id);
@@ -19,7 +20,7 @@ pub async fn create_report(
     // 为缺失的字段提供默认值
     let name = input
         .name
-        .unwrap_or_else(|| format!("Report {}", Utc::now().format("%Y-%m-%d %H:%M:%S")));
+        .unwrap_or_else(|| format!("Report {}", Utc::now().format("%Y-%m-%d")));
     log::debug!("Report name: {}", name);
 
     // 创建 ActiveModel 并插入报告
@@ -40,5 +41,6 @@ pub async fn create_report(
         result.id,
         result.name
     );
+    app_handle.emit("report_generated", &result.name).unwrap();
     Ok(result)
 }
