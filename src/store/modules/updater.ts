@@ -11,9 +11,9 @@ export const updater = defineStore({
     progress: 0,
   }),
   actions: {
-    async check() {
+    async check(): Promise<boolean> {
       this.updater = await check()
-      this.isNewVersion = !!this.updater
+      return this.isNewVersion = !!this.updater
     },
     async update() {
       if (!this.updater)

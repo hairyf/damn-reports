@@ -1,5 +1,6 @@
 import { Else, If, Then } from '@hairy/react-lib'
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -25,7 +26,21 @@ export function SettingAboutCard() {
   })
 
   const { mutate: checkForUpdate, isPending: checkingUpdate } = useMutation({
-    mutationFn: () => store.updater.check(),
+    mutationFn: async () => {
+      const isUpdate = await store.updater.check()
+      if (isUpdate) {
+        await openModal({
+          title: '检测到新版本可用',
+          content: '是否更新版本？',
+          confirmText: '确认',
+          cancelText: '暂不更新',
+        })
+        await store.updater.update()
+      }
+      else {
+        addToast({ title: '暂无更新', description: '当前版本已是最新版本' })
+      }
+    },
   })
 
   const { mutate: reset, isPending: resetting } = useMutation({

@@ -1,6 +1,7 @@
 import { If, useWhenever } from '@hairy/react-lib'
 import { Chip } from '@heroui/react'
 import { useOverlay } from '@overlastic/react'
+import { relaunch } from '@tauri-apps/plugin-process'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useStore } from 'valtio-define'
 import { Modal } from './modal'
@@ -13,10 +14,11 @@ export function UpdateStatus() {
   async function autoCheckAndInstall() {
     if (!await store.updater.checkAndInstall())
       return
-    openModal({
+    await openModal({
       title: '新版本已就绪',
       content: '点击确认重启应用更新版本',
     })
+    await relaunch()
   }
 
   async function manualCheckAndInstall() {
@@ -25,12 +27,13 @@ export function UpdateStatus() {
       content: '是否安装新版本？',
     })
     await store.updater.update()
-    openModal({
+    await openModal({
       title: '新版本已就绪',
       content: '点击确认重启应用更新版本',
       confirmText: '确认',
       cancelText: '暂不更新',
     })
+    await relaunch()
   }
 
   useWhenever(autoCheckUpdate, autoCheckAndInstall)

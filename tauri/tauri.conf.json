@@ -47,7 +47,7 @@
     "updater": {
       "active": true,
       "endpoints": [
-        "https://github.com/hairyf/damn-reports/releases/download/latest/latest.json"
+        "https://github.com/hairyf/damn-reports/releases/latest/download/latest.json"
       ],
       "dialog": true,
       "pubkey": "dW50cnVzdGVkIGNvbW1lbnQ6IG1pbmlzaWduIHB1YmxpYyBrZXk6IDk1ODVCMURCOUFCM0UwQjUKUldTMTRMT2EyN0dGbGVpZENPSzEyMjRFbkx2Z2NwRnZMcG9PQ3JhbnI1NURla1RlVkhwMDdMdmgK"
