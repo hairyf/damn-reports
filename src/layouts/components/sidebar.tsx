@@ -79,10 +79,10 @@ export function Sidebar() {
               <Button
                 key={item.href}
                 onPress={() => {
-                  if (item.onClick)
-                    item.onClick()
-                  else
-                    navigate(item.href)
+                  // if (item.onClick)
+                  //   item.onClick()
+                  // else
+                  navigate(item.href)
                 }}
                 variant={isActive ? 'solid' : 'light'}
                 color={isActive ? 'primary' : 'default'}
