@@ -14,9 +14,6 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
     let node_binary_path = config::get_node_binary_path(&app_handle);
     let n8n_binary_path = config::get_n8n_binary_path(&app_handle);
 
-    // 无论如何都先停止服务，避免 n8n 服务不稳定导致应用异常
-    stop(app_handle.clone()).await?;
-
     if !setting.installed {
         log::debug!("n8n not installed, skipping startup");
         return Ok(());
@@ -33,7 +30,13 @@ pub async fn start(app_handle: tauri::AppHandle) -> Result<(), String> {
     let port_in_use = is_port_in_use(config::N8N_PORT);
     let n8n_running = is_n8n_running().await;
 
-    if port_in_use && n8n_running {
+    if port_in_use && !n8n_running {
+      log::info!("n8n is not running, but port is in use, stopping n8n");
+      stop(app_handle.clone()).await?;
+      return Ok(());
+    }
+
+    if n8n_running {
         log::info!("n8n is already running");
         status::set_status(status::Status::Running);
         status::emit_status(&app_handle);
@@ -56,10 +59,7 @@ pub async fn restart(app_handle: tauri::AppHandle) -> Result<(), String> {
   // 1. 停止现有服务
   stop(app_handle.clone()).await?;
   
-  // 2. 稍微等待一下确保端口释放（可选，通常 500ms 足够）
-  tokio::time::sleep(std::time::Duration::from_millis(800)).await;
-  
-  // 3. 重新启动
+  // 2. 重新启动
   start(app_handle).await?;
   
   Ok(())
@@ -183,7 +183,7 @@ pub async fn stop(app_handle: tauri::AppHandle) -> Result<(), String> {
   }
 
   // 给系统一点时间释放端口 (重要！)
-  tokio::time::sleep(std::time::Duration::from_millis(500)).await;
+  tokio::time::sleep(std::time::Duration::from_millis(800)).await;
 
   status::set_status(status::Status::Stopped);
   status::emit_status(&app_handle);
