@@ -930,7 +930,7 @@ dependencies = [
 
 [[package]]
 name = "damn-daily-reports"
-version = "0.2.1"
+version = "0.2.2"
 dependencies = [
  "async-trait",
  "axum",
