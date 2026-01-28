@@ -8,7 +8,7 @@ pub const GITHUB_PROXY_PREFIX: &str = "https://gh-proxy.com/";
 pub const N8N_CORE_URL: &str = "https://github.com/hairyf/n8n-pkg/releases/latest/download/";
 pub const CLICKUP_API_URL: &str = "https://api.clickup.com/api/v2";
 
-pub const N8N_HOST: &str = "http://localhost";
+pub const N8N_HOST: &str = "http://127.0.0.1";
 pub const N8N_PORT: u16 = 5678; // ENV: N8N_PORT
                                 // pub const N8N_REST_ENDPOINT: &str = "/rest";
 

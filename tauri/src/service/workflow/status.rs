@@ -24,6 +24,7 @@ pub fn set_status(status: Status) {
 
 pub fn emit_status(app_handle: &AppHandle) {
     let status = get_status();
+    println!("emit_status: {:?}", status);
     let _ = app_handle.emit("n8n-status-updated", &status);
 }
 
