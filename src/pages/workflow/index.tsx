@@ -7,6 +7,7 @@ function Page() {
     ['email', email || N8N_LOGIN_DATA.emailOrLdapLoginId],
     ['password', password || N8N_LOGIN_DATA.password],
     ['hideUI', 'true'], // 通过 URL 参数告诉 n8n 隐藏 UI 元素
+    ['iframe', 'true'],
   ])
   const n8nUrl = `http://localhost:5678/workflow/${workflow}?${params.toString()}`
 

@@ -64,6 +64,7 @@ export const n8n = defineStore({
         emailOrLdapLoginId: this.account.email,
         password: this.account.password,
       })
+      console.log('loginWithPassword result', result)
       if (typeof result.code === 'number')
         throw new TypeError(result.message)
       this.userInfo = result.data!
