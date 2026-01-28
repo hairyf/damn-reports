@@ -51,12 +51,19 @@ pub fn get_node_download_url() -> Result<String, String> {
 }
 
 pub fn get_n8n_download_url() -> Result<String, String> {
-    let platform = match env::consts::OS {
-        "windows" | "macos" | "linux" => env::consts::OS,
-        _ => return Err(format!("Unsupported platform: {}", env::consts::OS)),
+    let arch = env::consts::ARCH;
+    let os = env::consts::OS;
+    
+    // 根据平台和架构生成文件名
+    let filename = match (os, arch) {
+        ("windows", _) => "n8n-pkg-windows.zip".to_string(),
+        ("macos", "aarch64") => "n8n-pkg-macos-arm64.zip".to_string(),
+        ("macos", "x86_64") => "n8n-pkg-macos-x64.zip".to_string(),
+        ("linux", _) => "n8n-pkg-linux.zip".to_string(),
+        _ => return Err(format!("Unsupported platform: {} {}", os, arch)),
     };
     
-    Ok(format!("{}{}n8n-pkg-{}.zip", GITHUB_PROXY_PREFIX, N8N_CORE_URL, platform))
+    Ok(format!("{}{}{}", GITHUB_PROXY_PREFIX, N8N_CORE_URL, filename))
 }
 
 pub fn get_node_binary_path(app_handle: &tauri::AppHandle) -> PathBuf {
