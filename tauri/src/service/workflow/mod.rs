@@ -101,6 +101,8 @@ pub async fn launch(app_handle: tauri::AppHandle) -> Result<(), String> {
         .env("SKIP_SETUP", "true")
         .env("N8N_PORT", "5678")
         .env("N8N_HOST", "127.0.0.1")
+        .env("N8N_PROTOCOL", "https")
+        .env("N8N_SAMESITE_COOKIE", "none")
         // .env("N8N_PREVIEW_MODE", "true")
         // 核心修正：提供一个空的 stdin 防止 setRawMode 报错
         .stdin(Stdio::null())
