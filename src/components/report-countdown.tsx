@@ -14,6 +14,8 @@ export function ReportCountdown({ className }: { className?: string }) {
     enabled: !!n8n.workflow,
   })
   const generateTime = useMemo(() => {
+    if (!workflow)
+      return '--:--'
     const node = workflow?.nodes.find(node => node.type === 'n8n-nodes-base.scheduleTrigger')
     const trigger = node?.parameters.rule.interval[0]
     const triggerAtHour = trigger?.triggerAtHour || '--'
@@ -21,12 +23,14 @@ export function ReportCountdown({ className }: { className?: string }) {
     const target = `${triggerAtHour}:${triggerAtMinute}`
     return target
   }, [workflow])
-  const [generateCountdown, setGenerateCountdown] = useState('')
+  const [generateCountdown, setGenerateCountdown] = useState('--:--')
 
   // 计算倒计时
   useEffect(() => {
     // 在 setInterval 回调中更新（这是允许的，根据 ESLint 规则）
     function updateCountdown() {
+      if (generateTime === '--:--')
+        return
       const target = formatCountdown(generateTime)
       const diff = target.diff(dayjs(), 'second')
       setGenerateCountdown(formatDuration(diff))
