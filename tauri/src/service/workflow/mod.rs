@@ -159,11 +159,21 @@ pub async fn stop(app_handle: tauri::AppHandle) -> Result<(), String> {
       );
       
       let mut cmd = Command::new("powershell");
-      cmd.args(["-Command", &ps_cmd]);
+      // 使用 -WindowStyle Hidden 和 -NoProfile -NonInteractive 确保不显示窗口
+      cmd.args([
+          "-NoProfile",
+          "-NonInteractive",
+          "-WindowStyle", "Hidden",
+          "-Command", &ps_cmd
+      ]);
       
       // 隐藏 PowerShell 窗口，避免弹出黑色控制台窗口
       use std::os::windows::process::CommandExt;
       cmd.creation_flags(0x08000000); // CREATE_NO_WINDOW
+      
+      // 重定向 stdout 和 stderr 到空，进一步确保不显示窗口
+      cmd.stdout(Stdio::null());
+      cmd.stderr(Stdio::null());
       
       let output = cmd.output();
 
