@@ -26,3 +26,6 @@ dist-ssr
 .tauri
 
 tauri/prisma/database
+**/skills
+!/skills
+!/skills/**
