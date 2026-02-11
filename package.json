@@ -23,6 +23,7 @@
     "prepare": "skills-manifest install"
   },
   "dependencies": {
+    "@ai-sdk/openai": "^3.0.26",
     "@hairy/react-lib": "^1.47.0",
     "@hairy/utils": "^1.47.0",
     "@heroui/react": "^2.8.7",
@@ -54,6 +55,7 @@
     "@tiptap/pm": "^3.17.1",
     "@tiptap/react": "^3.17.1",
     "@tiptap/starter-kit": "^3.17.1",
+    "ai": "^6.0.79",
     "clsx": "^2.1.1",
     "dayjs": "^1.11.19",
     "framer-motion": "^12.29.0",

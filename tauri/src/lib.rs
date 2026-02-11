@@ -95,6 +95,7 @@ fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
         bridge::cmd::database_loaded,
         bridge::cmd::collect_daily_records,
         bridge::cmd::generate_daily_report,
+        bridge::cmd::get_record_summary,
         bridge::cmd::collect_daily_clickup,
         bridge::cmd::collect_daily_git,
         // bridge::cmd::get_n8n_version, // Removed
@@ -129,7 +130,6 @@ fn migrations() -> tauri_plugin_sql::Builder {
 // configure tauri builder
 fn builder() -> tauri::Builder<tauri::Wry> {
     tauri::Builder::default()
-        .plugin(tauri_plugin_localhost::Builder::new(config::APP_SERVER_PORT).build())
         .plugin(tauri_plugin_updater::Builder::new().build())
         // Opener plugin
         .plugin(tauri_plugin_opener::init())

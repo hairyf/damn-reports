@@ -60,6 +60,7 @@ declare global {
   const cn: typeof import('../utils/utility').cn
   const createContext: typeof import('react').createContext
   const createRef: typeof import('react').createRef
+  const dailyReportPrompt: typeof import('../config/prompts').dailyReportPrompt
   const db: typeof import('../database/index').db
   const forwardRef: typeof import('react').forwardRef
   const layouts: typeof import('../layouts/index').layouts

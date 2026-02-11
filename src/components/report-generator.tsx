@@ -1,8 +1,10 @@
 import { addToast, Button, Card, CardBody } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
+import { useStore } from 'valtio-define'
+import { store } from '@/store'
 
 export interface ReportGeneratorProps {
   generating?: boolean
@@ -10,6 +12,8 @@ export interface ReportGeneratorProps {
 }
 
 export function ReportGenerator({ generating, onGeneratingChange }: ReportGeneratorProps) {
+  const queryClient = useQueryClient()
+  const { loading: llmLoading } = useStore(store.llm)
   const generateMutation = useMutation({
     mutationFn: async () => {
       await invoke('collect_daily_records')
@@ -23,13 +27,17 @@ export function ReportGenerator({ generating, onGeneratingChange }: ReportGenera
         return
       }
 
-      await invoke('generate_daily_report')
-      addToast({ title: '报告生成中...', promise: new Promise(() => {}) })
       onGeneratingChange?.(true)
+      await store.llm.generateDailyReport()
+      queryClient.invalidateQueries({ queryKey: ['reports'] })
+      queryClient.invalidateQueries({ queryKey: ['records'] })
+    },
+    onError: (err: Error) => {
+      addToast({ title: '生成失败', description: err.message, color: 'danger' })
     },
   })
 
-  const isGenerating = generateMutation.isPending || generating
+  const isGenerating = generateMutation.isPending || llmLoading || generating
 
   return (
     <Card className="flex-1 relative" shadow="none">

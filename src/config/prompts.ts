@@ -1,4 +1,6 @@
-pub const DAILY_REPORT_PROMPT: &str = r#"# Role
+/** 日报系统 prompt，与 tauri 侧 prompt 保持一致 */
+export function dailyReportPrompt(summaryData: string): string {
+  const template = `# Role
 你是一位高效的研发技术专家，擅长将复杂的原始日志（Git、ClickUp、Gmail）转化为精炼、专业的中文日报。
 
 # Task
@@ -15,4 +17,6 @@ pub const DAILY_REPORT_PROMPT: &str = r#"# Role
 
 # Input Data
 
-{{ JSON.stringify($json.data) }}"#;
+{{ JSON.stringify($json.data) }}`
+  return template.replace('{{ JSON.stringify($json.data) }}', summaryData)
+}

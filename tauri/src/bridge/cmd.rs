@@ -1,13 +1,13 @@
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::sync::Arc;
 
-use crate::bridge::server;
 use crate::core::db::connection;
 use crate::service::collector;
+use crate::service::record;
 use crate::service::scheduler;
-use crate::service::llm;
 use crate::task;
 use sea_orm::DatabaseConnection;
-use tauri::{AppHandle, State};
+use tauri::{AppHandle, Emitter, State};
 
 // 全局标志，确保数据库连接成功只运行一次
 static DATABASE_LOADED: AtomicBool = AtomicBool::new(false);
@@ -20,11 +20,21 @@ pub async fn database_loaded(app_handle: tauri::AppHandle) -> Result<(), String>
     {
         return Ok(());
     }
-    let db = connection::connect(&app_handle).await;
+    let _db = connection::connect(&app_handle).await;
     log::info!("Database Connection Successful");
-    tauri::async_runtime::spawn(server::start(db.clone(), app_handle.clone()));
-    scheduler::start(&app_handle, db.clone());
+    scheduler::start(&app_handle);
     Ok(())
+}
+
+#[tauri::command]
+pub async fn get_record_summary(
+    db: State<'_, DatabaseConnection>,
+    workspace_id: Option<i32>,
+) -> Result<String, String> {
+    let db = Arc::new(db.inner().clone());
+    record::get_summary_prompt(db, record::RecordType::Daily, workspace_id)
+        .await
+        .map_err(|e| e.to_string())
 }
 
 #[tauri::command]
@@ -37,12 +47,8 @@ pub async fn collect_daily_records(db: State<'_, DatabaseConnection>) -> Result<
 }
 
 #[tauri::command]
-pub async fn generate_daily_report(app_handle: AppHandle, db: State<'_, DatabaseConnection>) -> Result<(), String> {
-    // llm::generate_daily_report logic will be implemented later
-    // For now we just call the (to be created) service function
-    // We need to pass db connection
-    let db_inner = db.inner().clone();
-    llm::generate_daily_report(&app_handle, db_inner).await.map_err(|e| e.to_string())?;
+pub async fn generate_daily_report(app_handle: AppHandle) -> Result<(), String> {
+    app_handle.emit("trigger_generate_daily_report", ()).map_err(|e| e.to_string())?;
     Ok(())
 }
 
