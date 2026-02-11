@@ -37,8 +37,15 @@ tauri-plugin-notification = "2"
 tauri-plugin-store = "2"
 tauri-plugin-dialog = "2.6.0"
 tauri-plugin-fs = "2"
-reqwest = { version = "0.12", features = [ "json", "stream", "native-tls-vendored" ] }
-git2 = { version = "0.18", default-features = false, features = [ "https", "vendored-openssl" ] }
+reqwest = { version = "0.12", features = [
+  "json",
+  "stream",
+  "native-tls-vendored"
+] }
+git2 = { version = "0.18", default-features = false, features = [
+  "https",
+  "vendored-openssl"
+] }
 chrono = { version = "0.4", features = [ "serde" ] }
 uuid = { version = "1.0", features = [ "v4" ] }
 axum = "0.7"
@@ -61,6 +68,7 @@ sha2 = "0.10"
 async-trait = "0.1.89"
 log = "0.4"
 tauri-plugin-localhost = "2"
+dotenvy = "0.15.7"
 
 [dependencies.tauri-plugin-sql]
 features = [ "sqlite" ] # or "postgres", or "mysql"

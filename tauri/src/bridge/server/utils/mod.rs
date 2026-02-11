@@ -3,7 +3,7 @@ use tokio::net::TcpListener;
 
 /// 创建 TCP 监听器，优先尝试 IPv4 绑定以确保兼容性
 ///
-/// 在 Windows 上，优先使用 IPv4 (0.0.0.0) 以确保 n8n 等工具可以正常连接
+/// 在 Windows 上，优先使用 IPv4 (0.0.0.0) 以确保工具可以正常连接
 /// 如果 IPv4 绑定失败，再尝试 IPv6 双栈绑定
 pub async fn listen() -> Result<TcpListener, String> {
     let bind_address = config::get_app_server_url();

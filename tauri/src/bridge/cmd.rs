@@ -1,14 +1,12 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use crate::bridge::server;
-use crate::config;
 use crate::core::db::connection;
 use crate::service::collector;
 use crate::service::scheduler;
-use crate::service::workflow;
+use crate::service::llm;
 use crate::task;
 use sea_orm::DatabaseConnection;
-use serde_json::Value;
 use tauri::{AppHandle, State};
 
 // 全局标志，确保数据库连接成功只运行一次
@@ -30,51 +28,6 @@ pub async fn database_loaded(app_handle: tauri::AppHandle) -> Result<(), String>
 }
 
 #[tauri::command]
-pub async fn install_dependencies(app_handle: AppHandle) -> Result<(), String> {
-    let mut setting = config::get_store_dat_setting(&app_handle);
-    if setting.installed {
-        log::debug!("Already installed, skipping installation");
-        return Ok(());
-    }
-    if workflow::status::get_status() == workflow::status::Status::Installing {
-        log::info!("Installation process already running, skipping");
-        return Ok(());
-    }
-    log::debug!("Not installed detected, starting installation process");
-    workflow::status::set_status(workflow::status::Status::Installing);
-    workflow::status::emit_status(&app_handle);
-    workflow::install(&app_handle).await?;
-    log::debug!("Installation completed, marked as installed");
-    setting.installed = true;
-    config::set_store_dat_setting(&app_handle, setting);
-    workflow::launch(app_handle).await?;
-    Ok(())
-}
-
-#[tauri::command]
-pub async fn restart_n8n(app_handle: AppHandle) -> Result<(), String> {
-    workflow::restart(app_handle).await?;
-    Ok(())
-}
-
-#[tauri::command]
-pub fn get_n8n_status() -> workflow::status::Status {
-    workflow::status::get_status()
-}
-
-#[tauri::command]
-pub async fn get_n8n_version(app_handle: AppHandle) -> Result<String, String> {
-    let package_json_path = config::get_n8n_package_json_path(&app_handle);
-    let package_json: Value = std::fs::read_to_string(package_json_path)
-        .map_err(|e| e.to_string())
-        .and_then(|c| serde_json::from_str(&c).map_err(|e| e.to_string()))?;
-    package_json["version"]
-        .as_str()
-        .map(|s| s.to_string())
-        .ok_or_else(|| "-".to_string())
-}
-
-#[tauri::command]
 pub async fn collect_daily_records(db: State<'_, DatabaseConnection>) -> Result<usize, String> {
     let db_inner_clone = db.inner().clone();
     let count = task::collect_records_of_source::trigger(db_inner_clone)
@@ -84,10 +37,12 @@ pub async fn collect_daily_records(db: State<'_, DatabaseConnection>) -> Result<
 }
 
 #[tauri::command]
-pub async fn generate_daily_report() -> Result<(), String> {
-    task::call_n8n_workflow_webhook::trigger()
-        .await
-        .map_err(|e| e.to_string())?;
+pub async fn generate_daily_report(app_handle: AppHandle, db: State<'_, DatabaseConnection>) -> Result<(), String> {
+    // llm::generate_daily_report logic will be implemented later
+    // For now we just call the (to be created) service function
+    // We need to pass db connection
+    let db_inner = db.inner().clone();
+    llm::generate_daily_report(&app_handle, db_inner).await.map_err(|e| e.to_string())?;
     Ok(())
 }
 

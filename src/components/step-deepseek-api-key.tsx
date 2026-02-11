@@ -4,8 +4,8 @@ import { Icon } from '@iconify/react'
 export function StepDeepSeekApiKey() {
   const [apiKey, setApiKey] = useState('')
 
-  function onSkip() {
-    store.n8n.deepseekSkip = true
+  function onConfirm() {
+    store.setting.llmApiKey = apiKey
   }
 
   return (
@@ -32,23 +32,12 @@ export function StepDeepSeekApiKey() {
               placeholder="sk-..."
             />
           </div>
-          <div className="p-4 border rounded-xl bg-yellow-50 dark:bg-yellow-500/10 border-yellow-500/20">
-            <p className="text-xs flex items-start text-yellow-700 dark:text-yellow-200/80">
-              <span className="mr-2">💡</span>
-              Tip：点击 Skip 跳过，Workflow 将不会自动发布，你需要在自动化页面单独设置模型配置，并手动发布。
-            </p>
-          </div>
           <div className="flex space-x-3">
             <Button
-              onPress={onSkip}
-            >
-              Skip
-            </Button>
-            <Button
-              onPress={() => store.n8n.createCredential(apiKey)}
+              onPress={onConfirm}
               color="primary"
               className="flex-1"
-              disabled={!apiKey}
+              isDisabled={!apiKey}
             >
               <span>确认配置</span>
               <Icon icon="lucide:arrow-right" className="w-4.5 h-4.5" />

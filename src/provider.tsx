@@ -1,12 +1,11 @@
 import type { NavigateOptions } from 'react-router-dom'
 
-import { If, useWhenever } from '@hairy/react-lib'
+import { If } from '@hairy/react-lib'
 import { HeroUIProvider, ToastProvider } from '@heroui/react'
 import { OverlaysProvider } from '@overlastic/react'
 import { QueryClientProvider } from '@tanstack/react-query'
 import { useHref, useNavigate } from 'react-router-dom'
 import { useMount } from 'react-use'
-import { useStore } from 'valtio-define'
 import { queryClient } from './config/client'
 
 declare module '@react-types/shared' {
@@ -18,21 +17,8 @@ declare module '@react-types/shared' {
 export function Provider({ children }: { children: React.ReactNode }) {
   const navigate = useNavigate()
   const [initial, setInitial] = useState(false)
-  const n8n = useStore(store.n8n)
   useMount(() => storage.getItem('installed').then(() => setInitial(true)))
-  // 检测工作流是否真实存在，不存在则清除状态
-  useWhenever(n8n.loggedIn && n8n.workflow, async () => {
-    const detail = await getN8nWorkflow(n8n.workflow!)
-    if (!detail)
-      store.n8n.$patch({ workflow: null })
-  }, { immediate: true })
 
-  // 检测凭证是否真实存在，不存在则清除状态
-  useWhenever(n8n.credential, async () => {
-    const credentials = await getN8nCredentials()
-    if (!credentials.data.find(credential => credential.id === n8n.credential))
-      store.n8n.$patch({ credential: null, credentialName: null })
-  }, { immediate: true })
   return (
     <If cond={initial}>
       <QueryClientProvider client={queryClient}>

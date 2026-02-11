@@ -7,16 +7,10 @@
 export {}
 declare global {
   const Activity: typeof import('react').Activity
-  const Alimail: typeof import('../components/icons').Alimail
   const AlimailIcon: typeof import('../components/icons').AlimailIcon
-  const Button: typeof import('../components/button').Button
   const ClickupIcon: typeof import('../components/icons').ClickupIcon
   const CornerActions: typeof import('../components/corner-actions').CornerActions
-  const DEFAULT_N8N_LOGIN_DATA: typeof import('../config/constants').DEFAULT_N8N_LOGIN_DATA
-  const DEFAULT_N8N_REGISTER_DATA: typeof import('../config/constants').DEFAULT_N8N_REGISTER_DATA
-  const DeleteReportModal: typeof import('../components/delete-report-modal').DeleteReportModal
   const Dialog: typeof import('../components/dialog').Dialog
-  const DiscordIcon: typeof import('../components/icons').DiscordIcon
   const Ellipsis: typeof import('../components/ellipsis').Ellipsis
   const Form: typeof import('../components/form').Form
   const FormControl: typeof import('../components/form').FormControl
@@ -27,16 +21,11 @@ declare global {
   const FormMessage: typeof import('../components/form').FormMessage
   const Fragment: typeof import('react').Fragment
   const GitIcon: typeof import('../components/icons').GitIcon
-  const GitSourceForm: typeof import('../components/souce-git-form').GitSourceForm
   const GithubIcon: typeof import('../components/icons').GithubIcon
   const GmailIcon: typeof import('../components/icons').GmailIcon
-  const HeartFilledIcon: typeof import('../components/icons').HeartFilledIcon
-  const Initialize: typeof import('../components/initialize').Initialize
-  const Initiator: typeof import('../layouts/components/initiator').Initiator
   const Label: typeof import('../components/label').Label
   const Link: typeof import('react-router-dom').Link
   const Logo: typeof import('../components/icons').Logo
-  const ManualLoginN8n: typeof import('../components/step-manual-login').ManualLoginN8n
   const Modal: typeof import('../components/modal').Modal
   const Model: typeof import('../database/model').Model
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
@@ -46,111 +35,38 @@ declare global {
   const N8N_REGISTER_DATA: typeof import('../config/constants').N8N_REGISTER_DATA
   const N8N_WEBHOOK_ID: typeof import('../config/constants').N8N_WEBHOOK_ID
   const NavLink: typeof import('react-router-dom').NavLink
-  const Navbar: typeof import('../layouts/components/navbar').Navbar
   const Navigate: typeof import('react-router-dom').Navigate
   const Outlet: typeof import('react-router-dom').Outlet
   const ReportCountdown: typeof import('../components/report-countdown').ReportCountdown
   const ReportEditor: typeof import('../components/report-editor').ReportEditor
   const ReportGenerator: typeof import('../components/report-generator').ReportGenerator
-  const ReportNot: typeof import('../components/report-not').ReportNot
   const Route: typeof import('react-router-dom').Route
   const Routes: typeof import('react-router-dom').Routes
-  const SearchIcon: typeof import('../components/icons').SearchIcon
-  const SettingAboutCard: typeof import('../ui/setting-about-card').SettingAboutCard
-  const SettingOtherConfig: typeof import('../ui/setting-other-card').SettingOtherConfig
-  const SettingUserInterfaceCard: typeof import('../ui/setting-user-interface-card').SettingUserInterfaceCard
   const SlackIcon: typeof import('../components/icons').SlackIcon
   const SourceFormClickup: typeof import('../components/souce-form-clickup').SourceFormClickup
   const SourceFormGit: typeof import('../components/souce-form-git').SourceFormGit
-  const SourceGitForm: typeof import('../components/souce-git-form').SourceGitForm
   const SourceIcon: typeof import('../components/source-icon').SourceIcon
   const SourceItem: typeof import('../components/source-item').SourceItem
-  const SourceItemCard: typeof import('../components/source-item').SourceItemCard
   const SourceSelect: typeof import('../components/source-select').SourceSelect
-  const StatusStep: typeof import('../components/status-step').StatusStep
-  const StepDeepSeek: typeof import('../components/step-deepseek').StepDeepSeek
   const StepDeepSeekApiKey: typeof import('../components/step-deepseek-api-key').StepDeepSeekApiKey
-  const StepManualLoginN8n: typeof import('../components/step-manual-login').StepManualLoginN8n
-  const StepN8nManualLogin: typeof import('../components/step-n8n-manual-login').StepN8nManualLogin
   const StepStatus: typeof import('../components/step-status').StepStatus
-  const StepStatusChip: typeof import('../components/step-status-chip').StepStatusChip
-  const StepStatusChipContent: typeof import('../components/step-status-chip').StepStatusChipContent
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const Suspense: typeof import('react').Suspense
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
-  const Titlebar: typeof import('../components/titlebar').Titlebar
   const TrendCard: typeof import('../components/trend-card').TrendCard
-  const TwitterIcon: typeof import('../components/icons').TwitterIcon
   const UpdateStatus: typeof import('../components/update-status').UpdateStatus
-  const buttonVariants: typeof import('../components/button').buttonVariants
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
-  const clearRecordAndReportData: typeof import('../database/index').clearRecordAndReportData
   const cn: typeof import('../utils/utility').cn
-  const collectDailyClickup: typeof import('../services/collect-clickup').collectDailyClickup
-  const collectDailyGit: typeof import('../services/collect-git').collectDailyGit
   const createContext: typeof import('react').createContext
   const createRef: typeof import('react').createRef
-  const createReport: typeof import('../utils/mock-db').createReport
-  const createSource: typeof import('../utils/mock-db').createSource
   const db: typeof import('../database/index').db
-  const db_p: typeof import('../database').db_p
-  const db_promise: typeof import('../database').db_promise
-  const deleteReport: typeof import('../utils/mock-db').deleteReport
-  const emitter: typeof import('../config/emitter').emitter
-  const fixTableStructure: typeof import('../database/index').fixTableStructure
   const forwardRef: typeof import('react').forwardRef
-  const getAllDatabaseItems: typeof import('../utils/mock-db').getAllDatabaseItems
-  const getAllReports: typeof import('../utils/mock-db').getAllReports
-  const getDatabaseItemById: typeof import('../utils/mock-db').getDatabaseItemById
-  const getKysely: typeof import('../database').getKysely
-  const getN8nCredentials: typeof import('../apis/index').getN8nCredentials
-  const getN8nCredentialsId: typeof import('../apis/index').getN8nCredentialsId
-  const getN8nLogin: typeof import('../apis/index').getN8nLogin
-  const getN8nWebhook: typeof import('../apis/index').getN8nWebhook
-  const getN8nWorkflow: typeof import('../apis/index').getN8nWorkflow
-  const getReportById: typeof import('../utils/mock-db').getReportById
-  const getReportWorkflowData: typeof import('../config/workflow').getReportWorkflowData
-  const getSetting: typeof import('../utils/setting-store').getSetting
-  const getSettings: typeof import('../utils/setting-store').getSettings
-  const getSources: typeof import('../utils/mock-db').getSources
-  const get_report_workflow_params: typeof import('../config/workflow').get_report_workflow_params
-  const iconMap: typeof import('../components/source-icon').iconMap
-  const invokeCollectAll: typeof import('../services/invoke-collect-all').invokeCollectAll
-  const invokeCollectClickup: typeof import('../services/invoke-collect-clickup').invokeCollectClickup
-  const invokeCollectGit: typeof import('../services/invoke-collect-git').invokeCollectGit
-  const invokeGenerateDaily: typeof import('../services/invoke-generate-daily').invokeGenerateDaily
-  const isExistsIndex: typeof import('../utils/db').isExistsIndex
-  const isExistsTable: typeof import('../utils/db').isExistsTable
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
-  const loginN8nUser: typeof import('../apis/index').loginN8nUser
-  const main: typeof import('../database').main
   const memo: typeof import('react').memo
-  const mitt: typeof import('../config/mitt').mitt
-  const modal: typeof import('../components/modal').default
-  const params: typeof import('../services/post-n8n-workflow.params.mock').params
-  const patchN8nMe: typeof import('../apis/index').patchN8nMe
-  const postN8nApiKey: typeof import('../services/post-n8n-api-key').postN8nApiKey
-  const postN8nCredentials: typeof import('../apis/index').postN8nCredentials
-  const postN8nLogin: typeof import('../apis/index').postN8nLogin
-  const postN8nMeSurvey: typeof import('../apis/index').postN8nMeSurvey
-  const postN8nMySurvey: typeof import('../services/post-n8n-my-survey').postN8nMySurvey
-  const postN8nRegister: typeof import('../apis/index').postN8nRegister
-  const postN8nWorkflow: typeof import('../apis/index').postN8nWorkflow
-  const postN8nWorkflowParamsMock: typeof import('../services/post-n8n-workflow.mock').postN8nWorkflowParamsMock
-  const postN8nWorkflowResultMock: typeof import('../services/post-n8n-workflow.mock').postN8nWorkflowResultMock
-  const postN8nWorkflowWorkflowIdActivate: typeof import('../apis/index').postN8nWorkflowWorkflowIdActivate
   const queryClient: typeof import('../config/client').queryClient
-  const registerN8N: typeof import('../apis/index').registerN8N
-  const registerN8n: typeof import('../apis/index').registerN8n
-  const registerN8nUser: typeof import('../apis/index').registerN8nUser
   const retry: typeof import('../utils/utility').retry
-  const saveSettings: typeof import('../utils/setting-store').saveSettings
-  const searchDatabaseItems: typeof import('../utils/mock-db').searchDatabaseItems
-  const searchReports: typeof import('../utils/mock-db').searchReports
-  const setSetting: typeof import('../utils/setting-store').setSetting
-  const settingsStore: typeof import('../config/store').settingsStore
   const siteConfig: typeof import('../config/site').siteConfig
   const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition
@@ -159,10 +75,6 @@ declare global {
   const subtitle: typeof import('../components/primitives').subtitle
   const tauriStorageDriver: typeof import('../config/storage.driver').tauriStorageDriver
   const title: typeof import('../components/primitives').title
-  const tray: typeof import('../config/tary').tray
-  const trendCard: typeof import('../components/trend-card').default
-  const unstorage: typeof import('../config/storage').unstorage
-  const updateReport: typeof import('../utils/mock-db').updateReport
   const use: typeof import('react').use
   const useActionState: typeof import('react').useActionState
   const useCallback: typeof import('react').useCallback
@@ -177,7 +89,6 @@ declare global {
   const useImperativeHandle: typeof import('react').useImperativeHandle
   const useInRouterContext: typeof import('react-router-dom').useInRouterContext
   const useInsertionEffect: typeof import('react').useInsertionEffect
-  const useIsNeedInitiator: typeof import('../components/step-status-chip').useIsNeedInitiator
   const useLayoutEffect: typeof import('react').useLayoutEffect
   const useLinkClickHandler: typeof import('react-router-dom').useLinkClickHandler
   const useLocation: typeof import('react-router-dom').useLocation
@@ -188,7 +99,6 @@ declare global {
   const useOutlet: typeof import('react-router-dom').useOutlet
   const useOutletContext: typeof import('react-router-dom').useOutletContext
   const useParams: typeof import('react-router-dom').useParams
-  const useQueryN8nStatus: typeof import('../services/use-query-n8n-status').useQueryN8nStatus
   const useReducer: typeof import('react').useReducer
   const useRef: typeof import('react').useRef
   const useResolvedPath: typeof import('react-router-dom').useResolvedPath
@@ -197,8 +107,6 @@ declare global {
   const useState: typeof import('react').useState
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
   const useTransition: typeof import('react').useTransition
-  const verifyMigration: typeof import('../database/index').verifyMigration
-  const workflow: typeof import('../config/workflow').workflow
 }
 // for type re-export
 declare global {
@@ -214,9 +122,6 @@ declare global {
   // @ts-ignore
   export type { TauriStorageDriverOptions } from '../config/storage.driver'
   import('../config/storage.driver')
-  // @ts-ignore
-  export type { ReportWorkflowOptions } from '../config/workflow'
-  import('../config/workflow')
   // @ts-ignore
   export type { DialogProps } from '../components/dialog'
   import('../components/dialog')
@@ -250,7 +155,4 @@ declare global {
   // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
-  // @ts-ignore
-  export type { N8nUser, PostN8nCredentialsBody, PostN8nCredentialsResult, PatchN8nMeBody, PatchN8nMeResult, PostN8nLoginBody, PostN8nLoginResult, GetN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nWorkflowWorkflowIdActivateBody, PostN8nRegisterResult, PostN8nWorkflowResult, GetN8nWorkflowResult, GetN8nCredentialsIdResult, GetN8nCredentialsResult } from '../apis/index.types'
-  import('../apis/index.types')
 }

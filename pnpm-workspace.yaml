@@ -1,3 +1,9 @@
+shellEmulator: true
+trustPolicy: no-downgrade
+
+patchedDependencies:
+  bumpp: patches/bumpp.patch
+
 ignoredBuiltDependencies:
   - electron
 
@@ -5,8 +11,3 @@ onlyBuiltDependencies:
   - '@heroui/shared-utils'
   - '@tailwindcss/oxide'
   - esbuild
-
-patchedDependencies:
-  bumpp: patches/bumpp.patch
-
-shellEmulator: true

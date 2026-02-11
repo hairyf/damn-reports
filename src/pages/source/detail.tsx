@@ -5,9 +5,9 @@ import { addToast, Button, Card, CardBody, CardHeader, Divider, Input, Textarea 
 import { Icon } from '@iconify/react'
 import { useForm } from 'react-hook-form'
 import { useKey } from 'react-use'
-import { useStore } from 'valtio-define'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
 import { SourceFormGit } from '@/components/souce-form-git'
+import { db } from '@/database'
 
 function Page() {
   const navigate = useNavigate()
@@ -24,7 +24,6 @@ function Page() {
       config: {},
     },
   })
-  const n8n = useStore(store.n8n)
 
   const source = form.watch('type')
   const config = form.watch('config')
@@ -75,9 +74,14 @@ function Page() {
       })
     }
     else {
+      const workspace = await db.workspace.findFirst()
+      if (!workspace) {
+        addToast({ title: 'Error', description: 'No workspace found', color: 'danger' })
+        return
+      }
       await db.source.create({
         updatedAt: new Date().toISOString(),
-        workspaceId: n8n.workspace!,
+        workspaceId: workspace.id,
         enabled: true,
         name: data.name,
         description: data.description,

@@ -15,12 +15,8 @@ use tauri::{
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 // setup app
-fn setup(app_handle: tauri::AppHandle) {
-    tauri::async_runtime::spawn(async move {
-        if let Err(e) = service::workflow::start(app_handle).await {
-            log::error!("start failed: {}", e);
-        }
-    });
+fn setup(_app_handle: tauri::AppHandle) {
+    // No N8N startup anymore
 }
 
 // setup tray
@@ -98,14 +94,13 @@ fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         bridge::cmd::database_loaded,
-        bridge::cmd::install_dependencies,
-        bridge::cmd::restart_n8n,
-        bridge::cmd::get_n8n_status,
+        // bridge::cmd::restart_n8n, // Removed
+        // bridge::cmd::get_n8n_status, // Removed
         bridge::cmd::collect_daily_records,
         bridge::cmd::generate_daily_report,
         bridge::cmd::collect_daily_clickup,
         bridge::cmd::collect_daily_git,
-        bridge::cmd::get_n8n_version,
+        // bridge::cmd::get_n8n_version, // Removed
     ]
 }
 
@@ -161,6 +156,9 @@ fn builder() -> tauri::Builder<tauri::Wry> {
 
 // run app
 pub fn run() {
+    // Load env variables from .env file
+    dotenvy::dotenv().ok();
+
     // 初始化日志系统
     logger::init();
 

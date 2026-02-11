@@ -22,18 +22,6 @@ export const siteConfig = {
       href: '/source/',
     },
     {
-      label: '工作流',
-      href: '/workflow',
-      // onClick: () => {
-      //   const params = new URLSearchParams([
-      //     ['email', store.n8n.email || N8N_LOGIN_DATA.emailOrLdapLoginId],
-      //     ['password', store.n8n.password || N8N_LOGIN_DATA.password],
-      //     ['hideUI', 'true'], // 通过 URL 参数告诉 n8n 隐藏 UI 元素
-      //   ])
-      //   openUrl(`http://localhost:5678/workflow/${store.n8n.workflow}?${params.toString()}`)
-      // },
-    },
-    {
       label: '设置',
       href: '/setting',
     },

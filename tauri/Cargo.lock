@@ -947,6 +947,7 @@ dependencies = [
  "async-trait",
  "axum",
  "chrono",
+ "dotenvy",
  "flate2",
  "futures-util",
  "git2",
