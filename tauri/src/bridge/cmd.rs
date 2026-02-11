@@ -7,7 +7,7 @@ use crate::service::record;
 use crate::service::scheduler;
 use crate::task;
 use sea_orm::DatabaseConnection;
-use tauri::{AppHandle, Emitter, State};
+use tauri::State;
 
 // 全局标志，确保数据库连接成功只运行一次
 static DATABASE_LOADED: AtomicBool = AtomicBool::new(false);
@@ -44,12 +44,6 @@ pub async fn collect_daily_records(db: State<'_, DatabaseConnection>) -> Result<
         .await
         .map_err(|e| e.to_string())?;
     Ok(count)
-}
-
-#[tauri::command]
-pub async fn generate_daily_report(app_handle: AppHandle) -> Result<(), String> {
-    app_handle.emit("trigger_generate_daily_report", ()).map_err(|e| e.to_string())?;
-    Ok(())
 }
 
 #[tauri::command]

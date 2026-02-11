@@ -94,11 +94,9 @@ fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         bridge::cmd::database_loaded,
         bridge::cmd::collect_daily_records,
-        bridge::cmd::generate_daily_report,
         bridge::cmd::get_record_summary,
         bridge::cmd::collect_daily_clickup,
         bridge::cmd::collect_daily_git,
-        // bridge::cmd::get_n8n_version, // Removed
     ]
 }
 
