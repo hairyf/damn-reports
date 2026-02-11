@@ -45,6 +45,10 @@
     "sql:allow-execute",
     "dialog:default",
     "fs:default",
+    {
+      "identifier": "fs:allow-exists",
+      "allow": [{ "path": "*" }]
+    },
     "process:allow-exit",
     "process:default"
   ]

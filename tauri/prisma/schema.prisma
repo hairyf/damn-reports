@@ -7,6 +7,14 @@ generator kysely {
   output   = "../../src/database"
 }
 
+model Tool {
+  id          Int      @id @default(autoincrement())
+  name        String
+  description String
+  
+  parameterSchema Json
+}
+
 model Source {
   id          Int      @id @default(autoincrement())
   name        String

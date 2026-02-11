@@ -3,5 +3,11 @@
     "cursor",
     "claude-code"
   ],
-  "skills": {}
+  "skills": {
+    "hairyf/skills": [
+      "tauri",
+      "react-use",
+      "tailwindcss"
+    ]
+  }
 }
