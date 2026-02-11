@@ -1,3 +1,4 @@
+import type { FileUIPart } from 'ai'
 import {
   addToast,
   Button,
@@ -5,17 +6,101 @@ import {
   CardBody,
   ScrollShadow,
   Spinner,
-  Textarea,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import {
+  Attachment,
+  AttachmentPreview,
+  AttachmentRemove,
+  Attachments,
+  PromptInput,
+  PromptInputBody,
+  PromptInputFooter,
+  PromptInputHeader,
+  PromptInputProvider,
+  PromptInputSubmit,
+  PromptInputTextarea,
+  PromptInputTools,
+  Suggestion,
+  Suggestions,
+  usePromptInputAttachments,
+  usePromptInputController,
+} from 'ai-elements'
 import clsx from 'clsx'
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef } from 'react'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
+const QUICK_TAGS = [
+  { label: '分析数据', icon: 'lucide:bar-chart-2' },
+  { label: '随便聊聊', icon: 'lucide:box' },
+  { label: '总结文本', icon: 'lucide:file-text' },
+  { label: '写代码', icon: 'lucide:code' },
+  { label: '给建议', icon: 'lucide:graduation-cap' },
+  { label: '更多', icon: 'lucide:more-horizontal' },
+] as const
+
+function AttachButton() {
+  const { openFileDialog } = usePromptInputAttachments()
+  return (
+    <button
+      type="button"
+      className="inline-flex size-8 items-center justify-center rounded-md text-muted-foreground hover:bg-accent hover:text-accent-foreground"
+      onClick={openFileDialog}
+      title="附件"
+      aria-label="附件"
+    >
+      <Icon icon="lucide:paperclip" className="size-4" />
+    </button>
+  )
+}
+
+function MessageAreaExtras() {
+  const attachments = usePromptInputAttachments()
+  const controller = usePromptInputController()
+
+  const handleSuggestionClick = useCallback(
+    (suggestion: string) => {
+      controller.textInput.setInput(suggestion)
+    },
+    [controller],
+  )
+
+  return (
+    <div className="flex flex-col gap-2">
+      {attachments.files.length > 0 && (
+        <Attachments variant="grid" className="mt-1">
+          {attachments.files.map(file => (
+            <Attachment
+              key={file.id}
+              data={file}
+              onRemove={() => attachments.remove(file.id)}
+            >
+              <AttachmentPreview />
+              <AttachmentRemove />
+            </Attachment>
+          ))}
+        </Attachments>
+      )}
+      <Suggestions className="gap-2">
+        {QUICK_TAGS.map(({ label, icon }) => (
+          <Suggestion
+            key={label}
+            suggestion={label}
+            onClick={handleSuggestionClick}
+            className="rounded-full"
+          >
+            <Icon icon={icon} className="mr-1.5 size-3.5" />
+            {label}
+          </Suggestion>
+        ))}
+      </Suggestions>
+    </div>
+  )
+}
+
 function Page() {
   const sessionStore = useStore(store.session)
-  const [input, setInput] = useState('')
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   const sessions = sessionStore.sessions
@@ -29,38 +114,30 @@ function Page() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth', block: 'end' })
   }, [activeSession?.id, activeSession?.messages])
 
-  async function handleSend() {
-    const content = input.trim()
-    if (!content)
-      return
+  const chatStatus = sessionStore.isStreaming ? 'streaming' : undefined
 
-    // 先清空输入框，提供更及时的交互反馈
-    setInput('')
-
-    try {
-      await store.session.startStreaming(content)
-    }
-    catch (error) {
-      const message = error instanceof Error ? error.message : '发送失败，请稍后重试'
-      addToast({
-        title: '发送失败',
-        description: message,
-        color: 'danger',
-      })
-    }
-  }
-
-  function handleKeyDown(event: React.KeyboardEvent<HTMLTextAreaElement>) {
-    if (event.key === 'Enter' && !event.shiftKey) {
-      event.preventDefault()
-      if (!sessionStore.isStreaming)
-        handleSend()
-    }
-  }
+  const handleSubmit = useCallback(
+    async (message: { text: string, files: FileUIPart[] }) => {
+      const { text, files } = message
+      if (!text.trim() && files.length === 0)
+        return
+      try {
+        await store.session.startStreaming(text, files)
+      }
+      catch (error) {
+        const msg = error instanceof Error ? error.message : '发送失败，请稍后重试'
+        addToast({
+          title: '发送失败',
+          description: msg,
+          color: 'danger',
+        })
+      }
+    },
+    [],
+  )
 
   function handleNewSession() {
     store.session.createSession()
-    setInput('')
   }
 
   function handleDeleteSession(id: string) {
@@ -185,38 +262,38 @@ function Page() {
                 )}
           </div>
 
-          {/* 输入区 */}
+          {/* 输入区：ai-elements PromptInput + 附件 + 快速消息标签 */}
           <div className="flex flex-col gap-2">
-            <Textarea
-              minRows={2}
-              maxRows={6}
-              value={input}
-              onValueChange={setInput}
-              onKeyDown={handleKeyDown as unknown as React.KeyboardEventHandler<HTMLDivElement>}
-              placeholder="输入你的内容，Enter 发送，Shift+Enter 换行"
-            />
-            <div className="flex items-center justify-between">
-              <div className="text-xs text-default-400">
-                {sessionStore.isStreaming ? '正在生成回复，可以点击停止。' : '\u00A0'}
-              </div>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="flat"
-                  color="default"
-                  onPress={() => store.session.stopStreaming()}
-                  isDisabled={!sessionStore.isStreaming}
-                >
-                  停止
-                </Button>
-                <Button
-                  color="primary"
-                  onPress={handleSend}
-                  isDisabled={sessionStore.isStreaming || !input.trim()}
-                >
-                  发送
-                </Button>
-              </div>
-            </div>
+            <PromptInputProvider>
+              <PromptInput
+                accept="image/*,.pdf,.txt,.md,application/pdf"
+                multiple
+                maxFiles={10}
+                onSubmit={handleSubmit}
+                className="w-full"
+              >
+                <PromptInputHeader>
+                  <PromptInputTools>
+                    <AttachButton />
+                  </PromptInputTools>
+                </PromptInputHeader>
+                <PromptInputBody>
+                  <PromptInputTextarea placeholder="Ask anything" />
+                </PromptInputBody>
+                <PromptInputFooter>
+                  <div className="flex-1 text-xs text-muted-foreground">
+                    {sessionStore.isStreaming ? '正在生成回复，可点击停止。' : '\u00A0'}
+                  </div>
+                  <PromptInputTools>
+                    <PromptInputSubmit
+                      status={chatStatus}
+                      onStop={() => store.session.stopStreaming()}
+                    />
+                  </PromptInputTools>
+                </PromptInputFooter>
+              </PromptInput>
+              <MessageAreaExtras />
+            </PromptInputProvider>
           </div>
         </CardBody>
       </Card>

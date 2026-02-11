@@ -1,3 +1,4 @@
+import type { FileUIPart } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
 import { generateText, streamText } from 'ai'
 import { defineStore } from 'valtio-define'
@@ -92,9 +93,9 @@ export const session = defineStore(
         this.sessions = []
         this.activeSessionId = null
       },
-      async startStreaming(userContent: string) {
+      async startStreaming(userContent: string, files: FileUIPart[] = []) {
         const content = userContent.trim()
-        if (!content)
+        if (!content && files.length === 0)
           return
         if (this.isStreaming) {
           throw new Error('当前正在生成回复，请稍后再试')
@@ -113,7 +114,7 @@ export const session = defineStore(
 
         let current = this.activeSession
         if (!current) {
-          current = this.createSession(content)
+          current = this.createSession(content || undefined)
         }
 
         const isFirstRound = current.messages.length === 0
@@ -122,10 +123,13 @@ export const session = defineStore(
         const userMessageId = createId()
         const assistantMessageId = createId()
 
+        // 展示用：带附件的用户消息把附件信息简要写入 content（仅用于列表展示）
+        const displayContent = content || (files.length > 0 ? `[${files.length} 个附件]` : '')
+
         const userMessage: ChatMessage = {
           id: userMessageId,
           role: 'user',
-          content,
+          content: displayContent,
           createdAt: now,
         }
         current.messages.push(userMessage)
@@ -137,10 +141,22 @@ export const session = defineStore(
         })
         current.updatedAt = now
 
-        const messagesForModel = current.messages.map(m => ({
-          role: m.role,
-          content: m.content,
-        }))
+        const hasFiles = files.length > 0
+        const messagesForModel = current.messages.map((m, index) => {
+          const isLastUser = m.role === 'user' && index === current.messages.length - 2
+          if (isLastUser && hasFiles) {
+            const textPart = content ? [{ type: 'text' as const, text: content }] : []
+            const fileParts = files.map(f => ({
+              type: 'file' as const,
+              data: f.url,
+              mediaType: f.mediaType ?? 'application/octet-stream',
+              filename: f.filename,
+            }))
+            const parts = [...textPart, ...fileParts]
+            return { role: 'user' as const, content: parts }
+          }
+          return { role: m.role, content: m.content }
+        })
 
         const abortController = new AbortController()
         currentAbortController = abortController
