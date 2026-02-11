@@ -16,7 +16,6 @@ use tauri_plugin_sql::{Migration, MigrationKind};
 
 // setup app
 fn setup(_app_handle: tauri::AppHandle) {
-    // No N8N startup anymore
 }
 
 // setup tray
@@ -94,8 +93,6 @@ fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         bridge::cmd::database_loaded,
-        // bridge::cmd::restart_n8n, // Removed
-        // bridge::cmd::get_n8n_status, // Removed
         bridge::cmd::collect_daily_records,
         bridge::cmd::generate_daily_report,
         bridge::cmd::collect_daily_clickup,
