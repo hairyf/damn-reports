@@ -18,6 +18,10 @@ export const siteConfig = {
       href: '/record',
     },
     {
+      label: '对话',
+      href: '/chat',
+    },
+    {
       label: '数据源',
       href: '/source/',
     },

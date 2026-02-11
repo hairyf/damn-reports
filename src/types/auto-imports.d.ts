@@ -55,6 +55,8 @@ declare global {
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
   const TrendCard: typeof import('../components/trend-card').TrendCard
   const UpdateStatus: typeof import('../components/update-status').UpdateStatus
+  const add_source: typeof import('../config/tools').add_source
+  const add_tool: typeof import('../config/tools').add_tool
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
   const cn: typeof import('../utils/utility').cn
@@ -62,12 +64,23 @@ declare global {
   const createRef: typeof import('react').createRef
   const dailyReportPrompt: typeof import('../config/prompts').dailyReportPrompt
   const db: typeof import('../database/index').db
+  const edit: typeof import('../config/tools').edit
+  const find: typeof import('../config/tools').find
   const forwardRef: typeof import('react').forwardRef
+  const generate_report: typeof import('../config/tools').generate_report
+  const get_records: typeof import('../config/tools').get_records
+  const get_records_by_source: typeof import('../config/tools').get_records_by_source
+  const get_tool: typeof import('../config/tools').get_tool
+  const grep: typeof import('../config/tools').grep
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
+  const ls: typeof import('../config/tools').ls
   const memo: typeof import('react').memo
   const queryClient: typeof import('../config/client').queryClient
+  const read: typeof import('../config/tools').read
   const retry: typeof import('../utils/utility').retry
+  const set_source: typeof import('../config/tools').set_source
+  const set_tool: typeof import('../config/tools').set_tool
   const siteConfig: typeof import('../config/site').siteConfig
   const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition
@@ -108,6 +121,7 @@ declare global {
   const useState: typeof import('react').useState
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
   const useTransition: typeof import('react').useTransition
+  const write: typeof import('../config/tools').write
 }
 // for type re-export
 declare global {

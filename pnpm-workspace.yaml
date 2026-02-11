@@ -1,6 +1,12 @@
 shellEmulator: true
+
 trustPolicy: no-downgrade
 
+packages:
+  - playground
+  - docs
+  - packages/*
+  - examples/*
 patchedDependencies:
   bumpp: patches/bumpp.patch
 

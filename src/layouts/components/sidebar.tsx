@@ -9,6 +9,7 @@ const iconMap: Record<string, string> = {
   '/': 'lucide:layout-dashboard',
   '/report': 'lucide:bar-chart-3',
   '/record': 'lucide:database',
+  '/chat': 'lucide:messages-square',
   '/source': 'lucide:file-text',
   '/workflow': 'lucide:workflow',
   '/setting': 'lucide:settings',

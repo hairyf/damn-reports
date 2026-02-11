@@ -24,6 +24,7 @@
   },
   "dependencies": {
     "@ai-sdk/openai": "^3.0.26",
+    "ai-elements": "workspace:*",
     "@hairy/react-lib": "^1.47.0",
     "@hairy/utils": "^1.47.0",
     "@heroui/react": "^2.8.7",
@@ -35,8 +36,6 @@
     "@overlastic/react": "^0.8.7",
     "@prisma/client": "^7.3.0",
     "@prisma/driver-adapter-utils": "^7.3.0",
-    "@radix-ui/react-label": "^2.1.8",
-    "@radix-ui/react-slot": "^1.2.4",
     "@react-aria/visually-hidden": "3.8.28",
     "@tailwindcss/postcss": "4.1.11",
     "@tailwindcss/vite": "4.1.11",

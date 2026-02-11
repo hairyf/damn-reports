@@ -16,10 +16,10 @@ async function generateReportContent(systemPrompt: string): Promise<string> {
   const baseURL = llmBaseUrl?.trim().replace(/\/$/, '')
   const openai = createOpenAI({
     apiKey: llmApiKey,
-    baseURL: baseURL ? `${baseURL}/v1` : undefined,
+    baseURL: baseURL || undefined,
   })
   const { text } = await generateText({
-    model: openai(llmModel || 'deepseek-chat'),
+    model: openai.chat(llmModel || 'deepseek-chat'),
     system: systemPrompt,
     prompt: '',
   })

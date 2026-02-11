@@ -7,5 +7,5 @@ export default antfu({
     'react/no-array-index-key': 'off',
     'format/prettier': 'off',
   },
-  ignores: ['tauri'],
+  ignores: ['tauri', 'packages/ui'],
 })
