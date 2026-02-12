@@ -80,6 +80,7 @@ declare global {
   const executeCommandExpression: typeof import('../utils/exec').executeCommandExpression
   const executeHttpRequestExpression: typeof import('../utils/exec').executeHttpRequestExpression
   const exists: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').exists
+  const fetch_http: typeof import('../config/tools').fetch_http
   const find: typeof import('../config/tools').find
   const forwardRef: typeof import('react').forwardRef
   const generate_report: typeof import('../config/tools').generate_report
@@ -93,6 +94,7 @@ declare global {
   const get_tools: typeof import('../config/tools').get_tools
   const git_directory: typeof import('../config/collectors').git_directory
   const grep: typeof import('../config/tools').grep
+  const http: typeof import('../config/tools').http
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
   const ls: typeof import('../config/tools').ls

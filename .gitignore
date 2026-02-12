@@ -27,5 +27,5 @@ dist-ssr
 
 tauri/prisma/database
 **/skills
-!/skills
-!/skills/**
+!/tauri/workspace/skills
+!/tauri/workspace/skills/**
