@@ -13,7 +13,7 @@ export interface ChatMessage {
   role: ChatRole
   content: string
   createdAt: string
-  toolCalls?: Array<{ toolName: string }>
+  toolCalls?: Array<{ toolName: string, args?: Record<string, unknown> }>
 }
 
 export interface ChatSession {
@@ -176,6 +176,7 @@ export const session = defineStore(
           // 创建 ToolLoopAgent 实例
           const agent = new ToolLoopAgent({
             model: openai.chat(llmModel || 'deepseek-chat'),
+            instructions: '缺少权限时降级使用 exec 工具',
             tools,
           })
 
@@ -186,6 +187,7 @@ export const session = defineStore(
           })
 
           // 使用 fullStream 来处理文本和工具调用
+          let shouldClearOnNextText = false
           for await (const part of stream.fullStream) {
             const target = this.sessions.find(s => s.id === sessionId)
             if (!target)
@@ -196,7 +198,14 @@ export const session = defineStore(
 
             // 处理文本增量
             if (part.type === 'text-delta') {
-              last.content += part.text
+              // 如果标记了需要清空，说明这是工具调用后的新文本，清空并重新开始
+              if (shouldClearOnNextText) {
+                last.content = part.text
+                shouldClearOnNextText = false
+              }
+              else {
+                last.content += part.text
+              }
               updateTimestamp(target)
             }
             // 处理工具调用
@@ -205,12 +214,17 @@ export const session = defineStore(
               if (!last.toolCalls) {
                 last.toolCalls = []
               }
-              last.toolCalls.push({ toolName: part.toolName })
+              last.toolCalls.push({
+                toolName: part.toolName,
+                args: part.input as Record<string, unknown>,
+              })
               updateTimestamp(target)
             }
             // 处理工具结果
             else if (part.type === 'tool-result') {
               // 工具结果不显示在消息中，让 AI 继续处理
+              // 标记下次接收文本时需要清空
+              shouldClearOnNextText = true
               updateTimestamp(target)
             }
           }

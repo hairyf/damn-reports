@@ -231,6 +231,34 @@
       ]
     },
     "process:allow-exit",
-    "process:default"
+    "process:default",
+    "shell:default",
+    "shell:allow-execute",
+    "shell:allow-open",
+    {
+      "identifier": "shell:allow-execute",
+      "allow": [
+        {
+          "name": "sh",
+          "cmd": "sh",
+          "args": ["-c", { "validator": ".*" }]
+        },
+        {
+          "name": "cmd",
+          "cmd": "cmd",
+          "args": ["/C", { "validator": ".*" }]
+        },
+        {
+          "name": "powershell",
+          "cmd": "powershell",
+          "args": ["-Command", { "validator": ".*" }]
+        },
+        {
+          "name": "bash",
+          "cmd": "bash",
+          "args": ["-c", { "validator": ".*" }]
+        }
+      ]
+    }
   ]
 }

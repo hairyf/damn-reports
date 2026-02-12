@@ -15,8 +15,7 @@ use tauri::{
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 // setup app
-fn setup(_app_handle: tauri::AppHandle) {
-}
+fn setup(_app_handle: tauri::AppHandle) {}
 
 // setup tray
 fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
@@ -128,6 +127,7 @@ fn migrations() -> tauri_plugin_sql::Builder {
 // configure tauri builder
 fn builder() -> tauri::Builder<tauri::Wry> {
     tauri::Builder::default()
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         // Opener plugin
         .plugin(tauri_plugin_opener::init())

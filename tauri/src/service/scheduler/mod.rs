@@ -28,7 +28,10 @@ async fn scheduler_loop(app_handle: tauri::AppHandle) {
         if current_time == setting.daily_report_time && current_time != last_trigger_time {
             log::info!("Triggering scheduled daily report at {}", current_time);
             last_trigger_time = current_time.clone();
-            if app_handle.emit("trigger_generate_daily_report", ()).is_err() {
+            if app_handle
+                .emit("trigger_generate_daily_report", ())
+                .is_err()
+            {
                 log::warn!("Emit trigger_generate_daily_report failed (frontend may be closed)");
             }
         }

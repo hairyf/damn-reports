@@ -1,22 +1,23 @@
-import { Button, Chip, ScrollShadow } from '@heroui/react'
+import { ScrollShadow } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import {
   Message,
-  MessageActions,
+  // MessageActions,
   MessageBranch,
   MessageBranchContent,
-  MessageBranchNext,
-  MessageBranchPage,
-  MessageBranchPrevious,
-  MessageBranchSelector,
+  // MessageBranchNext,
+  // MessageBranchPage,
+  // MessageBranchPrevious,
+  // MessageBranchSelector,
   MessageContent,
   MessageResponse,
-  MessageToolbar,
+  // MessageToolbar,
   Spinner,
 } from 'ai-elements'
 import { useEffect, useRef } from 'react'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
+import { ChatToolItem } from './chat-tool-item'
 
 export function ChatMessages() {
   const { activeSession, isStreaming } = useStore(store.session)
@@ -45,7 +46,7 @@ export function ChatMessages() {
           && !message.content
           && isStreaming
           && isLastMessage
-        const isCurrentMessageStreaming = message.role === 'assistant' && isLastMessage && isStreaming
+        // const isCurrentMessageStreaming = message.role === 'assistant' && isLastMessage && isStreaming
         const contentClassName = 'max-w-[75%] text-sm whitespace-pre-wrap group-[.is-user]:rounded-2xl group-[.is-user]:px-3 group-[.is-user]:py-2 group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground'
 
         return (
@@ -64,26 +65,10 @@ export function ChatMessages() {
                         <MessageBranchContent>
                           <div key={message.id}>
                             <MessageResponse>{message.content}</MessageResponse>
-                            {message.toolCalls && message.toolCalls.length > 0 && (
-                              <div className="flex flex-wrap items-center gap-1.5 mt-3 text-xs text-default-400">
-                                <Icon icon="lucide:wrench" className="size-3.5" />
-                                <span>使用了工具:</span>
-                                {message.toolCalls.map((toolCall, idx) => (
-                                  <Chip
-                                    key={idx}
-                                    size="sm"
-                                    variant="flat"
-                                    color="default"
-                                    className="text-xs h-5"
-                                  >
-                                    {toolCall.toolName}
-                                  </Chip>
-                                ))}
-                              </div>
-                            )}
+                            <ChatToolItem message={message as any} sessionId={activeSession.id} />
                           </div>
                         </MessageBranchContent>
-                        <MessageToolbar className="mt-0">
+                        {/* <MessageToolbar className="mt-0">
                           <MessageBranchSelector>
                             <MessageBranchPrevious />
                             <MessageBranchPage />
@@ -101,7 +86,7 @@ export function ChatMessages() {
                               </Button>
                             </MessageActions>
                           )}
-                        </MessageToolbar>
+                        </MessageToolbar> */}
                       </MessageBranch>
                     )
                   : (

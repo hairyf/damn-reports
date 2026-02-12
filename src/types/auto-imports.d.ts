@@ -65,6 +65,7 @@ declare global {
   const dailyReportPrompt: typeof import('../config/prompts').dailyReportPrompt
   const db: typeof import('../database/index').db
   const edit: typeof import('../config/tools').edit
+  const exec: typeof import('../config/tools').exec
   const find: typeof import('../config/tools').find
   const forwardRef: typeof import('react').forwardRef
   const generate_report: typeof import('../config/tools').generate_report
