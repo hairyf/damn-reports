@@ -1,5 +1,5 @@
+import { getRecordSummaryPrompt } from '@/api/record-summary'
 import { createOpenAI } from '@ai-sdk/openai'
-import { invoke } from '@tauri-apps/api/core'
 import { generateText } from 'ai'
 import { defineStore } from 'valtio-define'
 import { dailyReportPrompt } from '@/config/prompts'
@@ -31,7 +31,7 @@ export const llm = defineStore({
     loading: false,
   }),
   actions: {
-    /** 生成日报：前端取 workspace → invoke 取摘要 → LLM → 前端 SQL 保存。 */
+    /** 生成日报：前端取 workspace → getRecordSummaryPrompt 取摘要 → LLM → 前端 SQL 保存。 */
     async generateDailyReport() {
       this.loading = true
       try {
@@ -41,7 +41,7 @@ export const llm = defineStore({
         }
         const workspaceId = ws.id as number
 
-        const summary = await invoke<string>('get_record_summary', { workspaceId })
+        const summary = await getRecordSummaryPrompt('daily', workspaceId)
 
         if (!summary?.trim() || summary === 'No record data available.') {
           return

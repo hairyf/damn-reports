@@ -1,55 +1,53 @@
-import type { Source } from '@/database/types'
+import type { SourceJson } from '@/api/sources'
+import { createSource, getSourceById, updateSource } from '@/api/sources'
+import { getToolOptions } from '@/api/tools'
 import { If, useWatch, useWhenever } from '@hairy/react-lib'
 import { isEqual } from '@hairy/utils'
-import { addToast, Button, Card, CardBody, CardHeader, Divider, Input, Textarea } from '@heroui/react'
+import { addToast, Button, Card, CardBody, CardHeader, Divider, Input } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useForm } from 'react-hook-form'
 import { useKey } from 'react-use'
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
+import { SourceFormClickup } from '@/components/souce-form-clickup'
 import { SourceFormGit } from '@/components/souce-form-git'
-import { db } from '@/database'
+import { useQuery } from '@tanstack/react-query'
 
 function Page() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const sourceId = searchParams.get('id')
   const [configs, setConfigs] = useState<Record<string, any>>({})
-  const [originalData, setOriginalData] = useState<Partial<Source> | null>(null)
+  const [originalData, setOriginalData] = useState<Partial<SourceJson> | null>(null)
+  const { data: toolOptions = [] } = useQuery({ queryKey: ['tool-options'], queryFn: getToolOptions })
   const form = useForm({
     defaultValues: {
-      id: 0,
       name: '',
-      description: '',
-      type: '',
-      config: {},
+      tool: '',
+      config: {} as Record<string, any>,
     },
   })
 
-  const source = form.watch('type')
+  const tool = form.watch('tool')
   const config = form.watch('config')
   const formValues = form.watch()
 
-  useWatch(source, (source, oldSource) => {
-    if (!oldSource)
+  useWatch(tool, (t, oldTool) => {
+    if (!oldTool)
       return
-    setConfigs(prev => ({ ...prev, [oldSource]: config }))
-    form.setValue('config', configs[source] || {})
+    setConfigs(prev => ({ ...prev, [oldTool]: config }))
+    form.setValue('config', configs[t] || {})
   })
 
   async function reset() {
-    const source = await db.source.findUnique(sourceId)
-
+    if (!sourceId)
+      return
+    const source = await getSourceById(sourceId)
     if (!source)
       return
-    const parsedSource = {
-      name: source.name,
-      description: source.description,
-      type: source.type,
-      config: JSON.parse(source.config),
-    }
-    form.reset(parsedSource)
-    setConfigs(prev => ({ ...prev, [parsedSource.type]: parsedSource.config }))
-    setOriginalData(parsedSource)
+    const parsed = { name: source.name, tool: source.tool, config: source.config }
+    form.reset(parsed)
+    setConfigs(prev => ({ ...prev, [parsed.tool]: parsed.config }))
+    setOriginalData(parsed)
   }
 
   useWhenever(sourceId, reset, { immediate: true })
@@ -59,12 +57,7 @@ function Page() {
 
   const onSubmit = form.handleSubmit(async (data) => {
     if (sourceId) {
-      await db.source.update(sourceId, {
-        name: data.name,
-        description: data.description,
-        type: data.type,
-        config: data.config,
-      })
+      await updateSource(sourceId, { name: data.name, tool: data.tool, config: data.config })
       reset()
       addToast({
         title: 'Success',
@@ -74,20 +67,7 @@ function Page() {
       })
     }
     else {
-      const workspace = await db.workspace.findFirst()
-      if (!workspace) {
-        addToast({ title: 'Error', description: 'No workspace found', color: 'danger' })
-        return
-      }
-      await db.source.create({
-        updatedAt: new Date().toISOString(),
-        workspaceId: workspace.id,
-        enabled: true,
-        name: data.name,
-        description: data.description,
-        type: data.type,
-        config: data.config,
-      })
+      await createSource({ name: data.name, tool: data.tool, config: data.config })
       addToast({
         title: 'Success',
         description: 'Source created successfully',
@@ -173,11 +153,11 @@ function Page() {
                 />
                 <FormField
                   control={form.control}
-                  name="type"
-                  rules={{ required: 'Please select a source' }}
+                  name="tool"
+                  rules={{ required: 'Please select a tool' }}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Source</FormLabel>
+                      <FormLabel>Tool</FormLabel>
                       <FormControl>
                         <SourceSelect onChange={field.onChange} value={field.value} />
                       </FormControl>
@@ -186,32 +166,15 @@ function Page() {
                   )}
                 />
               </div>
-              <FormField
-                control={form.control}
-                name="description"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Description</FormLabel>
-                    <FormControl>
-                      <Textarea
-                        {...field}
-                        labelPlacement="outside"
-                        placeholder="Enter source description"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
             </CardBody>
           </Card>
-          <If cond={source}>
+          <If cond={tool}>
             <Card shadow="none">
               <CardHeader className="flex gap-1">
-                <SourceIcon type={source} size={18} />
+                <SourceIcon type={tool} size={18} />
                 <p className="text-md flex gap-1">
                   <span>
-                    {sourceOptions.find(option => option.value === source)?.label}
+                    {toolOptions.find(o => o.id === tool)?.name ?? tool}
                   </span>
                   <span>配置</span>
                 </p>
@@ -219,10 +182,10 @@ function Page() {
               <Divider className="opacity-30 shadow" />
 
               <CardBody className="flex flex-col gap-4">
-                <If cond={source === 'git'}>
+                <If cond={tool === 'git_directory' || tool === 'git'}>
                   <SourceFormGit />
                 </If>
-                <If cond={source === 'clickup'}>
+                <If cond={tool === 'clickup'}>
                   <SourceFormClickup />
                 </If>
               </CardBody>

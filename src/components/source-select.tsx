@@ -1,13 +1,17 @@
+import { getToolOptions } from '@/api/tools'
+import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
 import { Select, SelectItem } from '@heroui/react'
+import { useQuery } from '@tanstack/react-query'
 import { createElement } from 'react'
 
-const sourceOptions = [
-  { label: 'Git', value: 'git', icon: GitIcon },
-  { label: 'Clickup', value: 'clickup', icon: ClickupIcon },
-  { label: 'Slack', value: 'slack', icon: SlackIcon },
-  { label: 'Gmail', value: 'gmail', icon: GmailIcon },
-  { label: 'Alimail', value: 'alimail', icon: AlimailIcon },
-]
+const iconByToolId: Record<string, any> = {
+  git_directory: GitIcon,
+  git: GitIcon,
+  clickup: ClickupIcon,
+  slack: SlackIcon,
+  gmail: GmailIcon,
+  alimail: AlimailIcon,
+}
 
 export interface SourceSelectProps {
   onChange?: (value: string) => void
@@ -17,6 +21,11 @@ export interface SourceSelectProps {
   isClearable?: boolean
 }
 export function SourceSelect(props: SourceSelectProps) {
+  const { data: options = [] } = useQuery({
+    queryKey: ['tool-options'],
+    queryFn: getToolOptions,
+  })
+
   return (
     <Select
       className={props.className}
@@ -38,16 +47,14 @@ export function SourceSelect(props: SourceSelectProps) {
         )
       }}
     >
-      {sourceOptions.map((option) => {
-        return (
-          <SelectItem
-            key={option.value}
-            startContent={option.icon ? createElement(option.icon, { size: 16 }) : null}
-          >
-            {option.label}
-          </SelectItem>
-        )
-      })}
+      {options.map((option) => (
+        <SelectItem
+          key={option.id}
+          startContent={iconByToolId[option.id] ? createElement(iconByToolId[option.id], { size: 16 }) : null}
+        >
+          {option.name}
+        </SelectItem>
+      ))}
     </Select>
   )
 }

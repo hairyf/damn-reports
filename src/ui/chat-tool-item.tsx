@@ -80,7 +80,7 @@ export function ChatToolItem({ message }: ChatToolItemProps) {
                       {toolCall.toolName}
                     </span>
                     {toolCall.args && Object.keys(toolCall.args).length > 0 && (
-                      <div className="mt-0.5 text-[11px] opacity-70">
+                      <div className="mt-0.5 text-[11px] opacity-70 truncate max-w-[400px]">
                         参数:
                         {' '}
                         {JSON.stringify(toolCall.args)}

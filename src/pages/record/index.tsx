@@ -15,14 +15,16 @@ import {
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
+import { createElement, useMemo, useState } from 'react'
+import { collectRecords } from '@/api/collect-records'
 
-import { createElement, useState } from 'react'
+import { getSources } from '@/api/sources'
 import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
 
-const mapping = {
+const iconMapping: Record<string, { icon: any, label: string }> = {
   git: { icon: GitIcon, label: 'Git' },
+  git_directory: { icon: GitIcon, label: 'Git' },
   clickup: { icon: ClickupIcon, label: 'Clickup' },
   slack: { icon: SlackIcon, label: 'Slack' },
   gmail: { icon: GmailIcon, label: 'Gmail' },
@@ -40,15 +42,29 @@ function Page() {
   const debouncedSearch = useDebounce(search, 300)
   const debouncedSourceFilter = useDebounce(sourceFilter, 300)
 
+  const { data: sources = [] } = useQuery({
+    queryKey: ['sources'],
+    queryFn: getSources,
+  })
+  const sourceMap = useMemo(() => {
+    const m = new Map<string, { name: string, tool: string }>()
+    for (const s of sources)
+      m.set(s.id, { name: s.name, tool: s.tool })
+    return m
+  }, [sources])
+
   const { data: records = [], isLoading } = useQuery({
-    queryKey: ['records', debouncedSearch, debouncedSourceFilter, pagination.page, pagination.pageSize],
+    queryKey: ['records', debouncedSearch, debouncedSourceFilter, pagination.page, pagination.pageSize, sourceMap.size],
     queryFn: async () => {
-      const { data, total } = await db.record.findManyPage({
-        search: debouncedSearch,
-        source: debouncedSourceFilter,
-        page: pagination.page,
-        pageSize: pagination.pageSize,
-      })
+      const { data, total } = await db.record.findManyPageWithSources(
+        {
+          search: debouncedSearch,
+          source: debouncedSourceFilter,
+          page: pagination.page,
+          pageSize: pagination.pageSize,
+        },
+        sourceMap,
+      )
       pagination.pageSizeChange(total)
       return data
     },
@@ -56,7 +72,7 @@ function Page() {
 
   const syncMutation = useMutation({
     mutationFn: async () => {
-      return await invoke<number>('collect_daily_records')
+      return await collectRecords()
     },
     onSuccess: (count) => {
       queryClient.invalidateQueries({ queryKey: ['records'] })
@@ -138,11 +154,11 @@ function Page() {
               <TableRow key={record.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {createElement(mapping[record.source as keyof typeof mapping].icon, { size: 20 })}
+                    {createElement(iconMapping[record.tool]?.icon ?? GitIcon, { size: 20 })}
                     <span>{record.sourceName}</span>
                   </div>
                 </TableCell>
-                <TableCell>{dayjs(record.createdAt * 1000).format('YYYY-MM-DD')}</TableCell>
+                <TableCell>{dayjs(typeof record.createdAt === 'number' ? record.createdAt * 1000 : record.createdAt).format('YYYY-MM-DD')}</TableCell>
                 <TableCell>
                   <div className="w-full relative h-5">
                     <div className="absolute inset-0">

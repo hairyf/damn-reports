@@ -1,7 +1,7 @@
+import { collectRecords } from '@/api/collect-records'
 import { addToast, Button, Card, CardBody } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
@@ -16,7 +16,7 @@ export function ReportGenerator({ generating, onGeneratingChange }: ReportGenera
   const { loading: llmLoading } = useStore(store.llm)
   const generateMutation = useMutation({
     mutationFn: async () => {
-      await invoke('collect_daily_records')
+      await collectRecords()
 
       const records = await db.record.findMany({
         date: dayjs().startOf('day').toISOString(),

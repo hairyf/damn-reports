@@ -24,5 +24,6 @@
     "skipLibCheck": true
   },
   "references": [{ "path": "./tsconfig.node.json" }],
-  "include": ["src", "packages/*/src", "sql-source-query_id.ts"]
+  "include": ["src", "packages/*/src"],
+  "exclude": ["sources"]
 }

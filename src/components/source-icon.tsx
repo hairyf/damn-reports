@@ -2,6 +2,7 @@ import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/compo
 
 const iconMap = {
   git: GitIcon,
+  git_directory: GitIcon,
   process: GitIcon,
   email: GmailIcon,
   clickup: ClickupIcon,

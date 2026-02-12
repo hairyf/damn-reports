@@ -1,3 +1,4 @@
+import { getSources } from '@/api/sources'
 import { Else, If, Then, useDebounce } from '@hairy/react-lib'
 import {
   Button,
@@ -7,6 +8,7 @@ import {
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
 
 function Page() {
@@ -14,12 +16,28 @@ function Page() {
 
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 300)
-  const [type, setType] = useState<string>('')
+  const [toolFilter, setToolFilter] = useState<string>('')
 
-  const { data: sources } = useQuery({
-    queryKey: ['sources', debouncedSearch, type],
-    queryFn: () => db.source.findMany({ search: debouncedSearch, type }),
+  const { data: allSources } = useQuery({
+    queryKey: ['sources'],
+    queryFn: getSources,
   })
+
+  const sources = useMemo(() => {
+    if (!allSources)
+      return []
+    let list = allSources
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase()
+      list = list.filter(s =>
+        s.name.toLowerCase().includes(q)
+        || s.tool.toLowerCase().includes(q),
+      )
+    }
+    if (toolFilter)
+      list = list.filter(s => s.tool === toolFilter)
+    return list
+  }, [allSources, debouncedSearch, toolFilter])
   return (
     <>
       <Card className="mb-4 flex-shrink-0" shadow="none">
@@ -36,8 +54,8 @@ function Page() {
               className="w-full sm:w-40"
               placeholder="全部来源"
               isClearable
-              value={type}
-              onChange={setType}
+              value={toolFilter}
+              onChange={setToolFilter}
             />
             <If cond={sources?.length !== 0}>
               <Button

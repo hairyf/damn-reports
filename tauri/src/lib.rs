@@ -92,10 +92,6 @@ fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         bridge::cmd::database_loaded,
-        bridge::cmd::collect_daily_records,
-        bridge::cmd::get_record_summary,
-        bridge::cmd::collect_daily_clickup,
-        bridge::cmd::collect_daily_git,
     ]
 }
 
@@ -112,6 +108,24 @@ fn migrations() -> tauri_plugin_sql::Builder {
             version: 2,
             description: "add branch field to git source configs",
             sql: include_str!("../prisma/migrations/20260122130600/migration.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 3,
+            description: "remove source table, change record.sourceId to string",
+            sql: include_str!("../prisma/migrations/20260212000000/migration.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 4,
+            description: "add tool column to record",
+            sql: include_str!("../prisma/migrations/20260212100000/migration.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 5,
+            description: "rename record.sourceId to source",
+            sql: include_str!("../prisma/migrations/20260212100001/migration.sql"),
             kind: MigrationKind::Up,
         },
     ];

@@ -1,1 +1,1 @@
-pub mod collect_records_of_source;
+// Task modules removed - record collection moved to frontend

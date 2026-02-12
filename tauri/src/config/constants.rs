@@ -1,5 +1,3 @@
-pub const CLICKUP_API_URL: &str = "https://api.clickup.com/api/v2";
-
 pub const STORE_DAT_FILE: &str = ".store.dat";
 
 pub const DB_NAME: &str = "main.db";

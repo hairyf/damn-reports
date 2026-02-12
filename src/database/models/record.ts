@@ -4,20 +4,24 @@ import { Model } from '../model'
 export interface RecordFindManyInput {
   search?: string
   source?: string
+  sourceIds?: string[]
   workspace?: number
   date?: string
 }
 
-export interface RecordInJoined {
+export interface RecordRow {
   id: string
   summary: string
   data: any
-  createdAt: number
-  updatedAt: number
-  sourceId: number
-  workspaceId: number
-  sourceName: string
+  createdAt: string | number
+  updatedAt: string | number
   source: string
+  tool: string
+  workspaceId: number
+}
+
+export interface RecordInJoined extends RecordRow {
+  sourceName: string
 }
 
 export interface RecordFindManyPageInput extends RecordFindManyInput {
@@ -30,12 +34,17 @@ export interface RecordFindManyPageOutput {
   total: number
 }
 
+export interface RecordFindManyPageRawOutput {
+  data: RecordRow[]
+  total: number
+}
+
 export class Record extends Model<DB, 'record'> {
   constructor(db: Kysely<DB>) {
     super(db, 'record', 'id')
   }
 
-  async findManyPage(input: RecordFindManyPageInput): Promise<RecordFindManyPageOutput> {
+  async findManyPage(input: RecordFindManyPageInput): Promise<RecordFindManyPageRawOutput> {
     const { page = 1, pageSize = 20, ...queryInput } = input
 
     // 构建基础查询（用于获取总数和分页数据）
@@ -62,51 +71,65 @@ export class Record extends Model<DB, 'record'> {
   }
 
   findManyQuery(input: RecordFindManyInput) {
-    const { search, source, workspace, date } = input
+    const { search, source, sourceIds, workspace, date } = input
 
     let query = this.db
-      .selectFrom('record') // 从 record 表开始查询
-      .innerJoin('source', 'source.id', 'record.sourceId') // 关联 source 表，条件是 id 匹配
-      .innerJoin('workspace', 'workspace.id', 'record.workspaceId') // 关联 workspace 表，条件是 id 匹配
-      .selectAll('record') // 选中 record 表的所有字段
-      .select([
-        'source.name as sourceName', // 也可以顺便选出 source 的一些字段
-        'source.type as source',
-      ])
+      .selectFrom('record')
+      .innerJoin('workspace', 'workspace.id', 'record.workspaceId')
+      .selectAll('record')
 
-    // 如果search不为空，添加搜索条件
     if (search) {
       const searchPattern = `%${search}%`
       query = query.where(eb =>
         eb.or([
-          eb('summary', 'like', searchPattern),
+          eb('record.summary', 'like', searchPattern),
         ]),
       )
     }
 
-    // 如果 source 不为空，添加来源过滤
     if (source) {
-      query = query.where('source.type', '=', 'git')
+      query = query.where('record.tool', '=', source)
+    }
+    else if (sourceIds && sourceIds.length > 0) {
+      query = query.where('record.source', 'in', sourceIds)
     }
 
-    // 如果 workspace 不为空，添加 workspace 过滤
     if (typeof workspace === 'number') {
       query = query.where('workspace.id', '=', workspace)
     }
 
     if (date) {
-      // date 是当天的开始时间（ISO 字符串），需要转换为时间戳（秒）进行比较
-      // 即 createdAt >= date && createdAt < date + 1 day
-      const startDate = Math.floor(new Date(date).getTime() / 1000) // 转换为秒级时间戳
-      const endDate = Math.floor((new Date(date).getTime() + 24 * 60 * 60 * 1000) / 1000) // 转换为秒级时间戳
+      const startStr = new Date(date).toISOString()
+      const endDate = new Date(new Date(date).getTime() + 24 * 60 * 60 * 1000)
+      const endStr = endDate.toISOString()
       query = query
-        .where('record.createdAt', '>=', startDate)
-        .where('record.createdAt', '<', endDate)
+        .where('record.createdAt', '>=', startStr)
+        .where('record.createdAt', '<', endStr)
     }
 
     query = query.orderBy('record.createdAt', 'desc')
 
     return query
+  }
+
+  /** Fetch records and merge with source info from sources.json. Use findManyPageWithSources for UI. */
+  async findManyPageWithSources(
+    input: RecordFindManyPageInput,
+    sourceMap: Map<string, { name: string, tool: string }>,
+  ): Promise<RecordFindManyPageOutput> {
+    const result = await this.findManyPage({
+      ...input,
+    })
+
+    const data: RecordInJoined[] = result.data.map((row: RecordRow) => {
+      const src = sourceMap.get(row.source)
+      return {
+        ...row,
+        sourceName: src?.name ?? row.source,
+      }
+    })
+
+    return { data, total: result.total }
   }
 
   findMany(input: RecordFindManyInput) {
