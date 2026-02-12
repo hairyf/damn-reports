@@ -59,6 +59,8 @@ declare global {
   const add_tool: typeof import('../config/tools').add_tool
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
+  const clickup: typeof import('../config/collectors').clickup
+  const clickup_tasks: typeof import('../config/collectors').clickup_tasks
   const cn: typeof import('../utils/utility').cn
   const createContext: typeof import('react').createContext
   const createRef: typeof import('react').createRef
@@ -66,12 +68,20 @@ declare global {
   const db: typeof import('../database/index').db
   const edit: typeof import('../config/tools').edit
   const exec: typeof import('../config/tools').exec
+  const executeCollector: typeof import('../utils/exec').executeCollector
+  const executeCommand: typeof import('../utils/exec').executeCommand
+  const executeCommandExpression: typeof import('../utils/exec').executeCommandExpression
+  const executeHttpRequestExpression: typeof import('../utils/exec').executeHttpRequestExpression
   const find: typeof import('../config/tools').find
   const forwardRef: typeof import('react').forwardRef
   const generate_report: typeof import('../config/tools').generate_report
+  const getBeijingDayRange: typeof import('../config/source-tools').getBeijingDayRange
+  const get_current_time: typeof import('../config/collectors').get_current_time
   const get_records: typeof import('../config/tools').get_records
   const get_records_by_source: typeof import('../config/tools').get_records_by_source
+  const get_sources: typeof import('../config/tools').get_sources
   const get_tool: typeof import('../config/tools').get_tool
+  const git_directory: typeof import('../config/collectors').git_directory
   const grep: typeof import('../config/tools').grep
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
@@ -89,6 +99,7 @@ declare global {
   const store: typeof import('../store/index').store
   const subtitle: typeof import('../components/primitives').subtitle
   const tauriStorageDriver: typeof import('../config/storage.driver').tauriStorageDriver
+  const test_node_js: typeof import('../config/source-tools').test_node_js
   const title: typeof import('../components/primitives').title
   const use: typeof import('react').use
   const useActionState: typeof import('react').useActionState
@@ -168,6 +179,9 @@ declare global {
   // @ts-ignore
   export type { ThemeSwitchProps } from '../components/theme-switch'
   import('../components/theme-switch')
+  // @ts-ignore
+  export type { Collector } from '../utils/exec'
+  import('../utils/exec')
   // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')

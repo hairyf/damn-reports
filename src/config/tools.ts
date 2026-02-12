@@ -1,5 +1,4 @@
 import * as fs from '@tauri-apps/plugin-fs'
-import { Command } from '@tauri-apps/plugin-shell'
 import { tool } from 'ai'
 import { z } from 'zod'
 
@@ -128,37 +127,7 @@ export const exec = tool({
   inputSchema: z.object({
     command: z.string().describe('要执行的命令'),
   }),
-  execute: async ({ command }) => {
-    try {
-      // Detect platform and use appropriate shell
-      const isWindows = navigator.userAgent.toLowerCase().includes('windows')
-
-      let cmd: any
-      if (isWindows) {
-        // Use PowerShell on Windows for better UTF-8 support
-        // Set output encoding to UTF-8
-        const psCommand = `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; ${command}`
-        cmd = Command.create('powershell', ['-Command', psCommand])
-      }
-      else {
-        // Use sh on Unix-like systems
-        cmd = Command.create('sh', ['-c', command])
-      }
-
-      const output = await cmd.execute()
-
-      if (output.code !== 0) {
-        return `Command failed with exit code ${output.code}\nstderr: ${output.stderr}\nstdout: ${output.stdout}`
-      }
-
-      return output.stdout || 'Command executed successfully'
-    }
-    catch (error) {
-      console.error(error)
-      const errorMessage = error instanceof Error ? error.message : String(error)
-      return `Command execution error: ${errorMessage}`
-    }
-  },
+  execute: async ({ command }) => executeCommand(command),
 })
 
 export const add_tool = tool({
@@ -208,6 +177,12 @@ export const set_source = tool({
     config: z.record(z.string(), z.any()),
   }),
   execute: async () => 'TODO',
+})
+
+export const get_sources = tool({
+  description: '获取所有数据源的配置',
+  inputSchema: z.object(),
+  execute: async () => db.source.findMany({}),
 })
 
 export const get_records = tool({

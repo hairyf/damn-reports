@@ -1,0 +1,140 @@
+import { appDataDir } from '@tauri-apps/api/path'
+import { Command } from '@tauri-apps/plugin-shell'
+import jsonata from 'jsonata'
+import mustache from 'mustache'
+
+export interface Collector {
+  name: string
+  description: string
+  type: 'exec' | 'http'
+  executor: Record<string, any>
+  definition?: Record<string, { type: string, description: string }>
+  transformer?: string
+}
+
+function renderTemplate(value: any, config: Record<string, any>): any {
+  if (typeof value === 'string') {
+    return mustache.render(value, config)
+  }
+  if (Array.isArray(value)) {
+    return value.map(item => renderTemplate(item, config))
+  }
+  if (value && typeof value === 'object') {
+    const result: Record<string, any> = {}
+    for (const [key, val] of Object.entries(value)) {
+      result[key] = renderTemplate(val, config)
+    }
+    return result
+  }
+  return value
+}
+
+export function executeCollector(collector: Collector, config: Record<string, any>) {
+  if (collector.type === 'exec') {
+    return executeCommandExpression(collector, config)
+  }
+  else if (collector.type === 'http') {
+    return executeHttpRequestExpression(collector, config)
+  }
+}
+
+export async function executeCommandExpression(collector: Collector, config: Record<string, any>) {
+  const { command, args = [] } = collector.executor
+
+  // Render command and args with mustache templates
+  const renderedCommand = mustache.render(command, config)
+  const renderedArgs = args.map((arg: string) => mustache.render(String(arg), config))
+
+  // Build full command string for executeCommand
+  const fullCommand = [renderedCommand, ...renderedArgs].join(' ')
+  const result = await executeCommand(fullCommand)
+
+  // Apply transformer if provided
+  if (collector.transformer) {
+    const expression = jsonata(collector.transformer)
+    return await expression.evaluate(result)
+  }
+
+  return result
+}
+
+export async function executeHttpRequestExpression(collector: Collector, config: Record<string, any>) {
+  // Render executor with template recursively
+  const rendered = renderTemplate(collector.executor, config)
+  const { baseUrl, method = 'GET', path, headers = {}, query = {}, body } = rendered
+
+  // Build URL with query parameters
+  const url = new URL(path, baseUrl)
+  for (const [key, value] of Object.entries(query)) {
+    url.searchParams.append(key, String(value))
+  }
+
+  try {
+    const options: RequestInit = {
+      method,
+      headers,
+    }
+
+    if (body) {
+      options.body = JSON.stringify(body)
+      if (!headers['Content-Type']) {
+        headers['Content-Type'] = 'application/json'
+      }
+    }
+
+    const response = await fetch(url.toString(), options)
+
+    if (!response.ok) {
+      throw new Error(`HTTP request failed with status ${response.status}: ${response.statusText}`)
+    }
+
+    const result = await response.json()
+
+    // Apply transformer if provided
+    if (collector.transformer) {
+      const expression = jsonata(collector.transformer)
+      return await expression.evaluate(result)
+    }
+
+    return result
+  }
+  catch (error) {
+    console.error('HTTP request error:', error)
+    throw error
+  }
+}
+
+export async function executeCommand(command: string) {
+  try {
+    // Get app data directory as working directory
+    const cwd = await appDataDir()
+
+    // Detect platform and use appropriate shell
+    const isWindows = navigator.userAgent.toLowerCase().includes('windows')
+
+    let cmd: any
+    if (isWindows) {
+      // Use PowerShell on Windows for better UTF-8 support
+      // Set output encoding to UTF-8 and change to working directory
+      const psCommand = `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Set-Location '${cwd}'; ${command}`
+      cmd = Command.create('powershell', ['-Command', psCommand])
+    }
+    else {
+      // Use sh on Unix-like systems with cd to working directory
+      cmd = Command.create('sh', ['-c', `cd '${cwd}' && ${command}`])
+    }
+
+    const output = await cmd.execute()
+
+    if (output.code !== 0) {
+      throw new Error(`Command failed with exit code ${output.code}\nstderr: ${output.stderr}\nstdout: ${output.stdout}`)
+    }
+
+    return output.stdout
+  }
+  catch (error) {
+    console.error(error)
+    const errorMessage = error instanceof Error ? error.message : String(error)
+    throw new Error(`Command execution error: ${errorMessage}`)
+  }
+}

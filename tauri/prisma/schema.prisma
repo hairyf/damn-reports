@@ -7,7 +7,7 @@ generator kysely {
   output   = "../../src/database"
 }
 
-model Tool {
+model Collector {
   id          Int      @id @default(autoincrement())
   // 例如 "Notion Page Reader", "Clickup Task Reader"
   name        String
@@ -30,13 +30,11 @@ model Tool {
   // - 源数据："v1.0\nv2.0\nv3.0"
   // - 表达式：$split($raw, '\n').{"version": $}
   // - 结果：[{"version": "v1.0"}, {"version": "v2.0"}, {"version": "v3.0"}]
-  dataTransformer String
-  // 核心：告诉系统怎么读取数据的摘要（JSONata 表达式）
-  summaryTransformer String
+  transformer String
 
   sources Source[]
 
-  @@map("tool")
+  @@map("collector")
 }
 
 model Source {
@@ -45,7 +43,8 @@ model Source {
   type        String
   description String
   enabled     Boolean
-  // 具体的配置值 (填入 Tool 定义的参数)
+  // 具体的配置值 (填入 Collector 定义的 definition 参数)
+  // 比如：{ "token": "my-secret-token", "repo_id": "123456" }
   config      Json
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -55,8 +54,8 @@ model Source {
 
   records Record[]
 
-  toolId Int
-  tool Tool @relation(fields: [toolId], references: [id])
+  collectorId Int
+  collector Collector @relation(fields: [collectorId], references: [id])
 
   @@map("source")
 }
