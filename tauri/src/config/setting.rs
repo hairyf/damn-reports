@@ -51,12 +51,12 @@ pub fn get_store_dat_setting(app_handle: &tauri::AppHandle) -> Setting {
     let store = app_handle
         .store(STORE_DAT_FILE)
         .expect("Failed to load store");
-    
+
     // 强制从磁盘重新加载，确保数据是最新的
     // store.load().expect("Failed to reload store from disk");
 
     let raw = store.get(STORE_SETTING_KEY);
-    
+
     if raw.is_none() {
         log::warn!("Setting key '{}' not found in store", STORE_SETTING_KEY);
     }

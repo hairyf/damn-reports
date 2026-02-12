@@ -7,12 +7,34 @@ generator kysely {
   output   = "../../src/database"
 }
 
-model Tool {
+model Collector {
   id          Int      @id @default(autoincrement())
+  // 例如 "Notion Page Reader", "Clickup Task Reader"
   name        String
+  // 给 AI 看的工具描述
   description String
+
+  // http（数据请求）或 exec（执行命令）
+  type String
   
-  parameterSchema Json
+  // 核心：告诉 AI 需要问用户要什么配置
+  // 比如：{ "token": "string", "repo_id": "string" }
+  definition Json
+
+  // 核心：告诉系统怎么干活
+  // 比如：{ "url": "https://www.yuque.com/api/...", "method": "GET" }
+  executor Json
+
+  // 核心：告诉系统怎么清洗和简化数据（JSONata 表达式）
+  // 比如：
+  // - 源数据："v1.0\nv2.0\nv3.0"
+  // - 表达式：$split($raw, '\n').{"version": $}
+  // - 结果：[{"version": "v1.0"}, {"version": "v2.0"}, {"version": "v3.0"}]
+  transformer String
+
+  sources Source[]
+
+  @@map("collector")
 }
 
 model Source {
@@ -21,6 +43,8 @@ model Source {
   type        String
   description String
   enabled     Boolean
+  // 具体的配置值 (填入 Collector 定义的 definition 参数)
+  // 比如：{ "token": "my-secret-token", "repo_id": "123456" }
   config      Json
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -29,6 +53,9 @@ model Source {
   workspaceId Int
 
   records Record[]
+
+  collectorId Int
+  collector Collector @relation(fields: [collectorId], references: [id])
 
   @@map("source")
 }

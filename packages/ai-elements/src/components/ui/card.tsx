@@ -63,4 +63,15 @@ function CardFooter({ ref, className, ...props }: React.HTMLAttributes<HTMLDivEl
 }
 CardFooter.displayName = 'CardFooter'
 
-export { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
+function CardAction({ ref, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement | null> }) {
+  return (
+    <div
+      ref={ref}
+      className={cn('flex items-center gap-2 p-6 pt-0', className)}
+      {...props}
+    />
+  )
+}
+CardAction.displayName = 'CardAction'
+
+export { Card, CardAction, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }

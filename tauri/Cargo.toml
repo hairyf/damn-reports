@@ -68,6 +68,7 @@ sha2 = "0.10"
 async-trait = "0.1.89"
 log = "0.4"
 dotenvy = "0.15.7"
+tauri-plugin-shell = "2"
 
 [dependencies.tauri-plugin-sql]
 features = [ "sqlite" ] # or "postgres", or "mysql"

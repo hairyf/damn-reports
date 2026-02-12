@@ -8,10 +8,12 @@ export {}
 declare global {
   const Activity: typeof import('react').Activity
   const AlimailIcon: typeof import('../components/icons').AlimailIcon
+  const BaseDirectory: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').BaseDirectory
   const ClickupIcon: typeof import('../components/icons').ClickupIcon
   const CornerActions: typeof import('../components/corner-actions').CornerActions
   const Dialog: typeof import('../components/dialog').Dialog
   const Ellipsis: typeof import('../components/ellipsis').Ellipsis
+  const FileHandle: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').FileHandle
   const Form: typeof import('../components/form').Form
   const FormControl: typeof import('../components/form').FormControl
   const FormDescription: typeof import('../components/form').FormDescription
@@ -42,6 +44,7 @@ declare global {
   const ReportGenerator: typeof import('../components/report-generator').ReportGenerator
   const Route: typeof import('react-router-dom').Route
   const Routes: typeof import('react-router-dom').Routes
+  const SeekMode: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').SeekMode
   const SlackIcon: typeof import('../components/icons').SlackIcon
   const SourceFormClickup: typeof import('../components/souce-form-clickup').SourceFormClickup
   const SourceFormGit: typeof import('../components/souce-form-git').SourceFormGit
@@ -59,36 +62,70 @@ declare global {
   const add_tool: typeof import('../config/tools').add_tool
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
+  const clickup: typeof import('../config/collectors').clickup
+  const clickup_tasks: typeof import('../config/collectors').clickup_tasks
   const cn: typeof import('../utils/utility').cn
+  const copyFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').copyFile
+  const create: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').create
   const createContext: typeof import('react').createContext
   const createRef: typeof import('react').createRef
+  const current_time: typeof import('../config/collectors').current_time
   const dailyReportPrompt: typeof import('../config/prompts').dailyReportPrompt
   const db: typeof import('../database/index').db
   const edit: typeof import('../config/tools').edit
+  const exe_tool: typeof import('../config/tools').exe_tool
+  const exec: typeof import('../config/tools').exec
+  const executeCollector: typeof import('../utils/exec').executeCollector
+  const executeCommand: typeof import('../utils/exec').executeCommand
+  const executeCommandExpression: typeof import('../utils/exec').executeCommandExpression
+  const executeHttpRequestExpression: typeof import('../utils/exec').executeHttpRequestExpression
+  const exists: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').exists
+  const fetch_http: typeof import('../config/tools').fetch_http
   const find: typeof import('../config/tools').find
   const forwardRef: typeof import('react').forwardRef
   const generate_report: typeof import('../config/tools').generate_report
+  const getBeijingDayRange: typeof import('../config/source-tools').getBeijingDayRange
+  const getTools: typeof import('../utils/tool').getTools
+  const get_current_time: typeof import('../config/collectors').get_current_time
   const get_records: typeof import('../config/tools').get_records
   const get_records_by_source: typeof import('../config/tools').get_records_by_source
+  const get_sources: typeof import('../config/tools').get_sources
   const get_tool: typeof import('../config/tools').get_tool
+  const get_tools: typeof import('../config/tools').get_tools
+  const git_directory: typeof import('../config/collectors').git_directory
   const grep: typeof import('../config/tools').grep
+  const http: typeof import('../config/tools').http
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
   const ls: typeof import('../config/tools').ls
+  const lstat: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').lstat
   const memo: typeof import('react').memo
+  const mkdir: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').mkdir
+  const open: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').open
   const queryClient: typeof import('../config/client').queryClient
   const read: typeof import('../config/tools').read
+  const readDir: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readDir
+  const readFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readFile
+  const readJson: typeof import('../utils/fs-extra').readJson
+  const readTextFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readTextFile
+  const readTextFileLines: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readTextFileLines
+  const remove: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').remove
+  const rename: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').rename
   const retry: typeof import('../utils/utility').retry
   const set_source: typeof import('../config/tools').set_source
   const set_tool: typeof import('../config/tools').set_tool
   const siteConfig: typeof import('../config/site').siteConfig
+  const size: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').size
   const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition
+  const stat: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').stat
   const storage: typeof import('../config/storage').storage
   const store: typeof import('../store/index').store
   const subtitle: typeof import('../components/primitives').subtitle
   const tauriStorageDriver: typeof import('../config/storage.driver').tauriStorageDriver
+  const test_node_js: typeof import('../config/source-tools').test_node_js
   const title: typeof import('../components/primitives').title
+  const truncate: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').truncate
   const use: typeof import('react').use
   const useActionState: typeof import('react').useActionState
   const useCallback: typeof import('react').useCallback
@@ -121,7 +158,12 @@ declare global {
   const useState: typeof import('react').useState
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
   const useTransition: typeof import('react').useTransition
+  const watch: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watch
+  const watchImmediate: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watchImmediate
   const write: typeof import('../config/tools').write
+  const writeFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').writeFile
+  const writeJson: typeof import('../utils/fs-extra').writeJson
+  const writeTextFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').writeTextFile
 }
 // for type re-export
 declare global {
@@ -167,6 +209,9 @@ declare global {
   // @ts-ignore
   export type { ThemeSwitchProps } from '../components/theme-switch'
   import('../components/theme-switch')
+  // @ts-ignore
+  export type { Collector } from '../utils/exec'
+  import('../utils/exec')
   // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')

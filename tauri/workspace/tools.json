@@ -1,0 +1,53 @@
+{
+  "git_directory": {
+    "name": "Git Directory Reader",
+    "description": "Read Git commits and diffs from a local Git repository",
+    "type": "exec",
+    "definition": {
+      "repository": { "type": "string", "description": "The local Git repository path" },
+      "author": { "type": "string", "description": "The author name to filter commits (commit author contains this string)" }
+    },
+    "executor": {
+      "command": "git",
+      "args": ["-C", "{{repository}}", "log", "--since=midnight", "--format=%h%x09%s%x09%an%x09%at", "--author={{author}}"]
+    },
+    "transformer": "$split($, \"\n\")[$ != \"\"].($p := $split($, \"\t\"); $count($p) >= 4 ? {\"id\": $p[0], \"summary\": $p[1], \"createdAt\": $number($p[3]) * 1000, \"data\": {\"id\": $p[0], \"message\": $p[1], \"author\": $p[2], \"date\": $number($p[3])}} : null)[$]"
+  },
+  "clickup": {
+    "name": "ClickUp Tasks Reader",
+    "description": "Read ClickUp tasks updated on the current day and assigned to the specified user",
+    "type": "http",
+    "definition": {
+      "token": { "type": "string", "description": "ClickUp API Token" },
+      "team": { "type": "string", "description": "Team ID" },
+      "user": { "type": "string", "description": "The Assignee user ID to filter" }
+    },
+    "executor": {
+      "baseUrl": "https://api.clickup.com",
+      "method": "GET",
+      "path": "/api/v2/team/{{team}}/task",
+      "headers": {
+        "Authorization": "{{token}}"
+      },
+      "query": {
+        "include_closed": "true",
+        "subtasks": "true",
+        "date_updated_gt": "$millis() - (24 * 60 * 60 * 1000)",
+        "date_updated_lt": "$millis()",
+        "assignees[]": "{{user}}"
+      }
+    },
+    "transformer": "tasks.{\"id\": id, \"summary\": name, \"createdAt\": $number(date_created), \"data\": $}"
+  },
+  "test_nodejs": {
+    "name": "Test Node.js",
+    "description": "Use Node.js to execute commands",
+    "type": "exec",
+    "files": ["tool/get_current_time.js"],
+    "executor": {
+      "command": "node",
+      "args": ["./tool/get_current_time.js"]
+    },
+    "transformer": "{\"id\": \"$now()\", \"summary\": \"Currency Date\", \"createdAt\": $now(), \"data\": $eval($)}"
+  }
+}
