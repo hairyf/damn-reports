@@ -1,4 +1,4 @@
-import { appDataDir } from '@tauri-apps/api/path'
+import { resolveResource } from '@tauri-apps/api/path'
 import { Command } from '@tauri-apps/plugin-shell'
 import jsonata from 'jsonata'
 import mustache from 'mustache'
@@ -6,23 +6,35 @@ import mustache from 'mustache'
 export interface Collector {
   name: string
   description: string
+  files?: string[]
   type: 'exec' | 'http'
   executor: Record<string, any>
   definition?: Record<string, { type: string, description: string }>
   transformer?: string
 }
 
-function renderTemplate(value: any, config: Record<string, any>): any {
+async function renderTemplate(value: any, config: Record<string, any>): Promise<any> {
   if (typeof value === 'string') {
+    // Check if it's a jsonata expression (starts with $)
+    if (value.trim().startsWith('$')) {
+      try {
+        const expression = jsonata(value)
+        return await expression.evaluate(config)
+      }
+      catch {
+        // If jsonata fails, fall back to mustache
+        return mustache.render(value, config)
+      }
+    }
     return mustache.render(value, config)
   }
   if (Array.isArray(value)) {
-    return value.map(item => renderTemplate(item, config))
+    return await Promise.all(value.map(item => renderTemplate(item, config)))
   }
   if (value && typeof value === 'object') {
     const result: Record<string, any> = {}
     for (const [key, val] of Object.entries(value)) {
-      result[key] = renderTemplate(val, config)
+      result[key] = await renderTemplate(val, config)
     }
     return result
   }
@@ -60,7 +72,7 @@ export async function executeCommandExpression(collector: Collector, config: Rec
 
 export async function executeHttpRequestExpression(collector: Collector, config: Record<string, any>) {
   // Render executor with template recursively
-  const rendered = renderTemplate(collector.executor, config)
+  const rendered = await renderTemplate(collector.executor, config)
   const { baseUrl, method = 'GET', path, headers = {}, query = {}, body } = rendered
 
   // Build URL with query parameters
@@ -107,7 +119,7 @@ export async function executeHttpRequestExpression(collector: Collector, config:
 export async function executeCommand(command: string) {
   try {
     // Get app data directory as working directory
-    const cwd = await appDataDir()
+    const cwd = await resolveResource('workspace')
 
     // Detect platform and use appropriate shell
     const isWindows = navigator.userAgent.toLowerCase().includes('windows')

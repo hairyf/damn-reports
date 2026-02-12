@@ -1,7 +1,7 @@
-import * as fs from '@tauri-apps/plugin-fs'
 import { tool } from 'ai'
+import pathe from 'pathe'
 import { z } from 'zod'
-
+import * as fs from '../utils/fs-extra'
 // 辅助函数：将 Uint8Array 转为字符串
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
@@ -11,7 +11,8 @@ export const read = tool({
   inputSchema: z.object({ path: z.string() }),
   execute: async ({ path }) => {
     try {
-      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.AppData })
+      path = pathe.join('workspace', path)
+      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.Resource })
       return decoder.decode(data)
     }
     catch (error) {
@@ -29,7 +30,8 @@ export const write = tool({
   }),
   execute: async ({ path, content }) => {
     try {
-      await fs.writeFile(path, encoder.encode(content), { baseDir: fs.BaseDirectory.AppData })
+      path = pathe.join('workspace', path)
+      await fs.writeFile(path, encoder.encode(content), { baseDir: fs.BaseDirectory.Resource })
       return `Successfully written to ${path}`
     }
     catch (error) {
@@ -48,7 +50,8 @@ export const edit = tool({
   }),
   execute: async ({ path, oldContent, newContent }) => {
     try {
-      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.AppData })
+      path = pathe.join('workspace', path)
+      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.Resource })
       const currentText = decoder.decode(data)
       const updatedText = currentText.replace(oldContent, newContent)
       await fs.writeFile(path, encoder.encode(updatedText), { baseDir: fs.BaseDirectory.AppData })
@@ -69,7 +72,7 @@ export const grep = tool({
   }),
   execute: async ({ path, pattern }) => {
     try {
-      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.AppData })
+      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.Resource })
       const lines = decoder.decode(data).split('\n')
       const matches = lines
         .map((line, index) => line.includes(pattern) ? `${index + 1}: ${line}` : null)
@@ -88,7 +91,8 @@ export const ls = tool({
   inputSchema: z.object({ path: z.string() }),
   execute: async ({ path }) => {
     try {
-      const entries = await fs.readDir(path, { baseDir: fs.BaseDirectory.AppData })
+      path = pathe.join('workspace', path)
+      const entries = await fs.readDir(path, { baseDir: fs.BaseDirectory.Resource })
       const result = entries.map(e => `${e.isDirectory ? '[DIR]' : '[FILE]'} ${e.name}`).join('\n')
       return result
     }
@@ -107,8 +111,9 @@ export const find = tool({
   }),
   execute: async ({ path, query }) => {
     const results: string[] = []
+    path = pathe.join('workspace', path)
     async function search(dir: string) {
-      const entries = await fs.readDir(dir, { baseDir: fs.BaseDirectory.AppData })
+      const entries = await fs.readDir(dir, { baseDir: fs.BaseDirectory.Resource })
       for (const entry of entries) {
         const fullPath = `${dir}/${entry.name}`
         if (entry.name.includes(query))
@@ -130,81 +135,84 @@ export const exec = tool({
   execute: async ({ command }) => executeCommand(command),
 })
 
+export const get_tools = tool({
+  description: '获取所有工具（收集器）的配置',
+  inputSchema: z.object({}),
+  execute: async () => fs.readJson('tools.json'),
+})
+
 export const add_tool = tool({
   description: '添加新的工具用于获取数据源的数据',
   inputSchema: z.object({
-    name: z.string(),
-    description: z.string(),
-    parameterSchema: z.record(z.string(), z.any()),
+    name: z.string().describe('工具名称'),
+    description: z.string().describe('工具描述'),
+    definition: z.record(z.string(), z.any()).describe('工具定义'),
+    files: z.array(z.string()).describe('工具文件').optional(),
+    type: z.enum(['exec', 'http']).describe('工具类型'),
+    executor: z.record(z.string(), z.any()).describe('工具执行器（Mustache、JSONata 表达式）'),
+    transformer: z.string().describe('工具转换器，必须返回该格式 { summary: string, createdAt: number, data: any } 的对象或数组，使用 JSONata 表达式。'),
   }),
-  // TODO
-  execute: async () => 'TODO',
+  execute: async ({ name, description, definition, files, type, executor, transformer }) => {
+    const tools = await fs.readJson('tools.json')
+    tools[name] = { name, description, definition, files, type, executor, transformer }
+    await fs.writeJson('tools.json', tools)
+    return `Tool ${name} added successfully`
+  },
 })
 
 export const get_tool = tool({
   description: '获取指定工具的配置',
   inputSchema: z.object({
-    toolId: z.string(),
+    tool: z.string(),
   }),
-  execute: async () => 'TODO',
+  execute: async ({ tool }) => {
+    const tools = await fs.readJson('tools.json')
+    return tools[tool]
+  },
 })
 
 export const set_tool = tool({
   description: '设置工具的配置',
   inputSchema: z.object({
-    toolId: z.string(),
-    config: z.record(z.string(), z.any()),
-  }),
-  execute: async () => 'TODO',
-})
-
-export const add_source = tool({
-  description: '添加新的数据源配置',
-  inputSchema: z.object({
-    name: z.string(),
+    tool: z.string(),
     description: z.string(),
-    config: z.record(z.string(), z.any()),
+    definition: z.record(z.string(), z.any()),
+    files: z.array(z.string()).optional(),
+    type: z.enum(['exec', 'http']),
+    executor: z.record(z.string(), z.any()),
+    transformer: z.string(),
   }),
-
-  // TODO
-  execute: async () => 'TODO',
+  execute: async ({ tool, description, definition, files, type, executor, transformer }) => {
+    const tools = await fs.readJson('tools.json')
+    tools[tool].description = description
+    tools[tool].definition = definition
+    tools[tool].files = files
+    tools[tool].type = type
+    tools[tool].executor = executor
+    tools[tool].transformer = transformer
+    await fs.writeJson('tools.json', tools)
+    return `Tool ${tool} updated successfully`
+  },
 })
 
-export const set_source = tool({
-  description: '设置数据源的配置',
+export const exe_tool = tool({
+  description: '执行指定的工具',
   inputSchema: z.object({
-    sourceId: z.string(),
-    config: z.record(z.string(), z.any()),
+    tool: z.string().describe('要执行的工具 ID'),
+    params: z.record(z.string(), z.any()).describe('工具参数').optional(),
   }),
-  execute: async () => 'TODO',
+  execute: async ({ tool, params = {} }) => {
+    const tools = await fs.readJson('tools.json')
+    const data = await executeCollector(tools[tool], params)
+    // eslint-disable-next-line no-console
+    console.log('Tool execution result:', data)
+    return data
+  },
 })
 
-export const get_sources = tool({
-  description: '获取所有数据源的配置',
-  inputSchema: z.object(),
-  execute: async () => db.source.findMany({}),
-})
-
-export const get_records = tool({
-  description: '同步并获取所有数据源的数据',
-  inputSchema: z.object({
-    type: z.enum(['daily', 'weekly', 'monthly']),
-  }),
-  execute: async () => 'TODO',
-})
-
-export const get_records_by_source = tool({
-  description: '获取指定数据源的数据',
-  inputSchema: z.object({
-    sourceId: z.string(),
-  }),
-  execute: async () => 'TODO',
-})
-
-export const generate_report = tool({
-  description: '生成报告',
-  inputSchema: z.object({
-    type: z.enum(['daily', 'weekly', 'monthly']),
-  }),
-  execute: async () => 'TODO',
-})
+// add_source
+// set_source
+// get_sources
+// get_records
+// get_records_by_source
+// generate_report
