@@ -10,8 +10,14 @@ export const read = tool({
   description: '读取文件内容',
   inputSchema: z.object({ path: z.string() }),
   execute: async ({ path }) => {
-    const data = await fs.readFile(path)
-    return decoder.decode(data)
+    try {
+      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.AppData })
+      return decoder.decode(data)
+    }
+    catch (error) {
+      console.error(error)
+      throw error
+    }
   },
 })
 
@@ -22,8 +28,14 @@ export const write = tool({
     content: z.string(),
   }),
   execute: async ({ path, content }) => {
-    await fs.writeFile(path, encoder.encode(content))
-    return `Successfully written to ${path}`
+    try {
+      await fs.writeFile(path, encoder.encode(content), { baseDir: fs.BaseDirectory.AppData })
+      return `Successfully written to ${path}`
+    }
+    catch (error) {
+      console.error(error)
+      throw error
+    }
   },
 })
 
@@ -35,11 +47,17 @@ export const edit = tool({
     newContent: z.string().describe('替换后的新文本'),
   }),
   execute: async ({ path, oldContent, newContent }) => {
-    const data = await fs.readFile(path)
-    const currentText = decoder.decode(data)
-    const updatedText = currentText.replace(oldContent, newContent)
-    await fs.writeFile(path, encoder.encode(updatedText))
-    return `Updated ${path}`
+    try {
+      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.AppData })
+      const currentText = decoder.decode(data)
+      const updatedText = currentText.replace(oldContent, newContent)
+      await fs.writeFile(path, encoder.encode(updatedText), { baseDir: fs.BaseDirectory.AppData })
+      return `Updated ${path}`
+    }
+    catch (error) {
+      console.error(error)
+      throw error
+    }
   },
 })
 
@@ -50,12 +68,18 @@ export const grep = tool({
     pattern: z.string(),
   }),
   execute: async ({ path, pattern }) => {
-    const data = await fs.readFile(path)
-    const lines = decoder.decode(data).split('\n')
-    const matches = lines
-      .map((line, index) => line.includes(pattern) ? `${index + 1}: ${line}` : null)
-      .filter(Boolean)
-    return matches.length > 0 ? matches.join('\n') : 'No matches found.'
+    try {
+      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.AppData })
+      const lines = decoder.decode(data).split('\n')
+      const matches = lines
+        .map((line, index) => line.includes(pattern) ? `${index + 1}: ${line}` : null)
+        .filter(Boolean)
+      return matches.length > 0 ? matches.join('\n') : 'No matches found.'
+    }
+    catch (error) {
+      console.error(error)
+      throw error
+    }
   },
 })
 
@@ -63,8 +87,15 @@ export const ls = tool({
   description: '列出目录内容',
   inputSchema: z.object({ path: z.string() }),
   execute: async ({ path }) => {
-    const entries = await fs.readDir(path)
-    return entries.map(e => `${e.isDirectory ? '[DIR]' : '[FILE]'} ${e.name}`).join('\n')
+    try {
+      const entries = await fs.readDir(path, { baseDir: fs.BaseDirectory.AppData })
+      const result = entries.map(e => `${e.isDirectory ? '[DIR]' : '[FILE]'} ${e.name}`).join('\n')
+      return result
+    }
+    catch (error) {
+      console.error(error)
+      throw error
+    }
   },
 })
 
@@ -77,7 +108,7 @@ export const find = tool({
   execute: async ({ path, query }) => {
     const results: string[] = []
     async function search(dir: string) {
-      const entries = await fs.readDir(dir)
+      const entries = await fs.readDir(dir, { baseDir: fs.BaseDirectory.AppData })
       for (const entry of entries) {
         const fullPath = `${dir}/${entry.name}`
         if (entry.name.includes(query))
@@ -99,7 +130,7 @@ export const add_tool = tool({
     parameterSchema: z.record(z.string(), z.any()),
   }),
   // TODO
-  execute: async () => {},
+  execute: async () => 'TODO',
 })
 
 export const get_tool = tool({
@@ -107,7 +138,7 @@ export const get_tool = tool({
   inputSchema: z.object({
     toolId: z.string(),
   }),
-  execute: async () => {},
+  execute: async () => 'TODO',
 })
 
 export const set_tool = tool({
@@ -116,7 +147,7 @@ export const set_tool = tool({
     toolId: z.string(),
     config: z.record(z.string(), z.any()),
   }),
-  execute: async () => {},
+  execute: async () => 'TODO',
 })
 
 export const add_source = tool({
@@ -128,7 +159,7 @@ export const add_source = tool({
   }),
 
   // TODO
-  execute: async () => {},
+  execute: async () => 'TODO',
 })
 
 export const set_source = tool({
@@ -137,7 +168,7 @@ export const set_source = tool({
     sourceId: z.string(),
     config: z.record(z.string(), z.any()),
   }),
-  execute: async () => {},
+  execute: async () => 'TODO',
 })
 
 export const get_records = tool({
@@ -145,7 +176,7 @@ export const get_records = tool({
   inputSchema: z.object({
     type: z.enum(['daily', 'weekly', 'monthly']),
   }),
-  execute: async () => {},
+  execute: async () => 'TODO',
 })
 
 export const get_records_by_source = tool({
@@ -153,7 +184,7 @@ export const get_records_by_source = tool({
   inputSchema: z.object({
     sourceId: z.string(),
   }),
-  execute: async () => {},
+  execute: async () => 'TODO',
 })
 
 export const generate_report = tool({
@@ -161,5 +192,5 @@ export const generate_report = tool({
   inputSchema: z.object({
     type: z.enum(['daily', 'weekly', 'monthly']),
   }),
-  execute: async () => {},
+  execute: async () => 'TODO',
 })

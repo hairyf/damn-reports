@@ -19,7 +19,6 @@ import {
 import { getStatusBadge } from './tool'
 
 export type SandboxRootProps = ComponentProps<typeof Collapsible>
-
 export function Sandbox({ className, ...props }: SandboxRootProps) {
   return (
     <Collapsible

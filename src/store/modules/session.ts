@@ -1,7 +1,8 @@
 import type { FileUIPart } from 'ai'
 import { createOpenAI } from '@ai-sdk/openai'
-import { generateText, streamText } from 'ai'
+import { generateText, ToolLoopAgent } from 'ai'
 import { defineStore } from 'valtio-define'
+import * as tools from '@/config/tools'
 import { store } from '@/store'
 import 'valtio-define/types'
 
@@ -12,6 +13,7 @@ export interface ChatMessage {
   role: ChatRole
   content: string
   createdAt: string
+  toolCalls?: Array<{ toolName: string }>
 }
 
 export interface ChatSession {
@@ -24,6 +26,10 @@ export interface ChatSession {
 
 function createId() {
   return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 8)}`
+}
+
+function updateTimestamp(session: ChatSession) {
+  session.updatedAt = new Date().toISOString()
 }
 
 // 不放在 state 里，避免被持久化
@@ -42,19 +48,25 @@ export const session = defineStore(
     },
     getters: {
       activeSession(): ChatSession | null {
+        // 显式「新对话」模式：不选中任何会话，聊天区为空
+        if (this.activeSessionId === '__new__')
+          return null
         if (!this.activeSessionId)
           return this.sessions[0] ?? null
         return this.sessions.find(s => s.id === this.activeSessionId) ?? null
       },
     },
     actions: {
-      createSession(initialMessage?: string) {
+      /** 仅切换到“新对话”状态：清空聊天区，不创建会话；发送第一条消息时会创建会话 */
+      prepareNewChat() {
+        this.activeSessionId = '__new__'
+      },
+      createSession() {
         const now = new Date().toISOString()
         const id = createId()
-        const title = (initialMessage?.trim() || '新会话').slice(0, 30)
         const newSession: ChatSession = {
           id,
-          title,
+          title: '新会话',
           createdAt: now,
           updatedAt: now,
           messages: [],
@@ -71,7 +83,7 @@ export const session = defineStore(
         if (!target)
           return
         target.messages.push(message)
-        target.updatedAt = new Date().toISOString()
+        updateTimestamp(target)
       },
       deleteSession(id: string) {
         const index = this.sessions.findIndex(s => s.id === id)
@@ -87,7 +99,7 @@ export const session = defineStore(
         if (!target)
           return
         target.title = title.trim() || target.title
-        target.updatedAt = new Date().toISOString()
+        updateTimestamp(target)
       },
       clearAll() {
         this.sessions = []
@@ -106,16 +118,14 @@ export const session = defineStore(
           throw new Error('请先在设置中配置 LLM API Key')
         }
 
-        const baseURL = llmBaseUrl?.trim().replace(/\/$/, '')
         const openai = createOpenAI({
           apiKey: llmApiKey,
-          baseURL: baseURL || undefined,
+          baseURL: llmBaseUrl?.trim().replace(/\/$/, '') || undefined,
         })
 
         let current = this.activeSession
-        if (!current) {
-          current = this.createSession(content || undefined)
-        }
+        if (!current)
+          current = this.createSession()
 
         const isFirstRound = current.messages.length === 0
         const sessionId = current.id
@@ -163,21 +173,46 @@ export const session = defineStore(
         this.isStreaming = true
 
         try {
-          const result = await streamText({
+          // 创建 ToolLoopAgent 实例
+          const agent = new ToolLoopAgent({
             model: openai.chat(llmModel || 'deepseek-chat'),
+            tools,
+          })
+
+          // 使用 agent.stream() 替代 streamText
+          const stream = await agent.stream({
             messages: messagesForModel,
             abortSignal: abortController.signal,
           })
 
-          for await (const delta of result.textStream) {
+          // 使用 fullStream 来处理文本和工具调用
+          for await (const part of stream.fullStream) {
             const target = this.sessions.find(s => s.id === sessionId)
             if (!target)
               break
             const last = target.messages[target.messages.length - 1]
             if (!last || last.id !== assistantMessageId)
               continue
-            last.content += delta
-            target.updatedAt = new Date().toISOString()
+
+            // 处理文本增量
+            if (part.type === 'text-delta') {
+              last.content += part.text
+              updateTimestamp(target)
+            }
+            // 处理工具调用
+            else if (part.type === 'tool-call') {
+              // 记录工具调用信息
+              if (!last.toolCalls) {
+                last.toolCalls = []
+              }
+              last.toolCalls.push({ toolName: part.toolName })
+              updateTimestamp(target)
+            }
+            // 处理工具结果
+            else if (part.type === 'tool-result') {
+              // 工具结果不显示在消息中，让 AI 继续处理
+              updateTimestamp(target)
+            }
           }
 
           // 首轮对话结束后，生成一个更合适的会话标题
@@ -199,7 +234,7 @@ export const session = defineStore(
                 const newTitle = text.trim().split('\n')[0]?.slice(0, 30)
                 if (newTitle) {
                   target.title = newTitle
-                  target.updatedAt = new Date().toISOString()
+                  updateTimestamp(target)
                 }
               }
               catch {
