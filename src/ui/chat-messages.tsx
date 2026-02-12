@@ -38,7 +38,7 @@ export function ChatMessages() {
   }
 
   return (
-    <ScrollShadow className="h-full pr-2 pb-2">
+    <ScrollShadow className="h-full">
       {activeSession.messages.map((message, index) => {
         const isLastMessage = index === activeSession.messages.length - 1
         const isAssistantLoading = message.role === 'assistant'

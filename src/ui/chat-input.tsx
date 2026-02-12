@@ -114,18 +114,16 @@ function ChatInputInner() {
   )
 
   return (
-    <>
-      <PromptInput
-        accept="image/*,.pdf,.txt,.md,application/pdf"
-        multiple
-        maxFiles={10}
-        onSubmit={handleSubmit}
-        className="w-full"
-      >
-        <PromptInputBody>
-          <PromptInputTextarea className="border-none" placeholder="Ask anything" />
-        </PromptInputBody>
-      </PromptInput>
+    <PromptInput
+      accept="image/*,.pdf,.txt,.md,application/pdf"
+      multiple
+      maxFiles={10}
+      onSubmit={handleSubmit}
+      className="w-full"
+    >
+      <PromptInputBody>
+        <PromptInputTextarea className="border-none" placeholder="Ask anything" />
+      </PromptInputBody>
       <div className="flex gap-2 justify-between">
         <MessageAreaExtras />
         <div className="flex gap-2">
@@ -137,7 +135,7 @@ function ChatInputInner() {
           />
         </div>
       </div>
-    </>
+    </PromptInput>
   )
 }
 
