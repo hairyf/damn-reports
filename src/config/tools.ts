@@ -1,6 +1,7 @@
 import { tool } from 'ai'
-import pathe from 'pathe'
+import matter from 'gray-matter'
 import { z } from 'zod'
+import { executeCollector, executeCommand } from '../utils/exec'
 import * as fs from '../utils/fs-extra'
 // 辅助函数：将 Uint8Array 转为字符串
 const decoder = new TextDecoder()
@@ -11,8 +12,7 @@ export const read = tool({
   inputSchema: z.object({ path: z.string() }),
   execute: async ({ path }) => {
     try {
-      path = pathe.join('workspace', path)
-      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.Resource })
+      const data = await fs.readFile(path)
       return decoder.decode(data)
     }
     catch (error) {
@@ -30,8 +30,7 @@ export const write = tool({
   }),
   execute: async ({ path, content }) => {
     try {
-      path = pathe.join('workspace', path)
-      await fs.writeFile(path, encoder.encode(content), { baseDir: fs.BaseDirectory.Resource })
+      await fs.writeFile(path, encoder.encode(content))
       return `Successfully written to ${path}`
     }
     catch (error) {
@@ -50,11 +49,10 @@ export const edit = tool({
   }),
   execute: async ({ path, oldContent, newContent }) => {
     try {
-      path = pathe.join('workspace', path)
-      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.Resource })
+      const data = await fs.readFile(path)
       const currentText = decoder.decode(data)
       const updatedText = currentText.replace(oldContent, newContent)
-      await fs.writeFile(path, encoder.encode(updatedText), { baseDir: fs.BaseDirectory.AppData })
+      await fs.writeFile(path, encoder.encode(updatedText))
       return `Updated ${path}`
     }
     catch (error) {
@@ -72,7 +70,7 @@ export const grep = tool({
   }),
   execute: async ({ path, pattern }) => {
     try {
-      const data = await fs.readFile(path, { baseDir: fs.BaseDirectory.Resource })
+      const data = await fs.readFile(path)
       const lines = decoder.decode(data).split('\n')
       const matches = lines
         .map((line, index) => line.includes(pattern) ? `${index + 1}: ${line}` : null)
@@ -91,8 +89,7 @@ export const ls = tool({
   inputSchema: z.object({ path: z.string() }),
   execute: async ({ path }) => {
     try {
-      path = pathe.join('workspace', path)
-      const entries = await fs.readDir(path, { baseDir: fs.BaseDirectory.Resource })
+      const entries = await fs.readDir(path)
       const result = entries.map(e => `${e.isDirectory ? '[DIR]' : '[FILE]'} ${e.name}`).join('\n')
       return result
     }
@@ -111,9 +108,8 @@ export const find = tool({
   }),
   execute: async ({ path, query }) => {
     const results: string[] = []
-    path = pathe.join('workspace', path)
     async function search(dir: string) {
-      const entries = await fs.readDir(dir, { baseDir: fs.BaseDirectory.Resource })
+      const entries = await fs.readDir(dir)
       for (const entry of entries) {
         const fullPath = `${dir}/${entry.name}`
         if (entry.name.includes(query))
@@ -125,14 +121,6 @@ export const find = tool({
     await search(path)
     return results.length > 0 ? results.join('\n') : 'No files found.'
   },
-})
-
-export const exec = tool({
-  description: '执行命令',
-  inputSchema: z.object({
-    command: z.string().describe('要执行的命令'),
-  }),
-  execute: async ({ command }) => executeCommand(command),
 })
 
 export const http = tool({
@@ -147,78 +135,122 @@ export const http = tool({
   },
 })
 
-export const get_tools = tool({
-  description: '获取所有工具（收集器）的配置',
-  inputSchema: z.object({}),
-  execute: async () => fs.readJson('tools.json'),
-})
-
-export const add_tool = tool({
-  description: '添加新的工具用于获取数据源的数据',
+export const exec = tool({
+  description: '执行命令',
   inputSchema: z.object({
-    name: z.string().describe('工具名称'),
-    description: z.string().describe('工具描述'),
-    definition: z.record(z.string(), z.any()).describe('工具定义'),
-    files: z.array(z.string()).describe('工具文件').optional(),
-    type: z.enum(['exec', 'http']).describe('工具类型'),
-    executor: z.record(z.string(), z.any()).describe('工具执行器（Mustache、JSONata 表达式）'),
-    transformer: z.string().describe('工具转换器，必须返回该格式 { summary: string, createdAt: number, data: any } 的对象或数组，使用 JSONata 表达式。'),
+    command: z.string().describe('要执行的命令'),
   }),
-  execute: async ({ name, description, definition, files, type, executor, transformer }) => {
-    const tools = await fs.readJson('tools.json')
-    tools[name] = { name, description, definition, files, type, executor, transformer }
-    await fs.writeJson('tools.json', tools)
-    return `Tool ${name} added successfully`
-  },
+  execute: async ({ command }) => executeCommand(command),
 })
 
-export const get_tool = tool({
-  description: '获取指定工具的配置',
+export const exec_tool = tool({
+  description: '执行指定 tools.json 中的工具',
   inputSchema: z.object({
-    tool: z.string(),
-  }),
-  execute: async ({ tool }) => {
-    const tools = await fs.readJson('tools.json')
-    return tools[tool]
-  },
-})
-
-export const set_tool = tool({
-  description: '设置工具的配置',
-  inputSchema: z.object({
-    tool: z.string(),
-    description: z.string(),
-    definition: z.record(z.string(), z.any()),
-    files: z.array(z.string()).optional(),
-    type: z.enum(['exec', 'http']),
-    executor: z.record(z.string(), z.any()),
-    transformer: z.string(),
-  }),
-  execute: async ({ tool, description, definition, files, type, executor, transformer }) => {
-    const tools = await fs.readJson('tools.json')
-    tools[tool].description = description
-    tools[tool].definition = definition
-    tools[tool].files = files
-    tools[tool].type = type
-    tools[tool].executor = executor
-    tools[tool].transformer = transformer
-    await fs.writeJson('tools.json', tools)
-    return `Tool ${tool} updated successfully`
-  },
-})
-
-export const exe_tool = tool({
-  description: '执行指定的工具',
-  inputSchema: z.object({
-    tool: z.string().describe('要执行的工具 ID'),
+    toolid: z.string().describe('要执行的工具 ID(key)'),
     params: z.record(z.string(), z.any()).describe('工具参数').optional(),
   }),
-  execute: async ({ tool, params = {} }) => {
+  execute: async ({ toolid, params = {} }) => {
     const tools = await fs.readJson('tools.json')
-    const data = await executeCollector(tools[tool], params)
+    const data = await executeCollector(tools[toolid], params)
     // eslint-disable-next-line no-console
     console.log('Tool execution result:', data)
     return data
+  },
+})
+
+interface WorkspaceSkill {
+  name: string
+  description: string
+  location: string
+  content: string
+}
+
+async function loadWorkspaceSkills(): Promise<WorkspaceSkill[]> {
+  const skills: WorkspaceSkill[] = []
+
+  async function scan(relativeDir: string) {
+    const entries = await fs.readDir(relativeDir)
+    for (const entry of entries) {
+      const childRelative = relativeDir ? `${relativeDir}/${entry.name}` : entry.name
+      if (entry.isDirectory) {
+        await scan(childRelative)
+      }
+      else if (entry.name === 'SKILL.md') {
+        const data = await fs.readFile(childRelative)
+        const text = decoder.decode(data)
+        const skill = parseSkillFromMarkdown(text, childRelative)
+        if (skill)
+          skills.push(skill)
+      }
+    }
+  }
+
+  // skills 目录位于 workspace 根目录下，location 基于 workspace 相对路径（例如 skills/tool/SKILL.md）
+  await scan('skills')
+  return skills
+}
+
+function parseSkillFromMarkdown(markdown: string, location: string): WorkspaceSkill | null {
+  const { data, content } = matter(markdown)
+  const frontmatter = data as { name?: string, description?: string }
+  if (!frontmatter.name)
+    return null
+
+  return {
+    name: String(frontmatter.name),
+    description: frontmatter.description ? String(frontmatter.description) : '',
+    location,
+    content: content.trim(),
+  }
+}
+
+export const skill = tool({
+  description: '加载 workspace/skills 下指定的 Skill，并返回其内容和相关文件列表',
+  inputSchema: z.object({
+    name: z.string().describe('要加载的 Skill 名称（来自 SKILL.md 的 name 字段）'),
+  }),
+  execute: async ({ name }) => {
+    const skills = await loadWorkspaceSkills()
+    const skill = skills.find(s => s.name === name)
+
+    if (!skill) {
+      const available = skills.map(s => s.name).join(', ')
+      throw new Error(`Skill "${name}" 不存在。可用技能: ${available || '无'}`)
+    }
+
+    const lastSlash = skill.location.lastIndexOf('/')
+    const dir = lastSlash === -1 ? skill.location : skill.location.slice(0, lastSlash)
+
+    let files: string[] = []
+    const entries = await fs.readDir(dir)
+    files = entries
+      .filter(e => !e.isDirectory && e.name !== 'SKILL.md')
+      .slice(0, 10)
+      .map(e => `${dir}/${e.name}`)
+
+    return {
+      title: `Loaded skill: ${skill.name}`,
+      output: [
+        `<skill_content name="${skill.name}">`,
+        `# Skill: ${skill.name}`,
+        '',
+        skill.content,
+        '',
+        `Base directory for this skill: ${dir}`,
+        'Relative paths in this skill (e.g., scripts/, reference/) are relative to this base directory.',
+        'Note: file list is sampled.',
+        '',
+        '<skill_files>',
+        ...files.map(file => `<file>${file}</file>`),
+        '</skill_files>',
+        '</skill_content>',
+      ].join('\n'),
+      metadata: {
+        name: skill.name,
+        description: skill.description,
+        dir,
+      },
+    }
   },
 })
 

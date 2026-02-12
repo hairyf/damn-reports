@@ -176,7 +176,7 @@ export const session = defineStore(
           // 创建 ToolLoopAgent 实例
           const agent = new ToolLoopAgent({
             model: openai.chat(llmModel || 'deepseek-chat'),
-            instructions: await readTextFile('workspace/AGENTS.md', { baseDir: BaseDirectory.Resource }),
+            instructions: await readTextFile('AGENTS.md'),
             tools,
           })
 
@@ -256,6 +256,10 @@ export const session = defineStore(
               }
             }
           }
+        }
+        catch (error) {
+          console.error(error)
+          throw error
         }
         finally {
           this.isStreaming = false

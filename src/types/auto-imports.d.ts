@@ -75,6 +75,7 @@ declare global {
   const edit: typeof import('../config/tools').edit
   const exe_tool: typeof import('../config/tools').exe_tool
   const exec: typeof import('../config/tools').exec
+  const exec_tool: typeof import('../config/tools').exec_tool
   const executeCollector: typeof import('../utils/exec').executeCollector
   const executeCommand: typeof import('../utils/exec').executeCommand
   const executeCommandExpression: typeof import('../utils/exec').executeCommandExpression
@@ -104,10 +105,10 @@ declare global {
   const open: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').open
   const queryClient: typeof import('../config/client').queryClient
   const read: typeof import('../config/tools').read
-  const readDir: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readDir
-  const readFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readFile
+  const readDir: typeof import('../utils/fs-extra').readDir
+  const readFile: typeof import('../utils/fs-extra').readFile
   const readJson: typeof import('../utils/fs-extra').readJson
-  const readTextFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readTextFile
+  const readTextFile: typeof import('../utils/fs-extra').readTextFile
   const readTextFileLines: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readTextFileLines
   const remove: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').remove
   const rename: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').rename
@@ -116,6 +117,7 @@ declare global {
   const set_tool: typeof import('../config/tools').set_tool
   const siteConfig: typeof import('../config/site').siteConfig
   const size: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').size
+  const skill: typeof import('../config/tools').skill
   const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition
   const stat: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').stat
@@ -161,9 +163,9 @@ declare global {
   const watch: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watch
   const watchImmediate: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watchImmediate
   const write: typeof import('../config/tools').write
-  const writeFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').writeFile
+  const writeFile: typeof import('../utils/fs-extra').writeFile
   const writeJson: typeof import('../utils/fs-extra').writeJson
-  const writeTextFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').writeTextFile
+  const writeTextFile: typeof import('../utils/fs-extra').writeTextFile
 }
 // for type re-export
 declare global {
