@@ -1,7 +1,7 @@
 {
   "name": "damn-daily-reports",
   "type": "module",
-  "version": "0.2.5",
+  "version": "0.2.7",
   "private": true,
   "packageManager": "pnpm@10.28.1",
   "engines": {
@@ -14,7 +14,7 @@
     "tauri": "tauri",
     "release": "bumpp",
     "lint": "eslint .",
-    "typecheck": "tsc -p tsconfig.typecheck.json --noEmit",
+    "typecheck": "tsc --noEmit",
     "tauri:dev": "tauri dev",
     "tauri:icon": "pnpm tauri icon",
     "prisma:generate": "prisma generate",
