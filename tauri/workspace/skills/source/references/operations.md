@@ -21,6 +21,8 @@
   - `edit` – 受控的小范围文本替换。
   - `grep` – 定位模式（如特定 `id`）在文件中的位置。
 
+**避免重复读取**：读-改-写流程中，同一操作只需读取一次；若上一步已解析 `sources.json`，下一步直接复用解析结果，勿再次 `read`。
+
 ## /source get_all
 
 **目的**
@@ -77,15 +79,13 @@
 6. 将 `sources` 序列化为 JSON 字符串（如可能，格式化输出）。
 7. 调用 `write` 持久化：
    - 输入：`{"path": "sources.json", "content": "<序列化后的 sources>"}`
-8. 可选：再次 `read` 并解析以确认新条目已存在。
+8. 验证：通常无需再次 `read`；若上一步在内存中正确追加，写入后即可认为成功。仅在需向用户展示写入结果时再读取。
 
-**测试建议**
+**测试建议（可选，仅 exec_tool）**
 
-- 添加后，使用 **tool 技能** 的 `exec_tool` 运行一次采集，确认配置有效。
-- 调用工作区工具 `exec_tool`，参数：
-  - `toolid`：新数据源的 `tool` 字段（即 `tools.json` 中的 tool id）；
-  - `params`：新数据源的 `params` 对象（与工具的 `definition` 对应）。
-- 即将 `source.params` 作为 `exec_tool` 的 `params` 参数，执行一次采集以验证配置。
+- 添加后，**仅当用户未明确反对**时，可选地使用 **tool 技能** 的 `exec_tool` 运行一次采集，确认配置有效。
+- 参数：`toolid` = 新数据源的 `tool`，`params` = 新数据源的 `params`。
+- **严禁**：添加数据源后擅自调用 `sync_records` 或 `generate_report`；除非用户明确请求，否则仅完成添加与（可选） exec_tool 验证。
 
 **使用 edit 做定向插入（可选）**
 
@@ -96,7 +96,27 @@
 3. 构建 `newContent`，将新数据源插入数组（注意逗号和合法 JSON）。
 4. 调用 `edit`：
    - 输入：`{"path": "sources.json", "oldContent": "<旧>", "newContent": "<新>"}`
-5. 可选：再次 `read` 并解析以验证文件仍为合法 JSON。
+5. 验证：通常无需再次 `read`；仅在异常或用户要求确认时再读取。
+
+## /source remove
+
+**目的**
+
+从 `sources.json` 中移除指定 `id` 的数据源（或清空全部）。
+
+**输入（概念）**
+
+- `id`（string，可选）– 要移除的数据源的 `id`。若省略或传入 `"*"`，清空整个数组。
+
+**实现**
+
+1. 调用 `read`：`{"path": "sources.json"}`，解析为数组 `sources`。
+2. 若指定了具体 `id`：
+   - 过滤：`sources = sources.filter(item => item.id !== id)`。
+   - 若过滤后与原数组长度相同，说明未找到，可返回「未找到」。
+3. 若清空全部：`sources = []`。
+4. 调用 `write`：`{"path": "sources.json", "content": "<序列化后的 sources>"}`。
+5. 无需再次读取验证；若需向用户确认，可基于已写入的内容说明。
 
 ## /source get
 
@@ -146,7 +166,7 @@
 5. 将 `sources` 序列化为 JSON 字符串。
 6. 调用 `write`：
    - 输入：`{"path": "sources.json", "content": "<序列化后的 sources>"}`
-7. 可选：调用 `/source get` 确认更新后的值。
+7. 验证：通常无需再次 `read`；写入后即可认为成功。
 
 **使用 edit 做小范围更新（可选）**
 
@@ -156,4 +176,4 @@
 2. 构建 `oldContent` 和 `newContent`（必要时包含引号和逗号）。
 3. 调用 `edit`：
    - 输入：`{"path": "sources.json", "oldContent": "<旧>", "newContent": "<新>"}`
-4. 再次读取并解析 `sources.json` 以验证正确性。
+4. 验证：通常无需再次 `read`；仅在异常或用户要求确认时再读取。

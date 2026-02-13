@@ -22,7 +22,7 @@ description: "Manage App Workspace data sources defined in sources.json: list al
   - 在仓库中位于 `tauri/workspace/sources.json`。
   - 使用工作区工具（read、write、edit）时，路径为 `path: "sources.json"`。
 - **单个数据源格式**：见 `references/schema.md`。
-- **高层操作**（`/source get_all`、`/source add`、`/source get`、`/source set`）：见 `references/operations.md`。
+- **高层操作**（`/source get_all`、`/source add`、`/source get`、`/source set`、`/source remove`）：见 `references/operations.md`。
 
 ## 使用的工具
 
@@ -58,8 +58,9 @@ description: "Manage App Workspace data sources defined in sources.json: list al
      - `/source get` – 按 id 获取单个数据源
      - `/source set` – 按 id 更新已有数据源
 
-3. **添加后建议测试**
-   - 加载 **tool 技能**（`skills/tool`）并调用 `exec_tool`：将数据源的 `tool` 作为 `toolid`，`source.params` 作为 `params`，运行一次采集以验证配置正确。
+3. **添加后可选测试（仅限 exec_tool）**
+   - 可选：加载 **tool 技能** 并调用 `exec_tool`，将数据源的 `tool` 作为 `toolid`，`params` 作为 `params`，验证采集能否成功。
+   - **严禁**：添加数据源后擅自调用 `sync_records` 或 `generate_report`；除非用户明确请求同步或生成日报，否则仅完成添加/更新操作。
 
 4. **保持 sources.json 有效**
    - 始终将 `sources.json` 视为 **JSON 数组**。
