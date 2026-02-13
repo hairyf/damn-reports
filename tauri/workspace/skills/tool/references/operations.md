@@ -15,10 +15,8 @@ All paths and examples assume you are operating inside the Tauri workspace.
 
 - `tools.json` logical path:
   - Repository location: `tauri/workspace/tools.json`.
-  - For `read`, `write`, `edit`:
-    - Use `path: "tools.json"` (these tools internally prefix `workspace`).
-  - For `grep`:
-    - Use `path: "workspace/tools.json"` (no automatic `workspace` prefix).
+  - For `read`, `write`, `edit`, `grep`:
+    - Use `path: "tools.json"` (all these tools internally prefix `workspace`; see `src/utils/fs-extra.ts`).
 
 - Helper tools:
   - `read` – load current JSON content as text.
@@ -131,7 +129,7 @@ Retrieve a single tool definition by id.
 - To quickly locate the raw text for a tool id, use `grep`:
 
   - Input:
-    - `{"path": "workspace/tools.json", "pattern": "\"<toolid>\""}`  
+    - `{"path": "tools.json", "pattern": "\"<toolid>\""}`  
 
 - This is useful for understanding the surrounding context before editing,
   but the authoritative value should still come from the parsed JSON.

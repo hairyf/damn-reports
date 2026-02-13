@@ -47,8 +47,7 @@ These tools are defined in `src/config/tools.ts` and exposed to the agent:
 
 - `grep`  
   - Searches for a string pattern in a file.  
-  - **Important**: `grep` does **not** automatically prefix `workspace`, so you must pass the full relative resource path.  
-  - To search inside `tools.json`, use `{"path": "workspace/tools.json", "pattern": "<toolid or text>"}`.
+  - Same path convention as `read`/`write`/`edit`: use `path: "tools.json"`.
 
 - `exec_tool`  
   - Executes a tool definition stored in `tools.json` by id.  
