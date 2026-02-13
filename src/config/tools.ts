@@ -1,6 +1,5 @@
 /* eslint-disable no-console */
 import { tool } from 'ai'
-import dayjs from 'dayjs'
 import { sql } from 'kysely'
 import { z } from 'zod'
 import { executeCollector, executeCommand } from '../utils/exec'
@@ -282,10 +281,16 @@ export const skill = tool({
   },
 })
 
-export const get_records = tool({
-  description: '同步数据源并获取数据库中今天的记录',
+export const sync_records = tool({
+  description: '同步记录并返回收集到的数量',
   inputSchema: z.object({}),
-  execute: async () => db.record.findMany({ date: dayjs().toISOString() }),
+  execute: () => store.source.collect(),
+})
+
+export const generate_report = tool({
+  description: '同步记录并生成、保存当天的日报',
+  inputSchema: z.object({}),
+  execute: () => store.report.generateDailyReport(),
 })
 
 // add_source

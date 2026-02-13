@@ -88,7 +88,19 @@ Usage notes:
 <skill>
 <name>source</name>
 <description>Manage workspace data sources defined in sources.json: list all sources, add a new source, get a source by id, and update an existing source. Use when you need to maintain the list of collector sources (sources.json) in the Tauri workspace.</description>
-<skills/source</location>
+<location>skills/source</location>
+</skill>
+
+<skill>
+<name>record</name>
+<description>Query, sync, and insert records in the Record table. Use when you need to: run SQL queries on record, sync records via sync_records, or add new records with tool='ai'. Use for /record get, /record sync, /record add.</description>
+<location>skills/record</location>
+</skill>
+
+<skill>
+<name>report</name>
+<description>Query, generate, and update reports in the Report table. Use when you need to: run SQL queries on report (prefer same-day), generate today's report via generate_report, or modify reports with SQL. Use for /report get, /report generate, /report set.</description>
+<location>skills/report</location>
 </skill>
 
 <skill>

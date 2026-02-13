@@ -118,6 +118,7 @@ declare global {
   const readJson: typeof import('../utils/fs-extra').readJson
   const readTextFile: typeof import('../utils/fs-extra').readTextFile
   const readTextFileLines: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readTextFileLines
+  const records_sync: typeof import('../config/tools').records_sync
   const remove: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').remove
   const rename: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').rename
   const retry: typeof import('../utils/utility').retry
@@ -133,6 +134,7 @@ declare global {
   const storage: typeof import('../config/storage').storage
   const store: typeof import('../store/index').store
   const subtitle: typeof import('../components/primitives').subtitle
+  const sync_records: typeof import('../config/tools').sync_records
   const tauriStorageDriver: typeof import('../config/storage.driver').tauriStorageDriver
   const test_node_js: typeof import('../config/source-tools').test_node_js
   const title: typeof import('../components/primitives').title

@@ -173,11 +173,15 @@ export const chat = defineStore(
         this.isStreaming = true
 
         try {
+          const ws = await db.workspace.findFirst()
           // 创建 ToolLoopAgent 实例
           const agent = new ToolLoopAgent({
             model: openai.chat(llmModel || 'deepseek-chat'),
             instructions: [
-              { role: 'system', content: `Current System: ${navigator.userAgent}` },
+              { role: 'system', content: [
+                `Current System: ${navigator.userAgent}`,
+                `Current Workspace ID: ${ws?.id}`,
+              ].join('\n') },
               { role: 'system', content: await readTextFile('AGENTS.md') },
             ],
             tools,
