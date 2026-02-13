@@ -16,9 +16,9 @@ export interface DefaultLayoutProps {
 }
 
 export function DefaultLayout(props: DefaultLayoutProps) {
-  const { ininitialized } = useStore(store.setting)
+  const isConfigured = useStore(store.llm).isConfigured
 
-  const isNeedInitiator = !ininitialized
+  const isNeedInitiator = !isConfigured
 
   return (
     <>

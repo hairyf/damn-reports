@@ -1,15 +1,27 @@
-import { Button, Card, CardBody, Input } from '@heroui/react'
+import type { LlmProvider } from '@/store/modules/llm'
+import { Button, Card, CardBody, Input, Select, SelectItem } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { useState } from 'react'
+import { useStore } from 'valtio-define'
+import { LLM_PROVIDERS } from '@/store/modules/llm'
+import { VercelModelSelect } from './vercel-model-select'
 
 export function StepLlmSetting() {
-  const [apiKey, setApiKey] = useState('')
-  const [baseUrl, setBaseUrl] = useState('https://api.deepseek.com')
-  const [model, setModel] = useState('deepseek-chat')
+  const persisted = useStore(store.llm)
+  const [apiKey, setApiKey] = useState(persisted.apiKey)
+  const [provider, setProvider] = useState<LlmProvider>(persisted.provider)
+  const [baseUrl, setBaseUrl] = useState(persisted.baseUrl)
+  const [model, setModel] = useState(persisted.model)
+
+  const modelOptions = LLM_PROVIDERS[provider].models
+  const isCustomProvider = provider === 'custom'
+  const isVercelProvider = provider === 'vercel'
 
   function onConfirm() {
-    store.setting.llmApiKey = apiKey
-    store.setting.llmBaseUrl = baseUrl
-    store.setting.llmModel = model
+    store.llm.apiKey = apiKey
+    store.llm.provider = provider
+    store.llm.baseUrl = baseUrl
+    store.llm.model = model
   }
 
   return (
@@ -33,37 +45,98 @@ export function StepLlmSetting() {
               type="text"
               value={apiKey}
               onChange={e => setApiKey(e.target.value)}
-              placeholder="sk-..."
+              placeholder={isVercelProvider ? 'Vercel AI Gateway API Key' : 'sk-...'}
             />
           </div>
           <div className="space-y-2">
             <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
-              Base URL
+              模型 / Provider
             </label>
-            <Input
-              type="text"
-              value={baseUrl}
-              onChange={e => setBaseUrl(e.target.value)}
-              placeholder="https://api.deepseek.com"
-            />
+            <Select
+              selectedKeys={[provider]}
+              onSelectionChange={(keys) => {
+                const p = Array.from(keys)[0] as LlmProvider
+                if (p) {
+                  setProvider(p)
+                  const config = LLM_PROVIDERS[p]
+                  if (config.models.length > 0)
+                    setModel(config.models[0].value)
+                  else if (p === 'custom')
+                    setModel('')
+                  else if (p === 'vercel')
+                    setModel('')
+                }
+              }}
+              placeholder="选择模型"
+              aria-label="选择模型"
+            >
+              {Object.entries(LLM_PROVIDERS).map(([key, config]) => (
+                <SelectItem key={key}>
+                  {config.label}
+                </SelectItem>
+              ))}
+            </Select>
           </div>
+          {isCustomProvider && (
+            <div className="space-y-2">
+              <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
+                Base URL
+              </label>
+              <Input
+                type="text"
+                value={baseUrl}
+                onChange={e => setBaseUrl(e.target.value)}
+                placeholder="https://api.openai.com/v1"
+              />
+            </div>
+          )}
           <div className="space-y-2">
             <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
               Model
             </label>
-            <Input
-              type="text"
-              value={model}
-              onChange={e => setModel(e.target.value)}
-              placeholder="deepseek-chat"
-            />
+            {isVercelProvider
+              ? (
+                  <VercelModelSelect
+                    value={model}
+                    onChange={setModel}
+                    placeholder="搜索并选择模型（200+）"
+                    ariaLabel="选择具体模型"
+                  />
+                )
+              : modelOptions.length > 0
+                ? (
+                    <Select
+                      selectedKeys={[model]}
+                      onSelectionChange={(keys) => {
+                        const m = Array.from(keys)[0] as string
+                        if (m)
+                          setModel(m)
+                      }}
+                      placeholder="选择模型"
+                      aria-label="选择具体模型"
+                    >
+                      {modelOptions.map(opt => (
+                        <SelectItem key={opt.value}>
+                          {opt.label}
+                        </SelectItem>
+                      ))}
+                    </Select>
+                  )
+                : (
+                    <Input
+                      type="text"
+                      value={model}
+                      onChange={e => setModel(e.target.value)}
+                      placeholder="如 gpt-4、claude-3"
+                    />
+                  )}
           </div>
           <div className="flex space-x-3">
             <Button
               onPress={onConfirm}
               color="primary"
               className="flex-1"
-              isDisabled={!apiKey}
+              isDisabled={!apiKey || !model}
             >
               <span>确认配置</span>
               <Icon icon="lucide:arrow-right" className="w-4.5 h-4.5" />

@@ -4,10 +4,7 @@ import { defineStore } from 'valtio-define'
 import { queryClient } from '@/config/client'
 import { dailyReportPrompt, optimizeReportPrompt } from '@/config/prompts'
 import { store } from '@/store'
-import { streamGenerateContent } from './streaming'
-
 import { buildRecordSummaryPrompt } from './summary'
-import { createModel } from './utils'
 import 'valtio-define/types'
 
 export const report = defineStore({
@@ -32,13 +29,8 @@ export const report = defineStore({
     async streamGenerate(systemPrompt: string): Promise<string> {
       this.loading = true
       this.streamingContent = ''
-      const model = createModel({
-        llmApiKey: store.setting.effectiveLlmApiKey,
-        llmBaseUrl: store.setting.effectiveLlmBaseUrl,
-        llmModel: store.setting.llmModel,
-      })
       try {
-        return await streamGenerateContent(model, systemPrompt, (delta) => {
+        return await store.llm.streamGenerateText(systemPrompt, (delta) => {
           this.streamingContent += delta
         })
       }

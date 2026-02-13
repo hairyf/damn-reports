@@ -61,6 +61,7 @@ declare global {
   const ToolIcon: typeof import('../components/tool-icon').ToolIcon
   const TrendCard: typeof import('../components/trend-card').TrendCard
   const UpdateStatus: typeof import('../components/update-status').UpdateStatus
+  const VercelModelSelect: typeof import('../components/vercel-model-select').VercelModelSelect
   const add_source: typeof import('../config/tools').add_source
   const add_tool: typeof import('../config/tools').add_tool
   const cache: typeof import('react').cache
@@ -228,6 +229,9 @@ declare global {
   // @ts-ignore
   export type { IconMap, ToolIconProps } from '../components/tool-icon'
   import('../components/tool-icon')
+  // @ts-ignore
+  export type { VercelModelSelectProps } from '../components/vercel-model-select'
+  import('../components/vercel-model-select')
   // @ts-ignore
   export type { Collector } from '../utils/exec'
   import('../utils/exec')

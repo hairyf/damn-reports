@@ -28,6 +28,8 @@ const QUICK_TAGS = [
   { label: '添加工具', icon: 'lucide:wrench', suggestion: '帮我配置用于获取远程 git 每天提交记录的工具' },
 ] as const
 
+const SHOW_ATTACHMENTS = false // 暂时隐藏附件功能
+
 function AttachButton() {
   const { openFileDialog } = usePromptInputAttachments()
   return (
@@ -57,7 +59,7 @@ function MessageAreaExtras() {
 
   return (
     <div className="flex flex-col gap-2">
-      {attachments.files.length > 0 && (
+      {SHOW_ATTACHMENTS && attachments.files.length > 0 && (
         <Attachments variant="grid" className="mt-1">
           {attachments.files.map((file: FileUIPart & { id: string }) => (
             <Attachment
@@ -130,7 +132,7 @@ function ChatInputInner() {
       <div className="flex gap-2 justify-between">
         <MessageAreaExtras />
         <div className="flex gap-2">
-          <AttachButton />
+          {SHOW_ATTACHMENTS && <AttachButton />}
           <PromptInputSubmit
             className="cursor-pointer"
             status={isStreaming ? 'streaming' : undefined}

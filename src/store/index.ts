@@ -1,4 +1,5 @@
 import { chat } from './modules/chat'
+import { llm } from './modules/llm'
 import { report } from './modules/report'
 import { setting } from './modules/setting'
 import { source } from './modules/source'
@@ -10,6 +11,7 @@ export const store = {
   tool,
   chat,
   setting,
+  llm,
   updater,
   report,
 }

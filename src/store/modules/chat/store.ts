@@ -2,8 +2,7 @@ import type { FileUIPart } from 'ai'
 import type { ChatMessage, ChatSession } from './types'
 import { defineStore } from 'valtio-define'
 import { store } from '@/store'
-
-import { buildMessagesForModel, generateSessionTitle, runStream } from './streaming'
+import { buildMessagesForModel } from '../llm'
 import { MAIN_SESSION_ID } from './types'
 import { createId, createMainSession, updateTimestamp } from './utils'
 import 'valtio-define/types'
@@ -56,11 +55,46 @@ export const chat = defineStore(
       setActiveSession(id: string) {
         this.activeSessionId = id
       },
-      appendMessage(sessionId: string, message: ChatMessage) {
+      /** 流式更新 assistant 消息内容（由 startStreaming 通过 callbacks 调用） */
+      applyStreamDelta(
+        sessionId: string,
+        assistantMessageId: string,
+        delta: string,
+        opts?: { replace?: boolean, toolCallIndex?: number },
+      ) {
         const target = this.sessions.find(s => s.id === sessionId)
         if (!target)
           return
-        target.messages.push(message)
+        const last = target.messages[target.messages.length - 1]
+        if (!last || last.id !== assistantMessageId)
+          return
+        if (opts?.replace && opts.toolCallIndex != null) {
+          const toolCall = last.toolCalls?.[opts.toolCallIndex]
+          if (toolCall)
+            toolCall.result = last.content
+          last.content = delta
+        }
+        else {
+          last.content += delta
+        }
+        updateTimestamp(target)
+      },
+      /** 流式添加工具调用（由 startStreaming 通过 callbacks 调用） */
+      addStreamToolCall(
+        sessionId: string,
+        assistantMessageId: string,
+        toolName: string,
+        args: Record<string, unknown>,
+      ) {
+        const target = this.sessions.find(s => s.id === sessionId)
+        if (!target)
+          return
+        const last = target.messages[target.messages.length - 1]
+        if (!last || last.id !== assistantMessageId)
+          return
+        if (!last.toolCalls)
+          last.toolCalls = []
+        last.toolCalls.push({ toolName, args, result: '' })
         updateTimestamp(target)
       },
       deleteSession(id: string) {
@@ -98,18 +132,6 @@ export const chat = defineStore(
           }
         }
       },
-      renameSession(id: string, title: string) {
-        const target = this.sessions.find(s => s.id === id)
-        if (!target)
-          return
-        target.title = title.trim() || target.title
-        updateTimestamp(target)
-      },
-      clearAll() {
-        const main = this.sessions.find(s => s.id === MAIN_SESSION_ID)
-        this.sessions = main ? [main] : []
-        this.activeSessionId = main?.id ?? null
-      },
       async startStreaming(userContent: string, files: FileUIPart[] = []) {
         const content = userContent.trim()
         if (!content && files.length === 0)
@@ -118,8 +140,7 @@ export const chat = defineStore(
           throw new Error('当前正在生成回复，请稍后再试')
         }
 
-        const { effectiveLlmApiKey: llmApiKey, effectiveLlmBaseUrl: llmBaseUrl, llmModel } = store.setting
-        if (!llmApiKey?.trim()) {
+        if (!store.llm.effectiveApiKey?.trim()) {
           throw new Error('请先在设置中配置 LLM API Key')
         }
 
@@ -157,16 +178,15 @@ export const chat = defineStore(
         this.isStreaming = true
 
         try {
-          await runStream({
-            llmApiKey,
-            llmBaseUrl,
-            llmModel: llmModel || 'deepseek-chat',
+          await store.llm.createStream({
             messagesForModel,
             abortSignal: abortController.signal,
-            ctx: {
-              sessionId,
-              assistantMessageId,
-              getSession: id => this.sessions.find(s => s.id === id),
+            callbacks: {
+              onTextDelta: (delta, opts) =>
+                this.applyStreamDelta(sessionId, assistantMessageId, delta, opts),
+              onToolCall: (toolName, args) =>
+                this.addStreamToolCall(sessionId, assistantMessageId, toolName, args),
+              onToolResult: () => { /* 下一次 onTextDelta 会带 replace: true */ },
             },
           })
 
@@ -178,12 +198,7 @@ export const chat = defineStore(
                   .map(m => `${m.role === 'user' ? '用户' : '助手'}: ${m.content}`)
                   .join('\n')
 
-                const newTitle = await generateSessionTitle(
-                  conversationText,
-                  llmApiKey,
-                  llmBaseUrl,
-                  llmModel,
-                )
+                const newTitle = await store.llm.generateSessionTitle(conversationText)
                 if (newTitle) {
                   target.title = newTitle
                   updateTimestamp(target)

@@ -325,15 +325,37 @@ export const generate_report = tool({
 export const get_settings = tool({
   description: '获取应用设置（LLM 模型、用户界面、通知、自动保存、日报生成时间）',
   inputSchema: z.object({}),
-  execute: () => store.setting.$state,
+  execute: () => ({
+    ...store.setting.$state,
+    llm: store.llm.$state,
+    effectiveLlmApiKey: store.llm.effectiveApiKey ? '(已配置)' : '',
+    effectiveLlmBaseUrl: store.llm.effectiveBaseUrl,
+    llmModel: store.llm.effectiveModel,
+  }),
 })
+
+const LLM_KEY_MAP: Record<string, string> = { llmApiKey: 'apiKey', llmBaseUrl: 'baseUrl', llmModel: 'model' }
 
 export const set_settings = tool({
   description: '设置应用设置',
   inputSchema: z.object({
     patchSettings: z.record(z.string(), z.any()).describe('应用设置'),
   }),
-  execute: ({ patchSettings }) => store.setting.$patch(patchSettings),
+  execute: ({ patchSettings }) => {
+    const settingPatch: Record<string, unknown> = {}
+    const llmPatch: Record<string, unknown> = {}
+    for (const [k, v] of Object.entries(patchSettings)) {
+      const llmKey = LLM_KEY_MAP[k] ?? (['apiKey', 'provider', 'baseUrl', 'model'].includes(k) ? k : null)
+      if (llmKey)
+        llmPatch[llmKey] = v
+      else
+        settingPatch[k] = v
+    }
+    if (Object.keys(settingPatch).length)
+      store.setting.$patch(settingPatch)
+    if (Object.keys(llmPatch).length)
+      store.llm.$patch(llmPatch)
+  },
 })
 
 // add_source
