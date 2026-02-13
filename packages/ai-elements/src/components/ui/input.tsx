@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-function Input({ ref, className, type, ...props }: React.ComponentProps<'input'> & { ref?: React.RefObject<HTMLInputElement | null> }) {
+function Input({ ref, className, type, ...props }: React.ComponentProps<'input'> & { ref?: React.Ref<HTMLInputElement> }) {
   return (
     <input
       type={type}
