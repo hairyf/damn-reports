@@ -14,7 +14,12 @@ export interface Collector {
   files?: string[]
   type: 'exec' | 'http'
   executor: Record<string, any>
-  definition?: Record<string, { type: string, description: string }>
+  definition?: Record<string, {
+    type: string
+    description: string
+    optional?: boolean
+    default?: string | number | boolean
+  }>
   transformer?: string
 }
 

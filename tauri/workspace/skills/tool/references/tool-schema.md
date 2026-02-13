@@ -49,14 +49,17 @@ Each tool definition has the following fields:
 - `definition` (object)  
   - Declarative definition of the tool parameters.  
   - Keys are parameter names.  
-  - Typical parameter schema:
+  - Parameter schema:
     - `type` (string) – e.g. `"string"`, `"number"`, `"boolean"`.
     - `description` (string) – description of the parameter.
-  - Additional fields may be added as needed by the executor.
+    - `optional` (boolean, optional) – if `true`, parameter may be omitted; when absent, an empty string is used in templates.
+    - `default` (any, optional) – when parameter is omitted or empty, this value is used.
+  - If both `optional` and `default` are set, `default` takes precedence when the parameter is absent.
 
 - `files` (optional, array of strings)  
   - Additional files needed by the tool (e.g. helper scripts).  
-  - Paths are relative to the workspace resource root.
+  - Paths are relative to the workspace resource root.  
+  - **For complex executors**: prefer adding a Node script under `tools/` and listing it here; use `executor.command: "node"` and `executor.args: ["./tools/script.js", ...]`.
 
 - `executor` (object)  
   - How to call the underlying system or HTTP layer.

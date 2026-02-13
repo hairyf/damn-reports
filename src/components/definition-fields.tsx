@@ -1,10 +1,12 @@
 import { Input } from '@heroui/react'
 import { useFormContext } from 'react-hook-form'
-import { FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
+import { FormControl, FormDescription, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
 
 export interface FieldSchema {
   type?: string
   description?: string
+  optional?: boolean
+  default?: string | number | boolean
 }
 
 export interface DefinitionFieldsProps {
@@ -28,16 +30,28 @@ export function DefinitionFields({ definition, prefix = 'params' }: DefinitionFi
           key={key}
           control={control}
           name={`${prefix}.${key}`}
-          rules={{ required: `${key} is required` }}
+          rules={{ required: schema.optional ? undefined : `${key} is required` }}
           render={({ field }) => (
             <FormItem>
-              <FormLabel>{key}</FormLabel>
+              <FormLabel>
+                {key}
+                {schema.optional && (
+                  <span className="text-default-400 font-normal ml-1">（可选）</span>
+                )}
+              </FormLabel>
+              {schema.description && (
+                <FormDescription>{schema.description}</FormDescription>
+              )}
               <FormControl>
                 <Input
                   {...field}
                   value={field.value ?? ''}
                   labelPlacement="outside"
-                  placeholder={schema.description || `Enter ${key}`}
+                  placeholder={
+                    schema.default != null
+                      ? `${schema.description || key}（默认: ${schema.default}）`
+                      : (schema.description || `Enter ${key}`)
+                  }
                 />
               </FormControl>
               <FormMessage />

@@ -55,6 +55,11 @@ Return the complete `tools.json` object (all collectors).
 
 Add a new tool definition under a given tool id.
 
+**Executor strategy**
+
+- For **simple** logic (single command, few args, straightforward output): use inline `executor` with `command` and `args`.
+- For **complex** logic (multi-step, branching, parsing, JSON shaping): prefer writing a Node.js script under `tools/`, then reference it via `executor.command: "node"` and `executor.args: ["./tools/script.js", ...]`. Add the script to `files`. See SKILL.md section "Executor complexity: prefer Node scripts".
+
 **Inputs (conceptual)**
 
 - `toolid` (string) – key under which the tool will be stored.

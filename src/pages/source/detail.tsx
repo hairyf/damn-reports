@@ -1,7 +1,7 @@
 import type { Source } from '@/store/modules/source'
 import { If, useWhenever } from '@hairy/react-lib'
 import { isEqual } from '@hairy/utils'
-import { addToast, Button, Card, CardBody, CardHeader, Divider, Input } from '@heroui/react'
+import { addToast, Button, Card, CardBody, CardHeader, Divider, Input, Textarea } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useForm } from 'react-hook-form'
 import { useKey } from 'react-use'
@@ -15,6 +15,7 @@ function Page() {
   const form = useForm({
     defaultValues: {
       name: '',
+      description: '',
       tool: '',
       params: {} as Record<string, any>,
     },
@@ -29,7 +30,7 @@ function Page() {
     const source = store.source.find(sourceId)
     if (!source)
       return
-    const parsed = { name: source.name, tool: source.tool, params: source.params }
+    const parsed = { name: source.name, description: source.description ?? '', tool: source.tool, params: source.params }
     form.reset(parsed)
     setOriginalData(parsed)
   }
@@ -41,7 +42,7 @@ function Page() {
 
   const onSubmit = form.handleSubmit(async (data) => {
     if (sourceId) {
-      await store.source.update(sourceId, { name: data.name, tool: data.tool, params: data.params })
+      await store.source.update(sourceId, { name: data.name, description: data.description, tool: data.tool, params: data.params })
       reset()
       addToast({
         title: 'Success',
@@ -51,7 +52,7 @@ function Page() {
       })
     }
     else {
-      await store.source.create({ name: data.name, tool: data.tool, params: data.params })
+      await store.source.create({ name: data.name, description: data.description, tool: data.tool, params: data.params })
       addToast({
         title: 'Success',
         description: 'Source created successfully',
@@ -74,7 +75,7 @@ function Page() {
 
   // 获取当前 tool 的 definition
   const toolDef = store.tool.raw[tool]
-  const definition = toolDef?.definition as Record<string, { type?: string, description?: string }> | undefined
+  const definition = toolDef?.definition as Record<string, { type?: string, description?: string, optional?: boolean, default?: string | number | boolean }> | undefined
 
   return (
     <Form {...form}>
@@ -120,34 +121,54 @@ function Page() {
             </CardHeader>
             <Divider className="opacity-30 shadow" />
             <CardBody className="flex flex-col gap-4">
-              <div className="flex gap-4">
+              <div className="flex flex-col gap-4">
+                <div className="flex gap-4">
+                  <FormField
+                    control={form.control}
+                    name="name"
+                    rules={{ required: '请输入名称' }}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>Name</FormLabel>
+                        <FormControl>
+                          <Input
+                            {...field}
+                            labelPlacement="outside"
+                            placeholder="Enter source name"
+                          />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                  <FormField
+                    control={form.control}
+                    name="tool"
+                    rules={{ required: '请选择数据源工具' }}
+                    render={({ field }) => (
+                      <FormItem className="flex-1">
+                        <FormLabel>数据源工具</FormLabel>
+                        <FormControl>
+                          <SourceSelect onChange={field.onChange} value={field.value} />
+                        </FormControl>
+                        <FormMessage />
+                      </FormItem>
+                    )}
+                  />
+                </div>
                 <FormField
                   control={form.control}
-                  name="name"
-                  rules={{ required: 'Please enter source name' }}
+                  name="description"
                   render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>Name</FormLabel>
+                    <FormItem>
+                      <FormLabel>描述</FormLabel>
                       <FormControl>
-                        <Input
+                        <Textarea
                           {...field}
+                          value={field.value ?? ''}
                           labelPlacement="outside"
-                          placeholder="Enter source name"
+                          placeholder="数据源简要说明（可选）"
                         />
-                      </FormControl>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                <FormField
-                  control={form.control}
-                  name="tool"
-                  rules={{ required: 'Please select a tool' }}
-                  render={({ field }) => (
-                    <FormItem className="flex-1">
-                      <FormLabel>数据源工具</FormLabel>
-                      <FormControl>
-                        <SourceSelect onChange={field.onChange} value={field.value} />
                       </FormControl>
                       <FormMessage />
                     </FormItem>

@@ -7,6 +7,8 @@ import * as fs from '../utils/fs-extra'
 // 辅助函数：将 Uint8Array 转为字符串
 const decoder = new TextDecoder()
 const encoder = new TextEncoder()
+/** 统一换行符为 \n，避免 Windows CRLF 与 LF 导致 edit 匹配失败 */
+const normalizeLn = (s: string) => s.replace(/\r\n/g, '\n').replace(/\r/g, '\n')
 
 export const read = tool({
   description: '读取文件内容',
@@ -42,17 +44,31 @@ export const write = tool({
 })
 
 export const edit = tool({
-  description: '对文件进行精确编辑（简单替换示例，建议根据需求优化为正则或行编辑）',
+  description: [
+    '对文件进行精确文本替换。oldContent 必须与文件中内容完全一致（空格、缩进、转义）。换行符 CRLF/LF 会自动规范化。',
+    '',
+    '使用前：先用 read 读取文件，从返回值中复制要替换的原文作为 oldContent，确保一字不差。',
+    '建议：替换范围尽量小（几行即可），大段修改或 JSON 结构变更优先用 write 重写整个文件。',
+    '若 oldContent 未找到，会抛出错误并返回文件片段以便排查。',
+  ].join('\n'),
   inputSchema: z.object({
-    path: z.string(),
-    oldContent: z.string().describe('要被替换的旧文本'),
+    path: z.string().describe('文件路径'),
+    oldContent: z.string().describe('要被替换的原文，必须与 read 读到的内容完全一致，含空格/换行/缩进'),
     newContent: z.string().describe('替换后的新文本'),
   }),
   execute: async ({ path, oldContent, newContent }) => {
     try {
       const data = await fs.readFile(path)
       const currentText = decoder.decode(data)
-      const updatedText = currentText.replace(oldContent, newContent)
+      const normCurrent = normalizeLn(currentText)
+      const normOld = normalizeLn(oldContent)
+      if (!normCurrent.includes(normOld)) {
+        const snippet = currentText.slice(0, 200).replace(/\n/g, '↵')
+        throw new Error(
+          `oldContent 在文件中未找到。请用 read 重新读取文件，复制确切的原文。文件开头片段: "${snippet}..."`,
+        )
+      }
+      const updatedText = normCurrent.replace(normOld, newContent)
       await fs.writeFile(path, encoder.encode(updatedText))
       return `Updated ${path}`
     }
@@ -137,7 +153,7 @@ export const http = tool({
 })
 
 export const exec = tool({
-  description: '执行命令，Windows（powershell），Mac/inux（bash）',
+  description: '执行命令',
   inputSchema: z.object({
     command: z.string().describe('要执行的命令'),
   }),
@@ -171,22 +187,32 @@ export const exec_tool = tool({
       )
     }
 
-    // 3. Validate required parameters
+    // 3. Build config: validate required params, apply defaults, and fill optional with ''
+    const config: Record<string, any> = { ...params }
     if (toolDef.definition) {
-      const missing = Object.entries(toolDef.definition)
-        .filter(([key]) => params[key] === undefined || params[key] === '')
-        .map(([key, schema]: [string, any]) => `  - ${key}: ${schema.description || schema.type}`)
-      if (missing.length > 0) {
-        throw new Error(
-          `Missing required parameters for tool "${toolid}":\n${missing.join('\n')}\n`
-          + `Provided params: ${JSON.stringify(params)}`,
-        )
+      for (const [key, schema] of Object.entries(toolDef.definition) as [string, any][]) {
+        const val = params[key]
+        const absent = val === undefined || val === ''
+
+        if (absent && schema.default !== undefined) {
+          config[key] = schema.default
+        }
+        else if (absent && schema.optional) {
+          config[key] = ''
+        }
+        else if (absent) {
+          throw new Error(
+            `Missing required parameter for tool "${toolid}": ${key}\n`
+            + `Description: ${schema.description || schema.type}\n`
+            + `Provided params: ${JSON.stringify(params)}`,
+          )
+        }
       }
     }
 
     // 4. Execute the tool
     try {
-      const data = await executeCollector(toolDef, params)
+      const data = await executeCollector(toolDef, config)
 
       console.log('Tool execution result:', data)
       return data

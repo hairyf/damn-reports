@@ -13,7 +13,7 @@ export interface ChatMessage {
   role: ChatRole
   content: string
   createdAt: string
-  toolCalls?: Array<{ toolName: string, args?: Record<string, unknown> }>
+  toolCalls?: Array<{ toolName: string, args?: Record<string, unknown>, result?: string }>
 }
 
 export interface ChatSession {
@@ -165,6 +165,14 @@ export const chat = defineStore(
             const parts = [...textPart, ...fileParts]
             return { role: 'user' as const, content: parts }
           }
+          // 如果消息包含工具调用，使用工具调用的结果作为上下文
+          if (m.role === 'assistant' && m.toolCalls && m.toolCalls.length > 0) {
+            const toolResults = m.toolCalls
+              .map(tc => tc.result || '')
+              .filter(Boolean)
+              .join('\n')
+            return { role: m.role, content: toolResults.trim() || m.content }
+          }
           return { role: m.role, content: m.content }
         })
 
@@ -195,6 +203,7 @@ export const chat = defineStore(
 
           // 使用 fullStream 来处理文本和工具调用
           let shouldClearOnNextText = false
+          let currentToolCallIndex = -1
           for await (const part of stream.fullStream) {
             const target = this.sessions.find(s => s.id === sessionId)
             if (!target)
@@ -207,6 +216,9 @@ export const chat = defineStore(
             if (part.type === 'text-delta') {
               // 如果标记了需要清空，说明这是工具调用后的新文本，清空并重新开始
               if (shouldClearOnNextText) {
+                const toolCall = last.toolCalls?.[currentToolCallIndex]
+                if (toolCall)
+                  toolCall.result = last.content
                 last.content = part.text
                 shouldClearOnNextText = false
               }
@@ -224,7 +236,9 @@ export const chat = defineStore(
               last.toolCalls.push({
                 toolName: part.toolName,
                 args: part.input as Record<string, unknown>,
+                result: '',
               })
+              currentToolCallIndex = last.toolCalls.length - 1
               updateTimestamp(target)
             }
             // 处理工具结果

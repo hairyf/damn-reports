@@ -21,8 +21,10 @@ import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
 const QUICK_TAGS = [
-  { label: '分析数据', icon: 'lucide:bar-chart-2' },
-  { label: '随便聊聊', icon: 'lucide:box' },
+  { label: '生成今日日报', icon: 'lucide:file-edit', suggestion: '生成今日日报' },
+  { label: '查看今日日报', icon: 'lucide:clipboard-list', suggestion: '查看今日日报' },
+  { label: '配置数据源', icon: 'lucide:database', suggestion: '帮我配置添加 xxx 为数据来源' },
+  { label: '添加工具', icon: 'lucide:wrench', suggestion: '帮我配置用于获取远程 git 每天提交记录的工具' },
 ] as const
 
 function AttachButton() {
@@ -68,11 +70,11 @@ function MessageAreaExtras() {
           ))}
         </Attachments>
       )}
-      <Suggestions className="gap-2">
-        {QUICK_TAGS.map(({ label, icon }) => (
+      <Suggestions className="ml-2 gap-2">
+        {QUICK_TAGS.map(({ label, icon, suggestion }) => (
           <Suggestion
             key={label}
-            suggestion={label}
+            suggestion={suggestion}
             onClick={handleSuggestionClick}
             className="rounded-full shadow-none"
           >

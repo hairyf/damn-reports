@@ -1,5 +1,4 @@
 import type { DirEntry } from '@tauri-apps/plugin-fs'
-import fs from 'node:fs'
 import {
   BaseDirectory,
   readDir as readDirFs,

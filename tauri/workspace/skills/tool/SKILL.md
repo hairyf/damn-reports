@@ -91,3 +91,39 @@ These tools are defined in `src/config/tools.ts` and exposed to the agent:
 
 For detailed step-by-step procedures for each `/tool` operation, see `references/operations.md`.
 
+## Executor complexity: prefer Node scripts
+
+When adding a tool whose executor logic is non-trivial, **prefer writing a Node.js execution file** instead of embedding complex shell commands or long argument chains in `tools.json`.
+
+**When to use a Node script:**
+- Logic involves multiple steps, branching, or data parsing
+- Complex parameter handling or validation
+- Output needs to be shaped as JSON before the transformer runs
+- Shell escape or cross-platform concerns make a long command fragile
+
+**How to do it:**
+1. Create a script under `tools/` (e.g. `tools/my_collector.js`)
+2. Accept parameters via `process.argv` or `process.env`, and output JSON to stdout
+3. Register the tool in `tools.json` with `type: "exec"` and:
+   - `executor.command`: `"node"`
+   - `executor.args`: `["./tools/my_collector.js", "{{param1}}", "{{param2}}"]`
+4. Add the script path to `files` so it is included when the workspace is packaged
+
+**Example** (see `test_nodejs` in `tools.json`):
+
+```json
+{
+  "my_tool": {
+    "type": "exec",
+    "files": ["tools/my_collector.js"],
+    "executor": {
+      "command": "node",
+      "args": ["./tools/my_collector.js", "{{someParam}}"]
+    },
+    "transformer": "..."
+  }
+}
+```
+
+This keeps `tools.json` declarative and makes complex logic easier to develop, test, and maintain.
+
