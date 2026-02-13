@@ -4,6 +4,7 @@ import { useStore } from 'valtio-define'
 
 export function SettingLlmCard() {
   const setting = useStore(store.setting)
+  const isEnvConfigured = store.setting.effectiveIsLlmEnvConfigured
 
   return (
     <Card shadow="none">
@@ -14,7 +15,7 @@ export function SettingLlmCard() {
         </div>
       </CardHeader>
       <CardBody className="gap-6 pt-0">
-        {!setting.isLlmEnvConfigured && (
+        {!isEnvConfigured && (
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Icon icon="lucide:link" className="w-4 h-4 text-default-500" />
@@ -32,17 +33,17 @@ export function SettingLlmCard() {
             <Icon icon="lucide:key" className="w-4 h-4 text-default-500" />
             <label className="text-sm font-medium">
               API Key
-              {setting.isLlmEnvConfigured && <span className="text-xs text-primary ml-2">(已由环境变量配置)</span>}
+              {isEnvConfigured && <span className="text-xs text-primary ml-2">(已由环境变量配置)</span>}
             </label>
           </div>
           <Input
-            value={setting.llmApiKey}
+            value={isEnvConfigured ? '••••••••' : setting.llmApiKey}
             onChange={e => store.setting.llmApiKey = e.target.value}
             type="password"
             placeholder="sk-..."
-            isDisabled={setting.isLlmEnvConfigured}
+            isDisabled={isEnvConfigured}
             endContent={
-              setting.isLlmEnvConfigured ? <Icon icon="lucide:lock" className="text-default-400" /> : null
+              isEnvConfigured ? <Icon icon="lucide:lock" className="text-default-400" /> : null
             }
           />
         </div>

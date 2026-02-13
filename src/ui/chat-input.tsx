@@ -59,7 +59,7 @@ function MessageAreaExtras() {
     <div className="flex flex-col gap-2">
       {attachments.files.length > 0 && (
         <Attachments variant="grid" className="mt-1">
-          {attachments.files.map(file => (
+          {attachments.files.map((file: FileUIPart & { id: string }) => (
             <Attachment
               key={file.id}
               data={file}

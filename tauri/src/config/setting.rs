@@ -1,7 +1,6 @@
 use super::constants::*;
 use serde::Deserialize;
 use serde::Serialize;
-use std::env;
 use tauri::Emitter;
 use tauri_plugin_store::StoreExt;
 
@@ -61,7 +60,7 @@ pub fn get_store_dat_setting(app_handle: &tauri::AppHandle) -> Setting {
         log::warn!("Setting key '{}' not found in store", STORE_SETTING_KEY);
     }
 
-    let mut value = raw
+    raw
         .as_ref()
         .and_then(|v| {
             v.as_str()
@@ -72,22 +71,5 @@ pub fn get_store_dat_setting(app_handle: &tauri::AppHandle) -> Setting {
         .unwrap_or_else(|| {
             log::warn!("Failed to parse setting, using default");
             Setting::default()
-        });
-
-    // log::info!("Loaded setting: {:?}", value);
-
-    // Override with environment variables
-    if let Ok(api_key) = env::var("LLM_API_KEY") {
-        if !api_key.is_empty() {
-            value.llm_api_key = api_key;
-            value.is_llm_env_configured = true;
-        }
-    }
-    if let Ok(base_url) = env::var("LLM_BASE_URL") {
-        if !base_url.is_empty() {
-            value.llm_base_url = base_url;
-        }
-    }
-
-    value
+        })
 }

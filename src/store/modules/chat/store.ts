@@ -118,7 +118,7 @@ export const chat = defineStore(
           throw new Error('当前正在生成回复，请稍后再试')
         }
 
-        const { llmApiKey, llmBaseUrl, llmModel } = store.setting
+        const { effectiveLlmApiKey: llmApiKey, effectiveLlmBaseUrl: llmBaseUrl, llmModel } = store.setting
         if (!llmApiKey?.trim()) {
           throw new Error('请先在设置中配置 LLM API Key')
         }

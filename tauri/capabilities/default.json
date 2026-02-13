@@ -44,6 +44,7 @@
     "sql:default",
     "sql:allow-execute",
     "dialog:default",
+    "updater:default",
     "fs:default",
     "fs:read-dirs",
     "fs:read-all",

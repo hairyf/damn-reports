@@ -165,9 +165,6 @@ fn builder() -> tauri::Builder<tauri::Wry> {
 
 // run app
 pub fn run() {
-    // Load env variables from .env file
-    dotenvy::dotenv().ok();
-
     // 初始化日志系统
     logger::init();
 

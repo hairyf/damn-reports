@@ -32,7 +32,11 @@ export const report = defineStore({
     async streamGenerate(systemPrompt: string): Promise<string> {
       this.loading = true
       this.streamingContent = ''
-      const model = createModel(store.setting)
+      const model = createModel({
+        llmApiKey: store.setting.effectiveLlmApiKey,
+        llmBaseUrl: store.setting.effectiveLlmBaseUrl,
+        llmModel: store.setting.llmModel,
+      })
       try {
         return await streamGenerateContent(model, systemPrompt, (delta) => {
           this.streamingContent += delta

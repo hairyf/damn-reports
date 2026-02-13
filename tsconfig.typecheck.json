@@ -1,0 +1,11 @@
+{
+  "extends": "./tsconfig.json",
+  "compilerOptions": {
+    "paths": {
+      "@/*": ["src/*"],
+      "ai-elements": ["./src/types/ai-elements.d.ts"]
+    }
+  },
+  "include": ["src"],
+  "exclude": ["sources", "packages"]
+}
