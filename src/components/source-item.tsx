@@ -1,4 +1,4 @@
-import type { Selectable } from 'kysely'
+import type { Source } from '@/store/modules/source'
 import {
   Button,
   Card,
@@ -7,10 +7,10 @@ import {
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useOverlay } from '@overlastic/react'
-import { SourceIcon } from './source-icon'
+import { store } from '@/store'
 
 export interface SourceItemProps {
-  item: Selectable<Source>
+  item: Source
   onDeleted?: (id: string) => void
 }
 
@@ -19,51 +19,45 @@ export function SourceItem(props: SourceItemProps) {
   const openDialog = useOverlay(Dialog)
   const { item } = props
 
-  async function onToggleEnabled() {
-    await db.source.update(item.id, {
-      enabled: !item.enabled,
-      id: item.id,
-    })
-    queryClient.invalidateQueries({ queryKey: ['sources'] })
+  async function onToggleEnable(enabled: boolean) {
+    await store.source.update(item.id, { enable: enabled })
   }
+
   async function onDelete() {
     await openDialog({
       title: '删除数据源',
       message: '确定要删除这个数据源吗？此操作无法撤销。',
       confirmText: '删除',
     })
-    await db.source.delete(item.id)
+    await store.source.remove(item.id)
     queryClient.invalidateQueries({ queryKey: ['sources'] })
+    props.onDeleted?.(item.id)
   }
   return (
     <Card shadow="none">
       <CardBody>
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
-            <SourceIcon type={item.type} size={24} />
+            <ToolIcon type={item.tool} size={24} />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
               <span className="font-medium">{item.name}</span>
-              {item.enabled && (
-                <div className="bg-success size-2 rounded-full" />
-              )}
             </div>
-            <Ellipsis lineClamp={2} className="text-sm text-default-500">
+            <div className="text-sm text-default-500">
               {item.description}
-            </Ellipsis>
-
+            </div>
           </div>
           <div className="flex items-center gap-2">
             <Switch
               size="sm"
-              isSelected={item.enabled}
-              onValueChange={onToggleEnabled}
+              isSelected={item.enable !== false}
+              onValueChange={onToggleEnable}
             />
             <Button
               size="sm"
               variant="light"
-              onPress={() => navigate(`/source/detail?id=${item.id}`)}
+              onPress={() => navigate(`/source/detail?id=${encodeURIComponent(item.id)}`)}
               isIconOnly
             >
               <Icon icon="lucide:edit" className="w-4 h-4" />

@@ -1,0 +1,19 @@
+{
+  "agents": [
+    "cursor",
+    "claude-code"
+  ],
+  "skills": {
+    "hairyf/skills": [
+      "tauri",
+      "react-use",
+      "tailwindcss",
+      "create-skill-from-repo",
+      "create-skill"
+    ],
+    "vercel-labs/agent-browser": [
+      "skill-creator",
+      "agent-browser"
+    ]
+  }
+}

@@ -4,5 +4,4 @@ pub mod prelude;
 
 pub mod record;
 pub mod report;
-pub mod source;
 pub mod workspace;

@@ -7,24 +7,6 @@ generator kysely {
   output   = "../../src/database"
 }
 
-model Source {
-  id          Int      @id @default(autoincrement())
-  name        String
-  type        String
-  description String
-  enabled     Boolean
-  config      Json
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  workspaceId Int
-
-  records Record[]
-
-  @@map("source")
-}
-
 model Report {
   id        Int      @id @default(autoincrement())
   name      String
@@ -47,9 +29,8 @@ model Record {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  source   Source @relation(fields: [sourceId], references: [id])
-  sourceId Int
-
+  source    String
+  tool      String
   workspace   Workspace @relation(fields: [workspaceId], references: [id])
   workspaceId Int
 
@@ -64,7 +45,6 @@ model Workspace {
 
   reports Report[]
   records Record[]
-  sources Source[]
 
   @@map("workspace")
 }

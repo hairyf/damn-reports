@@ -23,11 +23,11 @@ export const tauriStorageDriver = defineDriver<TauriStorageDriverOptions | undef
     async getItem(key) {
       await promise
       const value = await store.get(key)
-      return value
+      return value || '{}'
     },
     async setItem(key, value) {
       await promise
-      store.set(key, value)
+      await store.set(key, value)
     },
     async removeItem(key) {
       await promise
@@ -40,6 +40,7 @@ export const tauriStorageDriver = defineDriver<TauriStorageDriverOptions | undef
     async clear() {
       await promise
       await store.clear()
+      await store.save()
     },
     async watch(callback) {
       return store.onChange(key => callback('update', key))

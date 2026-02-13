@@ -7,7 +7,5 @@ export default antfu({
     'react/no-array-index-key': 'off',
     'format/prettier': 'off',
   },
-  ignores: [
-    'sidecar-app/n8n/main.js',
-  ],
+  ignores: ['tauri', 'packages/ai-elements'],
 })

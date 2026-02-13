@@ -16,15 +16,15 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - platform: 'macos-latest'
-            args: '--target aarch64-apple-darwin'
-            arch: 'aarch64'
-          - platform: 'macos-latest'
-            args: '--target x86_64-apple-darwin'
-            arch: 'x86_64'
-          - platform: 'windows-latest'
+          - platform: macos-latest
+            args: --target aarch64-apple-darwin
+            arch: aarch64
+          - platform: macos-latest
+            args: --target x86_64-apple-darwin
+            arch: x86_64
+          - platform: windows-latest
             args: ''
-          - platform: 'ubuntu-latest'
+          - platform: ubuntu-latest
             args: ''
 
     runs-on: ${{ matrix.platform }}
@@ -37,7 +37,7 @@ jobs:
         uses: mikepenz/release-changelog-builder-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          
+
       - name: Install pnpm
         uses: pnpm/action-setup@v4
 
@@ -45,8 +45,8 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: lts/*
-          cache: 'pnpm'
-          cache-dependency-path: 'pnpm-lock.yaml'
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
 
       - name: Install Rust stable
         uses: dtolnay/rust-toolchain@stable
@@ -75,7 +75,7 @@ jobs:
           releaseName: 'Damn Reports ${{ github.ref_name }}'
           releaseBody: |
             ${${{ steps.github_release.outputs.changelog }}}
-            
+
             ### 📦 Artifacts
             - **macOS (M1/M2/M3)**: download `aarch64.dmg`
             - **macOS (Intel)**: download `x64.dmg`

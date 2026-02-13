@@ -1,13 +1,6 @@
 import { Select, SelectItem } from '@heroui/react'
-import { createElement } from 'react'
-
-const sourceOptions = [
-  { label: 'Git', value: 'git', icon: GitIcon },
-  { label: 'Clickup', value: 'clickup', icon: ClickupIcon },
-  { label: 'Slack', value: 'slack', icon: SlackIcon },
-  { label: 'Gmail', value: 'gmail', icon: GmailIcon },
-  { label: 'Alimail', value: 'alimail', icon: AlimailIcon },
-]
+import { useStore } from 'valtio-define'
+import { store } from '@/store'
 
 export interface SourceSelectProps {
   onChange?: (value: string) => void
@@ -17,6 +10,8 @@ export interface SourceSelectProps {
   isClearable?: boolean
 }
 export function SourceSelect(props: SourceSelectProps) {
+  const { options } = useStore(store.tool)
+
   return (
     <Select
       className={props.className}
@@ -38,16 +33,14 @@ export function SourceSelect(props: SourceSelectProps) {
         )
       }}
     >
-      {sourceOptions.map((option) => {
-        return (
-          <SelectItem
-            key={option.value}
-            startContent={option.icon ? createElement(option.icon, { size: 16 }) : null}
-          >
-            {option.label}
-          </SelectItem>
-        )
-      })}
+      {options.map(option => (
+        <SelectItem
+          key={option.id}
+          startContent={<ToolIcon type={option.id} size={16} />}
+        >
+          {option.name}
+        </SelectItem>
+      ))}
     </Select>
   )
 }

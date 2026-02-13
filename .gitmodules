@@ -1,0 +1,6 @@
+[submodule "sources/jsonata"]
+	path = sources/jsonata
+	url = https://github.com/jsonata-js/jsonata.git
+[submodule "sources/opencode"]
+	path = sources/opencode
+	url = https://github.com/anomalyco/opencode

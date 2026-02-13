@@ -6,20 +6,33 @@ import {
   Input,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useQuery } from '@tanstack/react-query'
+import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useStore } from 'valtio-define'
+import { store } from '@/store'
 
 function Page() {
   const navigate = useNavigate()
 
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 300)
-  const [type, setType] = useState<string>('')
+  const [toolFilter, setToolFilter] = useState<string>('')
 
-  const { data: sources } = useQuery({
-    queryKey: ['sources', debouncedSearch, type],
-    queryFn: () => db.source.findMany({ search: debouncedSearch, type }),
-  })
+  const { raw: allSources } = useStore(store.source)
+
+  const sources = useMemo(() => {
+    let list = allSources
+    if (debouncedSearch) {
+      const q = debouncedSearch.toLowerCase()
+      list = list.filter(s =>
+        s.name.toLowerCase().includes(q)
+        || s.tool.toLowerCase().includes(q),
+      )
+    }
+    if (toolFilter)
+      list = list.filter(s => s.tool === toolFilter)
+    return list
+  }, [allSources, debouncedSearch, toolFilter])
   return (
     <>
       <Card className="mb-4 flex-shrink-0" shadow="none">
@@ -36,8 +49,8 @@ function Page() {
               className="w-full sm:w-40"
               placeholder="全部来源"
               isClearable
-              value={type}
-              onChange={setType}
+              value={toolFilter}
+              onChange={setToolFilter}
             />
             <If cond={sources?.length !== 0}>
               <Button

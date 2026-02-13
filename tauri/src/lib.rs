@@ -15,13 +15,7 @@ use tauri::{
 use tauri_plugin_sql::{Migration, MigrationKind};
 
 // setup app
-fn setup(app_handle: tauri::AppHandle) {
-    tauri::async_runtime::spawn(async move {
-        if let Err(e) = service::workflow::start(app_handle).await {
-            log::error!("start failed: {}", e);
-        }
-    });
-}
+fn setup(_app_handle: tauri::AppHandle) {}
 
 // setup tray
 fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
@@ -98,14 +92,6 @@ fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         bridge::cmd::database_loaded,
-        bridge::cmd::install_dependencies,
-        bridge::cmd::restart_n8n,
-        bridge::cmd::get_n8n_status,
-        bridge::cmd::collect_daily_records,
-        bridge::cmd::generate_daily_report,
-        bridge::cmd::collect_daily_clickup,
-        bridge::cmd::collect_daily_git,
-        bridge::cmd::get_n8n_version,
     ]
 }
 
@@ -124,6 +110,24 @@ fn migrations() -> tauri_plugin_sql::Builder {
             sql: include_str!("../prisma/migrations/20260122130600/migration.sql"),
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 3,
+            description: "remove source table, change record.sourceId to string",
+            sql: include_str!("../prisma/migrations/20260212000000/migration.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 4,
+            description: "add tool column to record",
+            sql: include_str!("../prisma/migrations/20260212100000/migration.sql"),
+            kind: MigrationKind::Up,
+        },
+        Migration {
+            version: 5,
+            description: "rename record.sourceId to source",
+            sql: include_str!("../prisma/migrations/20260212100001/migration.sql"),
+            kind: MigrationKind::Up,
+        },
     ];
     for migration in &migrations {
         log::info!("Migration: {}", migration.description);
@@ -137,7 +141,7 @@ fn migrations() -> tauri_plugin_sql::Builder {
 // configure tauri builder
 fn builder() -> tauri::Builder<tauri::Wry> {
     tauri::Builder::default()
-        .plugin(tauri_plugin_localhost::Builder::new(config::APP_SERVER_PORT).build())
+        .plugin(tauri_plugin_shell::init())
         .plugin(tauri_plugin_updater::Builder::new().build())
         // Opener plugin
         .plugin(tauri_plugin_opener::init())

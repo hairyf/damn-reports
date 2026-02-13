@@ -12,10 +12,8 @@ import { Icon } from '@iconify/react'
 import { useQuery } from '@tanstack/react-query'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useEffect, useState } from 'react'
-import { useStore } from 'valtio-define'
 
 export function Navbar() {
-  const n8n = useStore(store.n8n)
   const [currentTime, setCurrentTime] = useState(() => new Date())
 
   // 实时更新当前时间
@@ -38,9 +36,8 @@ export function Navbar() {
   }
 
   const { data: workspace } = useQuery({
-    queryKey: ['workspace', n8n.workspaceId],
-    queryFn: () => db.workspace.findUnique(n8n.workspaceId!.toString()),
-    enabled: !!n8n.workspaceId,
+    queryKey: ['workspace'],
+    queryFn: () => db.workspace.findFirst(),
   })
 
   async function handleMinimize() {

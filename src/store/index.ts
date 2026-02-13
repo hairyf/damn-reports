@@ -1,11 +1,15 @@
-import { installer } from './modules/installer'
-import { n8n } from './modules/n8n'
+import { chat } from './modules/chat'
+import { report } from './modules/report'
 import { setting } from './modules/setting'
+import { source } from './modules/source'
+import { tool } from './modules/tool'
 import { updater } from './modules/updater'
 
 export const store = {
-  n8n,
+  source,
+  tool,
+  chat,
   setting,
-  installer,
   updater,
+  report,
 }

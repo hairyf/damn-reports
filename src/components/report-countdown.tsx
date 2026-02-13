@@ -1,5 +1,4 @@
 import { Icon } from '@iconify/react'
-import { useQuery } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
 import { useStore } from 'valtio-define'
@@ -7,22 +6,8 @@ import { useStore } from 'valtio-define'
 dayjs.extend(duration)
 
 export function ReportCountdown({ className }: { className?: string }) {
-  const n8n = useStore(store.n8n)
-  const { data: workflow } = useQuery({
-    queryKey: ['workflow'],
-    queryFn: () => getN8nWorkflow(n8n.workflow!),
-    enabled: !!n8n.workflow,
-  })
-  const generateTime = useMemo(() => {
-    if (!workflow)
-      return '--:--'
-    const node = workflow?.nodes.find(node => node.type === 'n8n-nodes-base.scheduleTrigger')
-    const trigger = node?.parameters.rule.interval[0]
-    const triggerAtHour = trigger?.triggerAtHour || '--'
-    const triggerAtMinute = trigger?.triggerAtMinute || '--'
-    const target = `${triggerAtHour}:${triggerAtMinute}`
-    return target
-  }, [workflow])
+  const { dailyReportTime } = useStore(store.setting)
+  const generateTime = dailyReportTime || '--:--'
   const [generateCountdown, setGenerateCountdown] = useState('--:--')
 
   // 计算倒计时

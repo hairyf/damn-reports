@@ -1,35 +1,16 @@
-import { addToast, Button, Card, CardBody } from '@heroui/react'
+import { Button, Card, CardBody } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useMutation } from '@tanstack/react-query'
-import { invoke } from '@tauri-apps/api/core'
-import dayjs from 'dayjs'
+import { useStore } from 'valtio-define'
+import { store } from '@/store'
 
-export interface ReportGeneratorProps {
-  generating?: boolean
-  onGeneratingChange?: (isGenerating: boolean) => void
-}
-
-export function ReportGenerator({ generating, onGeneratingChange }: ReportGeneratorProps) {
+export function ReportGenerator() {
+  const { loading } = useStore(store.report)
   const generateMutation = useMutation({
-    mutationFn: async () => {
-      await invoke('collect_daily_records')
-
-      const records = await db.record.findMany({
-        date: dayjs().startOf('day').toISOString(),
-      })
-
-      if (records.length === 0) {
-        addToast({ title: '暂无数据', description: '未收集到任何数据' })
-        return
-      }
-
-      await invoke('generate_daily_report')
-      addToast({ title: '报告生成中...', promise: new Promise(() => {}) })
-      onGeneratingChange?.(true)
-    },
+    mutationFn: () => store.report.generateDailyReport(),
   })
 
-  const isGenerating = generateMutation.isPending || generating
+  const isGenerating = generateMutation.isPending || loading
 
   return (
     <Card className="flex-1 relative" shadow="none">

@@ -1,15 +1,7 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 
-use crate::bridge::server;
-use crate::config;
 use crate::core::db::connection;
-use crate::service::collector;
 use crate::service::scheduler;
-use crate::service::workflow;
-use crate::task;
-use sea_orm::DatabaseConnection;
-use serde_json::Value;
-use tauri::{AppHandle, State};
 
 // 全局标志，确保数据库连接成功只运行一次
 static DATABASE_LOADED: AtomicBool = AtomicBool::new(false);
@@ -22,92 +14,8 @@ pub async fn database_loaded(app_handle: tauri::AppHandle) -> Result<(), String>
     {
         return Ok(());
     }
-    let db = connection::connect(&app_handle).await;
+    let _db = connection::connect(&app_handle).await;
     log::info!("Database Connection Successful");
-    tauri::async_runtime::spawn(server::start(db.clone(), app_handle.clone()));
-    scheduler::start(&app_handle, db.clone());
+    scheduler::start(&app_handle);
     Ok(())
-}
-
-#[tauri::command]
-pub async fn install_dependencies(app_handle: AppHandle) -> Result<(), String> {
-    let mut setting = config::get_store_dat_setting(&app_handle);
-    if setting.installed {
-        log::debug!("Already installed, skipping installation");
-        return Ok(());
-    }
-    if workflow::status::get_status() == workflow::status::Status::Installing {
-        log::info!("Installation process already running, skipping");
-        return Ok(());
-    }
-    log::debug!("Not installed detected, starting installation process");
-    workflow::status::set_status(workflow::status::Status::Installing);
-    workflow::status::emit_status(&app_handle);
-    workflow::install(&app_handle).await?;
-    log::debug!("Installation completed, marked as installed");
-    setting.installed = true;
-    config::set_store_dat_setting(&app_handle, setting);
-    workflow::launch(app_handle).await?;
-    Ok(())
-}
-
-#[tauri::command]
-pub async fn restart_n8n(app_handle: AppHandle) -> Result<(), String> {
-    workflow::restart(app_handle).await?;
-    Ok(())
-}
-
-#[tauri::command]
-pub fn get_n8n_status() -> workflow::status::Status {
-    workflow::status::get_status()
-}
-
-#[tauri::command]
-pub async fn get_n8n_version(app_handle: AppHandle) -> Result<String, String> {
-    let package_json_path = config::get_n8n_package_json_path(&app_handle);
-    let package_json: Value = std::fs::read_to_string(package_json_path)
-        .map_err(|e| e.to_string())
-        .and_then(|c| serde_json::from_str(&c).map_err(|e| e.to_string()))?;
-    package_json["version"]
-        .as_str()
-        .map(|s| s.to_string())
-        .ok_or_else(|| "-".to_string())
-}
-
-#[tauri::command]
-pub async fn collect_daily_records(db: State<'_, DatabaseConnection>) -> Result<usize, String> {
-    let db_inner_clone = db.inner().clone();
-    let count = task::collect_records_of_source::trigger(db_inner_clone)
-        .await
-        .map_err(|e| e.to_string())?;
-    Ok(count)
-}
-
-#[tauri::command]
-pub async fn generate_daily_report() -> Result<(), String> {
-    task::call_n8n_workflow_webhook::trigger()
-        .await
-        .map_err(|e| e.to_string())?;
-    Ok(())
-}
-
-#[tauri::command]
-pub async fn collect_daily_clickup(
-    token: String,
-    team: String,
-    user: String,
-) -> Result<collector::clickup::CollectClickupResult, String> {
-    collector::clickup::daily(token, team, user)
-        .await
-        .map_err(|e| e.to_string())
-}
-
-#[tauri::command]
-pub async fn collect_daily_git(
-    repository: String,
-    author: String,
-) -> Result<collector::git::CollectGitResult, String> {
-    collector::git::daily(repository, author)
-        .await
-        .map_err(|e| e.to_string())
 }

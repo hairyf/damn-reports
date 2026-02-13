@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Environment variables (API keys etc.)
+.env
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
@@ -26,3 +29,6 @@ dist-ssr
 .tauri
 
 tauri/prisma/database
+**/skills
+!/tauri/workspace/skills
+!/tauri/workspace/skills/**

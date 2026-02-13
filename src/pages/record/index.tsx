@@ -15,19 +15,10 @@ import {
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
-import { invoke } from '@tauri-apps/api/core'
 import dayjs from 'dayjs'
-
-import { createElement, useState } from 'react'
-import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
-
-const mapping = {
-  git: { icon: GitIcon, label: 'Git' },
-  clickup: { icon: ClickupIcon, label: 'Clickup' },
-  slack: { icon: SlackIcon, label: 'Slack' },
-  gmail: { icon: GmailIcon, label: 'Gmail' },
-  alimail: { icon: AlimailIcon, label: 'Alimail' },
-}
+import { useState } from 'react'
+import { useStore } from 'valtio-define'
+import { store } from '@/store'
 
 function Page() {
   const [search, setSearch] = useState('')
@@ -40,15 +31,20 @@ function Page() {
   const debouncedSearch = useDebounce(search, 300)
   const debouncedSourceFilter = useDebounce(sourceFilter, 300)
 
+  const { raw: sources, map: sourceMap } = useStore(store.source)
+
   const { data: records = [], isLoading } = useQuery({
-    queryKey: ['records', debouncedSearch, debouncedSourceFilter, pagination.page, pagination.pageSize],
+    queryKey: ['records', debouncedSearch, debouncedSourceFilter, pagination.page, pagination.pageSize, sources.length],
     queryFn: async () => {
-      const { data, total } = await db.record.findManyPage({
-        search: debouncedSearch,
-        source: debouncedSourceFilter,
-        page: pagination.page,
-        pageSize: pagination.pageSize,
-      })
+      const { data, total } = await db.record.findManyPageWithSources(
+        {
+          search: debouncedSearch,
+          source: debouncedSourceFilter,
+          page: pagination.page,
+          pageSize: pagination.pageSize,
+        },
+        sourceMap,
+      )
       pagination.pageSizeChange(total)
       return data
     },
@@ -56,7 +52,7 @@ function Page() {
 
   const syncMutation = useMutation({
     mutationFn: async () => {
-      return await invoke<number>('collect_daily_records')
+      return await store.source.collect()
     },
     onSuccess: (count) => {
       queryClient.invalidateQueries({ queryKey: ['records'] })
@@ -138,11 +134,11 @@ function Page() {
               <TableRow key={record.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {createElement(mapping[record.source as keyof typeof mapping].icon, { size: 20 })}
-                    <span>{record.sourceName}</span>
+                    <ToolIcon type={record.tool} size={20} />
+                    <span>{record.tool}</span>
                   </div>
                 </TableCell>
-                <TableCell>{dayjs(record.createdAt * 1000).format('YYYY-MM-DD')}</TableCell>
+                <TableCell>{dayjs(typeof record.createdAt === 'number' ? record.createdAt * 1000 : record.createdAt).format('YYYY-MM-DD')}</TableCell>
                 <TableCell>
                   <div className="w-full relative h-5">
                     <div className="absolute inset-0">

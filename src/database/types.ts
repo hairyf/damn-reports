@@ -8,10 +8,11 @@ export type Timestamp = ColumnType<Date, Date | string, Date | string>
 export interface Record {
   id: string
   summary: string
-  data: any
-  createdAt: Generated<number> // INTEGER 时间戳（秒）
-  updatedAt: number // INTEGER 时间戳（秒）
-  sourceId: number
+  data: unknown
+  createdAt: Generated<string>
+  updatedAt: string
+  source: string
+  tool: string
   workspaceId: number
 }
 export interface Report {
@@ -19,17 +20,6 @@ export interface Report {
   name: string
   type: string
   content: string
-  createdAt: Generated<string>
-  updatedAt: string
-  workspaceId: number
-}
-export interface Source {
-  id: Generated<number>
-  name: string
-  type: string
-  description: string
-  enabled: boolean
-  config: any
   createdAt: Generated<string>
   updatedAt: string
   workspaceId: number
@@ -42,6 +32,5 @@ export interface Workspace {
 export interface DB {
   record: Record
   report: Report
-  source: Source
   workspace: Workspace
 }

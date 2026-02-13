@@ -6,10 +6,12 @@ import { useEvent } from 'react-use'
 import { siteConfig } from '@/config/site'
 
 const iconMap: Record<string, string> = {
-  '/': 'lucide:layout-dashboard',
-  '/report': 'lucide:bar-chart-3',
-  '/record': 'lucide:database',
-  '/source': 'lucide:file-text',
+  '/': 'lucide:house',
+  '/report': 'lucide:notebook-pen',
+  '/record': 'lucide:scroll-text',
+  '/chat': 'lucide:bot-message-square',
+  '/source': 'lucide:radar',
+  '/tool': 'lucide:wrench',
   '/workflow': 'lucide:workflow',
   '/setting': 'lucide:settings',
 }

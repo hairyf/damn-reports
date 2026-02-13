@@ -1,0 +1,13 @@
+[
+  {
+    "id": "damn_reports_git_directory",
+    "name": "Damn Reports Git Directory",
+    "tool": "git_directory",
+    "config": {
+      "repository": "D:/damn-reports",
+      "author": "hairyf"
+    },
+    "createAt": "2026-02-12T00:00:00.000Z",
+    "updateAt": "2026-02-12T00:00:00.000Z"
+  }
+]

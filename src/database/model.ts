@@ -81,4 +81,12 @@ export class Model<DB, TB extends keyof DB & string, PK extends keyof DB[TB] & s
       .selectAll()
       .execute()
   }
+
+  findFirst(): Promise<Selectable<DB[TB]>> {
+    // @ts-ignore
+    return this.db
+      .selectFrom(this.table)
+      .selectAll()
+      .executeTakeFirst()
+  }
 }

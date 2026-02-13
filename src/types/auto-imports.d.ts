@@ -7,17 +7,14 @@
 export {}
 declare global {
   const Activity: typeof import('react').Activity
-  const Alimail: typeof import('../components/icons').Alimail
   const AlimailIcon: typeof import('../components/icons').AlimailIcon
-  const Button: typeof import('../components/button').Button
+  const BaseDirectory: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').BaseDirectory
   const ClickupIcon: typeof import('../components/icons').ClickupIcon
   const CornerActions: typeof import('../components/corner-actions').CornerActions
-  const DEFAULT_N8N_LOGIN_DATA: typeof import('../config/constants').DEFAULT_N8N_LOGIN_DATA
-  const DEFAULT_N8N_REGISTER_DATA: typeof import('../config/constants').DEFAULT_N8N_REGISTER_DATA
-  const DeleteReportModal: typeof import('../components/delete-report-modal').DeleteReportModal
+  const DefinitionFields: typeof import('../components/definition-fields').DefinitionFields
   const Dialog: typeof import('../components/dialog').Dialog
-  const DiscordIcon: typeof import('../components/icons').DiscordIcon
   const Ellipsis: typeof import('../components/ellipsis').Ellipsis
+  const FileHandle: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').FileHandle
   const Form: typeof import('../components/form').Form
   const FormControl: typeof import('../components/form').FormControl
   const FormDescription: typeof import('../components/form').FormDescription
@@ -27,16 +24,11 @@ declare global {
   const FormMessage: typeof import('../components/form').FormMessage
   const Fragment: typeof import('react').Fragment
   const GitIcon: typeof import('../components/icons').GitIcon
-  const GitSourceForm: typeof import('../components/souce-git-form').GitSourceForm
   const GithubIcon: typeof import('../components/icons').GithubIcon
   const GmailIcon: typeof import('../components/icons').GmailIcon
-  const HeartFilledIcon: typeof import('../components/icons').HeartFilledIcon
-  const Initialize: typeof import('../components/initialize').Initialize
-  const Initiator: typeof import('../layouts/components/initiator').Initiator
   const Label: typeof import('../components/label').Label
   const Link: typeof import('react-router-dom').Link
   const Logo: typeof import('../components/icons').Logo
-  const ManualLoginN8n: typeof import('../components/step-manual-login').ManualLoginN8n
   const Modal: typeof import('../components/modal').Modal
   const Model: typeof import('../database/model').Model
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
@@ -46,123 +38,109 @@ declare global {
   const N8N_REGISTER_DATA: typeof import('../config/constants').N8N_REGISTER_DATA
   const N8N_WEBHOOK_ID: typeof import('../config/constants').N8N_WEBHOOK_ID
   const NavLink: typeof import('react-router-dom').NavLink
-  const Navbar: typeof import('../layouts/components/navbar').Navbar
   const Navigate: typeof import('react-router-dom').Navigate
+  const OptimizeReportButton: typeof import('../components/optimize-report-button').OptimizeReportButton
   const Outlet: typeof import('react-router-dom').Outlet
   const ReportCountdown: typeof import('../components/report-countdown').ReportCountdown
   const ReportEditor: typeof import('../components/report-editor').ReportEditor
   const ReportGenerator: typeof import('../components/report-generator').ReportGenerator
-  const ReportNot: typeof import('../components/report-not').ReportNot
   const Route: typeof import('react-router-dom').Route
   const Routes: typeof import('react-router-dom').Routes
-  const SearchIcon: typeof import('../components/icons').SearchIcon
-  const SettingAboutCard: typeof import('../ui/setting-about-card').SettingAboutCard
-  const SettingOtherConfig: typeof import('../ui/setting-other-card').SettingOtherConfig
-  const SettingUserInterfaceCard: typeof import('../ui/setting-user-interface-card').SettingUserInterfaceCard
+  const SeekMode: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').SeekMode
   const SlackIcon: typeof import('../components/icons').SlackIcon
   const SourceFormClickup: typeof import('../components/souce-form-clickup').SourceFormClickup
   const SourceFormGit: typeof import('../components/souce-form-git').SourceFormGit
-  const SourceGitForm: typeof import('../components/souce-git-form').SourceGitForm
   const SourceIcon: typeof import('../components/source-icon').SourceIcon
   const SourceItem: typeof import('../components/source-item').SourceItem
-  const SourceItemCard: typeof import('../components/source-item').SourceItemCard
   const SourceSelect: typeof import('../components/source-select').SourceSelect
-  const StatusStep: typeof import('../components/status-step').StatusStep
-  const StepDeepSeek: typeof import('../components/step-deepseek').StepDeepSeek
-  const StepDeepSeekApiKey: typeof import('../components/step-deepseek-api-key').StepDeepSeekApiKey
-  const StepManualLoginN8n: typeof import('../components/step-manual-login').StepManualLoginN8n
-  const StepN8nManualLogin: typeof import('../components/step-n8n-manual-login').StepN8nManualLogin
+  const StepLlmSetting: typeof import('../components/step-llm-setting').StepLlmSetting
   const StepStatus: typeof import('../components/step-status').StepStatus
-  const StepStatusChip: typeof import('../components/step-status-chip').StepStatusChip
-  const StepStatusChipContent: typeof import('../components/step-status-chip').StepStatusChipContent
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const Suspense: typeof import('react').Suspense
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
-  const Titlebar: typeof import('../components/titlebar').Titlebar
+  const ToolIcon: typeof import('../components/tool-icon').ToolIcon
   const TrendCard: typeof import('../components/trend-card').TrendCard
-  const TwitterIcon: typeof import('../components/icons').TwitterIcon
   const UpdateStatus: typeof import('../components/update-status').UpdateStatus
-  const buttonVariants: typeof import('../components/button').buttonVariants
+  const add_source: typeof import('../config/tools').add_source
+  const add_tool: typeof import('../config/tools').add_tool
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
-  const clearRecordAndReportData: typeof import('../database/index').clearRecordAndReportData
+  const clickup: typeof import('../config/collectors').clickup
+  const clickup_tasks: typeof import('../config/collectors').clickup_tasks
   const cn: typeof import('../utils/utility').cn
-  const collectDailyClickup: typeof import('../services/collect-clickup').collectDailyClickup
-  const collectDailyGit: typeof import('../services/collect-git').collectDailyGit
+  const copyFile: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').copyFile
+  const create: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').create
   const createContext: typeof import('react').createContext
   const createRef: typeof import('react').createRef
-  const createReport: typeof import('../utils/mock-db').createReport
-  const createSource: typeof import('../utils/mock-db').createSource
+  const current_time: typeof import('../config/collectors').current_time
+  const dailyReportPrompt: typeof import('../config/prompts').dailyReportPrompt
   const db: typeof import('../database/index').db
-  const db_p: typeof import('../database').db_p
-  const db_promise: typeof import('../database').db_promise
-  const deleteReport: typeof import('../utils/mock-db').deleteReport
-  const emitter: typeof import('../config/emitter').emitter
-  const fixTableStructure: typeof import('../database/index').fixTableStructure
+  const edit: typeof import('../config/tools').edit
+  const exe_tool: typeof import('../config/tools').exe_tool
+  const exec: typeof import('../config/tools').exec
+  const exec_sql: typeof import('../config/tools').exec_sql
+  const exec_tool: typeof import('../config/tools').exec_tool
+  const executeCollector: typeof import('../utils/exec').executeCollector
+  const executeCommand: typeof import('../utils/exec').executeCommand
+  const executeCommandExpression: typeof import('../utils/exec').executeCommandExpression
+  const executeHttpRequestExpression: typeof import('../utils/exec').executeHttpRequestExpression
+  const exists: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').exists
+  const fetch_http: typeof import('../config/tools').fetch_http
+  const find: typeof import('../config/tools').find
   const forwardRef: typeof import('react').forwardRef
-  const getAllDatabaseItems: typeof import('../utils/mock-db').getAllDatabaseItems
-  const getAllReports: typeof import('../utils/mock-db').getAllReports
-  const getDatabaseItemById: typeof import('../utils/mock-db').getDatabaseItemById
-  const getKysely: typeof import('../database').getKysely
-  const getN8nCredentials: typeof import('../apis/index').getN8nCredentials
-  const getN8nCredentialsId: typeof import('../apis/index').getN8nCredentialsId
-  const getN8nLogin: typeof import('../apis/index').getN8nLogin
-  const getN8nWebhook: typeof import('../apis/index').getN8nWebhook
-  const getN8nWorkflow: typeof import('../apis/index').getN8nWorkflow
-  const getReportById: typeof import('../utils/mock-db').getReportById
-  const getReportWorkflowData: typeof import('../config/workflow').getReportWorkflowData
-  const getSetting: typeof import('../utils/setting-store').getSetting
-  const getSettings: typeof import('../utils/setting-store').getSettings
-  const getSources: typeof import('../utils/mock-db').getSources
-  const get_report_workflow_params: typeof import('../config/workflow').get_report_workflow_params
-  const iconMap: typeof import('../components/source-icon').iconMap
-  const invokeCollectAll: typeof import('../services/invoke-collect-all').invokeCollectAll
-  const invokeCollectClickup: typeof import('../services/invoke-collect-clickup').invokeCollectClickup
-  const invokeCollectGit: typeof import('../services/invoke-collect-git').invokeCollectGit
-  const invokeGenerateDaily: typeof import('../services/invoke-generate-daily').invokeGenerateDaily
-  const isExistsIndex: typeof import('../utils/db').isExistsIndex
-  const isExistsTable: typeof import('../utils/db').isExistsTable
+  const generateTitlePrompt: typeof import('../config/prompts').generateTitlePrompt
+  const generate_report: typeof import('../config/tools').generate_report
+  const getBeijingDayRange: typeof import('../config/source-tools').getBeijingDayRange
+  const getTools: typeof import('../utils/tool').getTools
+  const getWorkspaceSkills: typeof import('../utils/skills').getWorkspaceSkills
+  const get_current_time: typeof import('../config/collectors').get_current_time
+  const get_records: typeof import('../config/tools').get_records
+  const get_records_by_source: typeof import('../config/tools').get_records_by_source
+  const get_settings: typeof import('../config/tools').get_settings
+  const get_sources: typeof import('../config/tools').get_sources
+  const get_tool: typeof import('../config/tools').get_tool
+  const get_tools: typeof import('../config/tools').get_tools
+  const git_directory: typeof import('../config/collectors').git_directory
+  const grep: typeof import('../config/tools').grep
+  const http: typeof import('../config/tools').http
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
-  const loginN8nUser: typeof import('../apis/index').loginN8nUser
-  const main: typeof import('../database').main
+  const ls: typeof import('../config/tools').ls
+  const lstat: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').lstat
   const memo: typeof import('react').memo
-  const mitt: typeof import('../config/mitt').mitt
-  const modal: typeof import('../components/modal').default
-  const params: typeof import('../services/post-n8n-workflow.params.mock').params
-  const patchN8nMe: typeof import('../apis/index').patchN8nMe
-  const postN8nApiKey: typeof import('../services/post-n8n-api-key').postN8nApiKey
-  const postN8nCredentials: typeof import('../apis/index').postN8nCredentials
-  const postN8nLogin: typeof import('../apis/index').postN8nLogin
-  const postN8nMeSurvey: typeof import('../apis/index').postN8nMeSurvey
-  const postN8nMySurvey: typeof import('../services/post-n8n-my-survey').postN8nMySurvey
-  const postN8nRegister: typeof import('../apis/index').postN8nRegister
-  const postN8nWorkflow: typeof import('../apis/index').postN8nWorkflow
-  const postN8nWorkflowParamsMock: typeof import('../services/post-n8n-workflow.mock').postN8nWorkflowParamsMock
-  const postN8nWorkflowResultMock: typeof import('../services/post-n8n-workflow.mock').postN8nWorkflowResultMock
-  const postN8nWorkflowWorkflowIdActivate: typeof import('../apis/index').postN8nWorkflowWorkflowIdActivate
+  const mkdir: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').mkdir
+  const open: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').open
+  const optimizeReportPrompt: typeof import('../config/prompts').optimizeReportPrompt
+  const parseSkill: typeof import('../utils/skills').parseSkill
   const queryClient: typeof import('../config/client').queryClient
-  const registerN8N: typeof import('../apis/index').registerN8N
-  const registerN8n: typeof import('../apis/index').registerN8n
-  const registerN8nUser: typeof import('../apis/index').registerN8nUser
+  const read: typeof import('../config/tools').read
+  const readDir: typeof import('../utils/fs-extra').readDir
+  const readFile: typeof import('../utils/fs-extra').readFile
+  const readJson: typeof import('../utils/fs-extra').readJson
+  const readTextFile: typeof import('../utils/fs-extra').readTextFile
+  const readTextFileLines: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readTextFileLines
+  const records_sync: typeof import('../config/tools').records_sync
+  const remove: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').remove
+  const rename: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').rename
   const retry: typeof import('../utils/utility').retry
-  const saveSettings: typeof import('../utils/setting-store').saveSettings
-  const searchDatabaseItems: typeof import('../utils/mock-db').searchDatabaseItems
-  const searchReports: typeof import('../utils/mock-db').searchReports
-  const setSetting: typeof import('../utils/setting-store').setSetting
-  const settingsStore: typeof import('../config/store').settingsStore
+  const set_settings: typeof import('../config/tools').set_settings
+  const set_source: typeof import('../config/tools').set_source
+  const set_tool: typeof import('../config/tools').set_tool
   const siteConfig: typeof import('../config/site').siteConfig
+  const size: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').size
+  const skill: typeof import('../config/tools').skill
+  const skills: typeof import('../utils/skills').skills
   const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition
+  const stat: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').stat
   const storage: typeof import('../config/storage').storage
   const store: typeof import('../store/index').store
   const subtitle: typeof import('../components/primitives').subtitle
+  const sync_records: typeof import('../config/tools').sync_records
   const tauriStorageDriver: typeof import('../config/storage.driver').tauriStorageDriver
+  const test_node_js: typeof import('../config/source-tools').test_node_js
   const title: typeof import('../components/primitives').title
-  const tray: typeof import('../config/tary').tray
-  const trendCard: typeof import('../components/trend-card').default
-  const unstorage: typeof import('../config/storage').unstorage
-  const updateReport: typeof import('../utils/mock-db').updateReport
+  const truncate: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').truncate
   const use: typeof import('react').use
   const useActionState: typeof import('react').useActionState
   const useCallback: typeof import('react').useCallback
@@ -177,7 +155,6 @@ declare global {
   const useImperativeHandle: typeof import('react').useImperativeHandle
   const useInRouterContext: typeof import('react-router-dom').useInRouterContext
   const useInsertionEffect: typeof import('react').useInsertionEffect
-  const useIsNeedInitiator: typeof import('../components/step-status-chip').useIsNeedInitiator
   const useLayoutEffect: typeof import('react').useLayoutEffect
   const useLinkClickHandler: typeof import('react-router-dom').useLinkClickHandler
   const useLocation: typeof import('react-router-dom').useLocation
@@ -188,7 +165,6 @@ declare global {
   const useOutlet: typeof import('react-router-dom').useOutlet
   const useOutletContext: typeof import('react-router-dom').useOutletContext
   const useParams: typeof import('react-router-dom').useParams
-  const useQueryN8nStatus: typeof import('../services/use-query-n8n-status').useQueryN8nStatus
   const useReducer: typeof import('react').useReducer
   const useRef: typeof import('react').useRef
   const useResolvedPath: typeof import('react-router-dom').useResolvedPath
@@ -197,8 +173,12 @@ declare global {
   const useState: typeof import('react').useState
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
   const useTransition: typeof import('react').useTransition
-  const verifyMigration: typeof import('../database/index').verifyMigration
-  const workflow: typeof import('../config/workflow').workflow
+  const watch: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watch
+  const watchImmediate: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watchImmediate
+  const write: typeof import('../config/tools').write
+  const writeFile: typeof import('../utils/fs-extra').writeFile
+  const writeJson: typeof import('../utils/fs-extra').writeJson
+  const writeTextFile: typeof import('../utils/fs-extra').writeTextFile
 }
 // for type re-export
 declare global {
@@ -206,7 +186,7 @@ declare global {
   export type { Model } from '../database/model'
   import('../database/model')
   // @ts-ignore
-  export type { Generated, Timestamp, Record, Report, Source, Workspace, DB } from '../database/types'
+  export type { Generated, Timestamp, Record, Report, Workspace, DB } from '../database/types'
   import('../database/types')
   // @ts-ignore
   export type { SiteConfig } from '../config/site'
@@ -215,8 +195,8 @@ declare global {
   export type { TauriStorageDriverOptions } from '../config/storage.driver'
   import('../config/storage.driver')
   // @ts-ignore
-  export type { ReportWorkflowOptions } from '../config/workflow'
-  import('../config/workflow')
+  export type { FieldSchema, DefinitionFieldsProps } from '../components/definition-fields'
+  import('../components/definition-fields')
   // @ts-ignore
   export type { DialogProps } from '../components/dialog'
   import('../components/dialog')
@@ -230,14 +210,11 @@ declare global {
   export type { ModalProps } from '../components/modal'
   import('../components/modal')
   // @ts-ignore
+  export type { OptimizeReportButtonProps } from '../components/optimize-report-button'
+  import('../components/optimize-report-button')
+  // @ts-ignore
   export type { ReportEditorProps } from '../components/report-editor'
   import('../components/report-editor')
-  // @ts-ignore
-  export type { ReportGeneratorProps } from '../components/report-generator'
-  import('../components/report-generator')
-  // @ts-ignore
-  export type { IconMap, SourceIconProps } from '../components/source-icon'
-  import('../components/source-icon')
   // @ts-ignore
   export type { SourceItemProps } from '../components/source-item'
   import('../components/source-item')
@@ -248,9 +225,18 @@ declare global {
   export type { ThemeSwitchProps } from '../components/theme-switch'
   import('../components/theme-switch')
   // @ts-ignore
+  export type { IconMap, ToolIconProps } from '../components/tool-icon'
+  import('../components/tool-icon')
+  // @ts-ignore
+  export type { Collector } from '../utils/exec'
+  import('../utils/exec')
+  // @ts-ignore
+  export type { ReadDirOptions } from '../utils/fs-extra'
+  import('../utils/fs-extra')
+  // @ts-ignore
+  export type { Skill } from '../utils/skills'
+  import('../utils/skills')
+  // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
-  // @ts-ignore
-  export type { N8nUser, PostN8nCredentialsBody, PostN8nCredentialsResult, PatchN8nMeBody, PatchN8nMeResult, PostN8nLoginBody, PostN8nLoginResult, GetN8nLoginResult, PostN8nMeSurveyParams, PostN8nRegisterBody, PostN8nWorkflowWorkflowIdActivateBody, PostN8nRegisterResult, PostN8nWorkflowResult, GetN8nWorkflowResult, GetN8nCredentialsIdResult, GetN8nCredentialsResult } from '../apis/index.types'
-  import('../apis/index.types')
 }
