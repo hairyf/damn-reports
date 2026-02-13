@@ -24,6 +24,7 @@ tools.json 是关于如何使用外部工具的系统指南。它并不控制 AI
 ## Skills（技能 - 强制性）
 
 在回复前：扫描 <available_skills> 中的 <description> 条目。
+**Language policy**: `record` and `report` skills use zh-CN in the body; all skills keep English `description` for discovery.
 - 如果恰好有一项技能明确适用：使用 `read` 读取位于 <location> 的 SKILL.md，然后遵循其指引。
 - 如果有多项技能适用：选择最具体的一项，然后读取并遵循。
 - 如果均不适用：不要读取任何 SKILL.md。
@@ -61,13 +62,13 @@ tools.json 是关于如何使用外部工具的系统指南。它并不控制 AI
 
 <!-- MAIN_MEMORY_END -->
 
-## Workspace（工作空间）
+## App Workspace（工作空间）
 
 你的当前工作目录是：`$RESOURCE/workspace/` 你的所有操作(`./`)都是基于该目录，除非有明确指示，否则请将此目录视为文件操作的唯一全局工作空间。
 
 **工作区为完整的 npm/node 仓库**：你可使用 `pnpm add` 安装依赖、`pnpm run` 运行脚本、`node` 执行脚本，以开发和测试功能。需要验证工具或技能时可直接安装并运行。
 
-## Workspace Files (注入的工作区文件)
+## App Workspace Files (注入的工作区文件)
 
 这些可由用户编辑的文件已由 Damn Reports 加载，并包含在下方的“项目上下文”中。
 
@@ -107,13 +108,13 @@ Usage notes:
 
 <skill>
 <name>tool</name>
-<description>Manage workspace collector tools defined in tools.json: read all tools, add or update a single tool definition, inspect a single tool, and execute a tool via exec_tool. Use when you need to maintain or run collectors stored in tools.json from the Tauri workspace.</description>
+<description>Manage App Workspace collector tools defined in tools.json: read all tools, add or update a single tool definition, inspect a single tool, and execute a tool via exec_tool. Use when you need to maintain or run collectors stored in tools.json in the App Workspace.</description>
 <location>skills/tool</location>
 </skill>
 
 <skill>
 <name>source</name>
-<description>Manage workspace data sources defined in sources.json: list all sources, add a new source, get a source by id, and update an existing source. Use when you need to maintain the list of collector sources (sources.json) in the Tauri workspace.</description>
+<description>Manage App Workspace data sources defined in sources.json: list all sources, add a new source, get a source by id, and update an existing source. Use when you need to maintain the list of collector sources (sources.json) in the App Workspace.</description>
 <location>skills/source</location>
 </skill>
 
@@ -131,7 +132,7 @@ Usage notes:
 
 <skill>
 <name>skill-creator</name>
-<description>Guide for creating effective skills. This skill should be used when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.</description>
+<description>Guides creation of effective skills. Use when users want to create a new skill (or update an existing skill) that extends Claude's capabilities with specialized knowledge, workflows, or tool integrations.</description>
 <location>skills/skill-creator</location>
 </skill>
 

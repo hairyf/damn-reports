@@ -3,7 +3,7 @@ name: report
 description: "Query, generate, and update reports in the Report table. Use when you need to: run SQL queries on report (prefer same-day), generate today's report via generate_report, or modify reports with SQL. Use for /report get, /report generate, /report set."
 ---
 
-# Report Skill
+# 报告技能
 
 本技能描述如何对 `report` 表进行增删改查，以及如何调用 `generate_report` 生成当天日报。
 
@@ -13,17 +13,13 @@ description: "Query, generate, and update reports in the Report table. Use when 
 - `/report generate` – 调用 generate_report 工具生成当天日报
 - `/report set` – 使用 SQL 更改（INSERT/UPDATE/DELETE）
 
-所有指令假设在 Tauri workspace 上下文中操作。
-
 ## 文件与结构
 
 - **表名**: `report`（Prisma @@map）
-- **Schema 详情**: 见 `references/report-schema.md`
+- **Schema 详情**: 见 `references/schema.md`
 - **操作指令**: 见 `references/operations.md`
 
-## 使用的 Workspace 工具
-
-定义于 `src/config/tools.ts`，对 Agent 暴露：
+## 使用的工具
 
 - `exec_sql`
   - 在应用内置 SQLite（main.db）上执行 SQL。
@@ -36,7 +32,7 @@ description: "Query, generate, and update reports in the Report table. Use when 
 ## 使用方式
 
 1. **理解 Schema**
-   - 打开 `references/report-schema.md` 了解 report 表结构与字段类型。
+   - 打开 `references/schema.md` 了解 report 表结构与字段类型。
 
 2. **按操作指令执行**
    - 具体流程见 `references/operations.md`，定义：

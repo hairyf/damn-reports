@@ -1,11 +1,9 @@
 # /record 操作
 
-本文定义 `/record` 的三类操作及实现方式，使用 workspace 工具：
+本文定义 `/record` 的三类操作及实现方式：
 
 - `exec_sql`
 - `sync_records`
-
-所有路径与示例均假定在 Tauri workspace 中操作。
 
 ## /record get
 

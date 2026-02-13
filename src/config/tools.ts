@@ -258,12 +258,12 @@ export const exec_sql = tool({
 })
 
 export const skill = tool({
-  description: '加载 workspace/skills 下指定的 Skill，并返回其内容和相关文件列表',
+  description: '加载指定的 Skill，并返回其内容和相关文件列表',
   inputSchema: z.object({
     name: z.string().describe('要加载的 Skill 名称（来自 SKILL.md 的 name 字段）'),
   }),
   execute: async ({ name }) => {
-    const skills = await getWorkspaceSkills()
+    const skills = await getSkills()
     const skill = skills.find(s => s.name === name)
 
     if (!skill) {

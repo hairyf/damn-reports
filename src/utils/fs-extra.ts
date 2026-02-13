@@ -27,7 +27,6 @@ export async function writeTextFile(path: string, data: string) {
 }
 
 export interface ReadDirOptions {
-  /** 为 true 时递归列出所有文件路径（相对 workspace），仅包含文件不包含目录 */
   recursive?: boolean
 }
 

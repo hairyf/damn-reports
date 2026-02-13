@@ -7,7 +7,7 @@ export interface Skill {
   content: string
 }
 
-export async function getWorkspaceSkills() {
+export async function getSkills() {
   const skills: Skill[] = []
 
   async function scan(relativeDir: string) {
@@ -26,7 +26,6 @@ export async function getWorkspaceSkills() {
     }
   }
 
-  // skills 目录位于 workspace 根目录下，location 基于 workspace 相对路径（例如 skills/tool/SKILL.md）
   await scan('skills')
   return skills
 }

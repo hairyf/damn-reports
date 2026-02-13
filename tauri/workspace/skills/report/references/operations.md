@@ -1,11 +1,9 @@
 # /report 操作
 
-本文定义 `/report` 的三类操作及实现方式，使用 workspace 工具：
+本文定义 `/report` 的三类操作及实现方式：
 
 - `exec_sql`
 - `generate_report`
-
-所有路径与示例均假定在 Tauri workspace 中操作。
 
 ## /report get
 

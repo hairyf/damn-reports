@@ -3,7 +3,7 @@ name: record
 description: "Query, sync, and insert records in the Record table. Use when you need to: run SQL queries on record, sync records via sync_records, or add new records with tool='ai'. Use for /record get, /record sync, /record add."
 ---
 
-# Record Skill
+# 记录技能
 
 本技能描述如何对 `record` 表进行增删改查，以及如何调用 `sync_records` 同步采集数据。
 
@@ -13,17 +13,13 @@ description: "Query, sync, and insert records in the Record table. Use when you 
 - `/record sync` – 调用 sync_records 工具同步采集
 - `/record add` – 使用 SQL 插入记录，tool 固定为 `"ai"`
 
-所有指令假设在 Tauri workspace 上下文中操作。
-
 ## 文件与结构
 
 - **表名**: `record`（Prisma @@map）
-- **Schema 详情**: 见 `references/record-schema.md`
+- **Schema 详情**: 见 `references/schema.md`
 - **操作指令**: 见 `references/operations.md`
 
-## 使用的 Workspace 工具
-
-定义于 `src/config/tools.ts`，对 Agent 暴露：
+## 使用的工具
 
 - `exec_sql`  
   - 在应用内置 SQLite（main.db）上执行 SQL。  
@@ -36,7 +32,7 @@ description: "Query, sync, and insert records in the Record table. Use when you 
 ## 使用方式
 
 1. **理解 Schema**  
-   - 打开 `references/record-schema.md` 了解 record 表结构与字段类型。
+   - 打开 `references/schema.md` 了解 record 表结构与字段类型。
 
 2. **按操作指令执行**  
    - 具体流程见 `references/operations.md`，定义：

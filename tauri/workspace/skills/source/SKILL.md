@@ -1,68 +1,68 @@
 ---
 name: source
-description: "Manage workspace data sources defined in sources.json: list all sources, add a new source, get a source by id, and update an existing source. Use when you need to maintain the list of collector sources (sources.json) in the Tauri workspace."
+description: "Manage App Workspace data sources defined in sources.json: list all sources, add a new source, get a source by id, and update an existing source. Use when you need to maintain the list of collector sources (sources.json) in the App Workspace."
 ---
 
-# Source Skill
+# 数据源技能
 
-This skill describes how to manage **data sources (sources)** stored in `sources.json` in the Tauri workspace and the standard workflow for listing, adding, getting, and updating them.
+本技能描述如何管理存储在 App Workspace 中 `sources.json` 的**数据源**，以及列出、添加、查询、更新的标准流程。
 
-The goal is to provide a consistent workflow for:
+目标：提供一致的指令用于
 
-- Reading all source definitions from `sources.json` (get_all)
-- Adding a new source (add)
-- Getting a single source by id (get)
-- Updating an existing source (set)
+- 从 `sources.json` 读取所有数据源定义（get_all）
+- 添加新数据源（add）
+- 按 id 获取单个数据源（get）
+- 更新已有数据源（set）
 
-All instructions assume you are operating inside the Tauri workspace context.
+所有指令假设你在 App Workspace 上下文中操作。
 
-## Files and layout
+## 文件与结构
 
-- `sources.json`: root structure is a **JSON array** of source definitions.
-  - In the repository it lives at `tauri/workspace/sources.json`.
-  - From workspace tools (read, write, edit) use `path: "sources.json"`.
-- **Single source format**: see `references/source-schema.md`.
-- **High-level operations** (`/source get_all`, `/source add`, `/source get`, `/source set`): see `references/operations.md`.
+- `sources.json`：根结构为** JSON 数组**，每个元素为数据源定义。
+  - 在仓库中位于 `tauri/workspace/sources.json`。
+  - 使用工作区工具（read、write、edit）时，路径为 `path: "sources.json"`。
+- **单个数据源格式**：见 `references/schema.md`。
+- **高层操作**（`/source get_all`、`/source add`、`/source get`、`/source set`）：见 `references/operations.md`。
 
-## Workspace tools used
+## 使用的工具
 
-These tools are defined in `src/config/tools.ts` and exposed to the agent:
+这些工具在 `src/config/tools.ts` 中定义并暴露给 agent：
 
-- `read`  
-  - Reads a text file under the workspace.  
-  - Joins the given path with the `workspace` directory internally.  
-  - Use `{"path": "sources.json"}` to read the current sources list.
+- `read`
+  - 读取工作区下的文本文件。
+  - 内部会将给定路径与 `workspace` 目录拼接。
+  - 使用 `{"path": "sources.json"}` 读取当前数据源列表。
 
-- `write`  
-  - Creates or overwrites a file under the workspace.  
-  - Also joins the given path with `workspace`.  
-  - Use `{"path": "sources.json", "content": "<updated JSON>"}` to persist changes.
+- `write`
+  - 创建或覆盖工作区下的文件。
+  - 同样会与 `workspace` 拼接。
+  - 使用 `{"path": "sources.json", "content": "<更新后的 JSON>"}` 持久化更改。
 
-- `edit`  
-  - Performs a simple text replacement on a file under the workspace.  
-  - Use for small, precise updates.
+- `edit`
+  - 对文件进行简单文本替换。
+  - 适用于较小、精确的更新。
 
-- `grep`  
-  - Searches for a string pattern in a file.  
-  - Same path convention as `read`/`write`/`edit`: use `path: "sources.json"`.
+- `grep`
+  - 在文件中搜索字符串模式。
+  - 路径约定与 `read`/`write`/`edit` 相同：使用 `path: "sources.json"`。
 
-## How to use this skill
+## 使用方式
 
-1. **Understand the schema**  
-   - Open `references/source-schema.md` to see the structure of `sources.json` and a single source definition.
+1. **理解 Schema**
+   - 打开 `references/schema.md` 查看 `sources.json` 结构和单个数据源定义。
 
-2. **Follow the operation recipes**  
-   - For concrete workflows, follow `references/operations.md`. It defines:
-     - `/source get_all` – read and return all sources
-     - `/source add` – add a new source
-     - `/source get` – retrieve a single source by id
-     - `/source set` – update an existing source by id
+2. **按操作指令执行**
+   - 具体流程见 `references/operations.md`，定义：
+     - `/source get_all` – 读取并返回所有数据源
+     - `/source add` – 添加新数据源
+     - `/source get` – 按 id 获取单个数据源
+     - `/source set` – 按 id 更新已有数据源
 
-3. **Test after adding a source**  
-   - Use the **tool skill** (`tauri/workspace/skills/tool`) `exec_tool`: pass the source’s `tool` as `toolid` and `source.params` as `params` to run the collector once and verify the configuration works.
+3. **添加后建议测试**
+   - 加载 **tool 技能**（`skills/tool`）并调用 `exec_tool`：将数据源的 `tool` 作为 `toolid`，`source.params` 作为 `params`，运行一次采集以验证配置正确。
 
-4. **Keep sources.json valid**  
-   - Always treat `sources.json` as a **JSON array**.  
-   - When adding or updating: read and parse, modify the array in memory, then serialize and write back via `write`; use `edit` only for small, well-localized changes.
+4. **保持 sources.json 有效**
+   - 始终将 `sources.json` 视为 **JSON 数组**。
+   - 添加或更新时：读取并解析，在内存中修改数组，然后序列化并通过 `write` 写回；仅在较小、位置明确的修改时使用 `edit`。
 
-For detailed step-by-step procedures for each `/source` operation, see `references/operations.md`.
+详细步骤见 `references/operations.md`。
