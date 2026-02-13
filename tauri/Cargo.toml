@@ -37,35 +37,12 @@ tauri-plugin-notification = "2"
 tauri-plugin-store = "2"
 tauri-plugin-dialog = "2.6.0"
 tauri-plugin-fs = "2"
-reqwest = { version = "0.12", features = [
-  "json",
-  "stream",
-  "native-tls-vendored"
-] }
-git2 = { version = "0.18", default-features = false, features = [
-  "https",
-  "vendored-openssl"
-] }
 chrono = { version = "0.4", features = [ "serde" ] }
-uuid = { version = "1.0", features = [ "v4" ] }
-axum = "0.7"
 tokio = { version = "1.0", features = [ "full" ] }
-sqlx = { version = "0.8", features = [
-  "runtime-tokio",
-  "sqlite",
-  "chrono"
-] }
-tower-http = { version = "0.5", features = [ "cors" ] } # 如果需要处理跨域
 sea-orm = { version = "1.1.19", features = [
   "sqlx-sqlite",
   "macros"
 ] }
-zip = "0.6"
-futures-util = "0.3"
-flate2 = "1.1.8"
-tar = "0.4.44"
-sha2 = "0.10"
-async-trait = "0.1.89"
 log = "0.4"
 tauri-plugin-shell = "2"
 
