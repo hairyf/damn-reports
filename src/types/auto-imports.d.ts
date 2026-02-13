@@ -212,9 +212,6 @@ declare global {
   export type { ReportEditorProps } from '../components/report-editor'
   import('../components/report-editor')
   // @ts-ignore
-  export type { ReportGeneratorProps } from '../components/report-generator'
-  import('../components/report-generator')
-  // @ts-ignore
   export type { SourceItemProps } from '../components/source-item'
   import('../components/source-item')
   // @ts-ignore

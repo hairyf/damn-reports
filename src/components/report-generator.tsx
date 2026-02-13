@@ -1,45 +1,16 @@
-import { addToast, Button, Card, CardBody } from '@heroui/react'
+import { Button, Card, CardBody } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useMutation, useQueryClient } from '@tanstack/react-query'
-import dayjs from 'dayjs'
+import { useMutation } from '@tanstack/react-query'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
-export interface ReportGeneratorProps {
-  generating?: boolean
-  onGeneratingChange?: (isGenerating: boolean) => void
-}
-
-export function ReportGenerator({ generating, onGeneratingChange }: ReportGeneratorProps) {
-  const queryClient = useQueryClient()
+export function ReportGenerator() {
   const { loading } = useStore(store.report)
   const generateMutation = useMutation({
-    mutationFn: async () => {
-      await store.source.collect()
-
-      const records = await db.record.findMany({
-        date: dayjs().startOf('day').toISOString(),
-      })
-
-      if (records.length === 0) {
-        addToast({ title: '暂无数据', description: '未收集到任何数据' })
-        return
-      }
-
-      onGeneratingChange?.(true)
-      await store.report.generateDailyReport()
-      await Promise.all([
-        queryClient.invalidateQueries({ queryKey: ['reports'] }),
-        queryClient.invalidateQueries({ queryKey: ['records'] }),
-      ])
-      store.report.clearStreaming()
-    },
-    onError: (err: Error) => {
-      addToast({ title: '生成失败', description: err.message, color: 'danger' })
-    },
+    mutationFn: store.report.generateDailyReport,
   })
 
-  const isGenerating = generateMutation.isPending || loading || generating
+  const isGenerating = generateMutation.isPending || loading
 
   return (
     <Card className="flex-1 relative" shadow="none">

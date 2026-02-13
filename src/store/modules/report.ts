@@ -1,7 +1,9 @@
 import { createOpenAI } from '@ai-sdk/openai'
+import { addToast } from '@heroui/react'
 import { streamText } from 'ai'
 import dayjs from 'dayjs'
 import { defineStore } from 'valtio-define'
+import { queryClient } from '@/config/client'
 import { dailyReportPrompt, optimizeReportPrompt } from '@/config/prompts'
 import { store } from '@/store'
 import 'valtio-define/types'
@@ -99,10 +101,20 @@ export const report = defineStore({
     /** 首次生成日报：收集数据摘要 → 流式生成 → 创建报告 */
     async generateDailyReport() {
       try {
-        const ws = await db.workspace.findFirst()
-        if (ws == null) {
-          throw new Error('未找到工作区，请先完成初始化')
+        await store.source.collect()
+
+        const records = await db.record.findMany({
+          date: dayjs().startOf('day').toISOString(),
+        })
+
+        if (records.length === 0) {
+          addToast({ title: '暂无数据', description: '未收集到任何数据' })
+          return
         }
+
+        const ws = await db.workspace.findFirst()
+        if (ws == null)
+          throw new Error('未找到工作区，请先完成初始化')
 
         const summary = await buildRecordSummaryPrompt()
         if (!summary?.trim() || summary === 'No record data available.') {
@@ -117,6 +129,20 @@ export const report = defineStore({
           content,
           workspaceId: ws.id as number,
           updatedAt: new Date().toISOString(),
+        })
+
+        await Promise.all([
+          queryClient.invalidateQueries({ queryKey: ['reports'] }),
+          queryClient.invalidateQueries({ queryKey: ['records'] }),
+        ])
+        this.clearStreaming()
+      }
+      catch (error) {
+        console.error('generateDailyReport error', error)
+        addToast({
+          title: '生成失败',
+          description: error instanceof Error ? error.message : '未知错误',
+          color: 'danger',
         })
       }
       finally {

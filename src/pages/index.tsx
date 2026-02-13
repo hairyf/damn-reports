@@ -2,12 +2,10 @@ import { Else, If, Then } from '@hairy/react-lib'
 import { closeAll } from '@heroui/react'
 import { useQuery } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
-import { useLocalStorage } from 'react-use'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
 function Page() {
-  const [generating, setGenerating] = useLocalStorage('report_generating', false)
   const { streamingContent } = useStore(store.report)
 
   const { data: generatedReportsCount = 0 } = useQuery({
@@ -26,10 +24,8 @@ function Page() {
     queryKey: ['reports', 'daily'],
     queryFn: async () => {
       const result = await db.report.findFirstByType({ type: 'daily' })
-      if (result) {
-        setGenerating(false)
+      if (result)
         closeAll()
-      }
       return result ?? null
     },
     refetchInterval: 5000,
@@ -55,10 +51,7 @@ function Page() {
           />
         </Then>
         <Else>
-          <ReportGenerator
-            generating={generating}
-            onGeneratingChange={setGenerating}
-          />
+          <ReportGenerator />
         </Else>
       </If>
     </div>
