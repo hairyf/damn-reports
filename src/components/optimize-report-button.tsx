@@ -7,7 +7,7 @@ import { useRef, useState } from 'react'
 import { store } from '@/store'
 
 export interface OptimizeReportButtonProps {
-  reportId: number | string
+  reportId: string
   text: string
   isStreaming?: boolean
 }

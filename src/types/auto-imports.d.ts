@@ -91,6 +91,7 @@ declare global {
   const generateTitlePrompt: typeof import('../config/prompts').generateTitlePrompt
   const generate_report: typeof import('../config/tools').generate_report
   const getBeijingDayRange: typeof import('../config/source-tools').getBeijingDayRange
+  const getSkills: typeof import('../utils/skills').getSkills
   const getTools: typeof import('../utils/tool').getTools
   const getWorkspaceSkills: typeof import('../utils/skills').getWorkspaceSkills
   const get_current_time: typeof import('../config/collectors').get_current_time
@@ -186,7 +187,7 @@ declare global {
   export type { Model } from '../database/model'
   import('../database/model')
   // @ts-ignore
-  export type { Generated, Timestamp, Record, Report, DB } from '../database/types'
+  export type { Generated, Timestamp, Record, Report, Workspace, DB } from '../database/types'
   import('../database/types')
   // @ts-ignore
   export type { SiteConfig } from '../config/site'

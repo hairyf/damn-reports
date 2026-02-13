@@ -33,7 +33,9 @@ export default defineConfig(async () => ({
       ],
     }),
     Pages(),
-    tsconfigPaths(),
+    tsconfigPaths({
+      skip: dir => dir === 'sources',
+    }),
     tailwindcss() as unknown as PluginOption,
   ],
   resolve: {

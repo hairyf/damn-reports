@@ -85,11 +85,6 @@ export const report = defineStore({
       }
       catch (error) {
         console.error('generateDailyReport error', error)
-        addToast({
-          title: '生成失败',
-          description: error instanceof Error ? error.message : '未知错误',
-          color: 'danger',
-        })
         throw error
       }
       finally {
@@ -98,7 +93,7 @@ export const report = defineStore({
     },
 
     /** 重新生成：基于最新数据重新生成并更新已有报告 */
-    async regenerateReport(reportId: number | string) {
+    async regenerateReport(reportId: string) {
       try {
         const summary = await buildRecordSummaryPrompt(store.source.raw)
         if (!summary?.trim() || summary === 'No record data available.') {
@@ -112,20 +107,27 @@ export const report = defineStore({
           updatedAt: new Date().toISOString(),
         })
       }
+      catch (error) {
+        console.error('regenerateReport error', error)
+        throw error
+      }
       finally {
         this.loading = false
       }
     },
 
     /** 优化日报：基于当前内容优化表述并更新报告，可传入自定义提示词 */
-    async optimizeReport(reportId: number | string, currentContent: string, userInstruction?: string) {
+    async optimizeReport(reportId: string, currentContent: string, userInstruction?: string) {
       try {
         const content = await this.streamGenerate(optimizeReportPrompt(currentContent, userInstruction))
-
         await db.report.update(reportId, {
           content,
           updatedAt: new Date().toISOString(),
         })
+      }
+      catch (error) {
+        console.error('optimizeReport error', error)
+        throw error
       }
       finally {
         this.loading = false

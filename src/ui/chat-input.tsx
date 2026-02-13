@@ -1,5 +1,5 @@
 import type { FileUIPart } from 'ai'
-import { addToast, Button, Card, CardBody } from '@heroui/react'
+import { Button, Card, CardBody } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import {
   Attachment,
@@ -111,17 +111,7 @@ function ChatInputInner() {
       // 发送后立即清空输入框和附件，不等待流式结束
       controller.textInput.clear()
       attachments.clear()
-      const p = store.chat.startStreaming(text, files)
-      if (p && typeof p.then === 'function') {
-        p.catch((error: unknown) => {
-          const msg = error instanceof Error ? error.message : '发送失败，请稍后重试'
-          addToast({
-            title: '发送失败',
-            description: msg,
-            color: 'danger',
-          })
-        })
-      }
+      store.chat.startStreaming(text, files)
     },
     [controller, attachments],
   )

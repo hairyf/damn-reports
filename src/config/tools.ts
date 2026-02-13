@@ -34,6 +34,8 @@ export const write = tool({
   execute: async ({ path, content }) => {
     try {
       await fs.writeFile(path, encoder.encode(content))
+      store.tool.sync()
+      store.source.sync()
       return `Successfully written to ${path}`
     }
     catch (error) {
@@ -70,6 +72,8 @@ export const edit = tool({
       }
       const updatedText = normCurrent.replace(normOld, newContent)
       await fs.writeFile(path, encoder.encode(updatedText))
+      store.tool.sync()
+      store.source.sync()
       return `Updated ${path}`
     }
     catch (error) {
