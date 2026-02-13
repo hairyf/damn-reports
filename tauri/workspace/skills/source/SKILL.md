@@ -54,7 +54,7 @@ description: "Manage App Workspace data sources defined in sources.json: list al
 2. **按操作指令执行**
    - 具体流程见 `references/operations.md`，定义：
      - `/source get_all` – 读取并返回所有数据源
-     - `/source add` – 添加新数据源
+     - `/source add` – 添加新数据源（**交互时必问 name、description 及 tool 的 params，不可只问 params**）
      - `/source get` – 按 id 获取单个数据源
      - `/source set` – 按 id 更新已有数据源
 

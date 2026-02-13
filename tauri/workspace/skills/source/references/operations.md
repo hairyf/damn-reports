@@ -51,6 +51,20 @@
 - 若省略 `enable`，默认为 `true`。
 - 若省略 `createAt`/`updateAt`，设为当前 ISO 8601 时间。
 
+**交互式添加时的必问项（不可遗漏）**
+
+当用户请求添加数据源但未提供完整信息时，必须一次性或分步询问以下**全部**项，严禁只问 `params` 而忽略元信息：
+
+1. **数据源元信息**（与 tool 无关，必须由用户或你推断）：
+   - `name`：人类可读的名称（如「Damn Reports Git 仓库」）
+   - `description`：该数据源的简短描述（如「读取本地 Git 仓库的提交与 diff」）
+
+2. **采集参数**（`params`）：
+   - 查阅 `tools.json` 中对应 tool 的 `definition`，按需询问每个参数的取值（如 `git_directory` 的 `repository`、`author` 等）
+
+- 询问时请**同时**覆盖元信息与 params，不要只根据 tools.json 列出 tool 参数。
+- `id`：无须用户未提供，从 `name` 或工具类型合理生成（如 `project_git_directory`）
+
 **推荐实现（读–改–写）**
 
 1. 调用 `/source get_all`（或直接 `read`）获取当前 JSON 文本。

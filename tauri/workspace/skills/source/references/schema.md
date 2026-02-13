@@ -15,6 +15,7 @@
   {
     "id": "damn_reports_git_directory",
     "name": "Damn Reports Git Directory",
+    "description": "Read Git commits and diffs from a local Git repository",
     "tool": "git_directory",
     "enable": true,
     "params": {
@@ -29,13 +30,16 @@
 
 ## 单个数据源定义
 
-每个数据源定义包含以下字段：
+每个数据源定义包含以下字段。添加时**必填**：`id`、`name`、`description`、`tool`、`params`。
 
 - `id`（string）
   - 唯一标识符；供 `/source get`、`/source set` 等使用。
 
 - `name`（string）
   - 人类可读名称。
+
+- `description`（string）
+  - 数据源的简短描述。
 
 - `tool`（string）
   - 关联的采集器类型（`tools.json` 中的 tool id）。
