@@ -7,7 +7,7 @@ import { store } from '@/store'
 export function ReportGenerator() {
   const { loading } = useStore(store.report)
   const generateMutation = useMutation({
-    mutationFn: store.report.generateDailyReport,
+    mutationFn: () => store.report.generateDailyReport(),
   })
 
   const isGenerating = generateMutation.isPending || loading

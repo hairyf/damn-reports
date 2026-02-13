@@ -10,10 +10,23 @@ export function SettingLlmCard() {
       <CardHeader className="flex gap-3 items-center justify-between py-4">
         <div className="flex items-center gap-3">
           <Icon icon="lucide:brain-circuit" className="w-5 h-5" />
-          <p className="text-md font-semibold">LLM 设置</p>
+          <p className="text-md font-semibold">模型设置</p>
         </div>
       </CardHeader>
       <CardBody className="gap-6 pt-0">
+        {!setting.isLlmEnvConfigured && (
+          <div className="flex flex-col gap-2">
+            <div className="flex items-center gap-2">
+              <Icon icon="lucide:link" className="w-4 h-4 text-default-500" />
+              <label className="text-sm font-medium">Base URL</label>
+            </div>
+            <Input
+              value={setting.llmBaseUrl}
+              onChange={e => store.setting.llmBaseUrl = e.target.value}
+              placeholder="https://api.deepseek.com"
+            />
+          </div>
+        )}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
             <Icon icon="lucide:key" className="w-4 h-4 text-default-500" />
@@ -33,20 +46,6 @@ export function SettingLlmCard() {
             }
           />
         </div>
-
-        {!setting.isLlmEnvConfigured && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Icon icon="lucide:link" className="w-4 h-4 text-default-500" />
-              <label className="text-sm font-medium">Base URL</label>
-            </div>
-            <Input
-              value={setting.llmBaseUrl}
-              onChange={e => store.setting.llmBaseUrl = e.target.value}
-              placeholder="https://api.deepseek.com"
-            />
-          </div>
-        )}
       </CardBody>
     </Card>
   )

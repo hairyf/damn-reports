@@ -20,7 +20,7 @@ export function StepLlmSetting() {
             <Icon icon="lucide:brain-circuit" className="text-indigo-600 w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold">LLM 设置</h2>
+            <h2 className="text-2xl font-bold">模型设置</h2>
             <p className="text-gray-500 dark:text-white/60 text-sm">配置大语言模型以增强自动化能力</p>
           </div>
         </div>

@@ -109,7 +109,7 @@ export const report = defineStore({
 
         if (records.length === 0) {
           addToast({ title: '暂无数据', description: '未收集到任何数据' })
-          return
+          throw new Error('未收集到任何数据')
         }
 
         const ws = await db.workspace.findFirst()
@@ -118,7 +118,7 @@ export const report = defineStore({
 
         const summary = await buildRecordSummaryPrompt()
         if (!summary?.trim() || summary === 'No record data available.') {
-          return
+          throw new Error('没有可用的记录数据')
         }
 
         const content = await this.streamGenerate(dailyReportPrompt(summary))
@@ -136,6 +136,8 @@ export const report = defineStore({
           queryClient.invalidateQueries({ queryKey: ['records'] }),
         ])
         this.clearStreaming()
+
+        return content
       }
       catch (error) {
         console.error('generateDailyReport error', error)
@@ -144,6 +146,7 @@ export const report = defineStore({
           description: error instanceof Error ? error.message : '未知错误',
           color: 'danger',
         })
+        throw error
       }
       finally {
         this.loading = false
