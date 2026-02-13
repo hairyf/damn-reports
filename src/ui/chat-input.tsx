@@ -16,7 +16,8 @@ import {
   usePromptInputAttachments,
   usePromptInputController,
 } from 'ai-elements'
-import { useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
+import { useSearchParams } from 'react-router-dom'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
@@ -87,10 +88,20 @@ function MessageAreaExtras() {
   )
 }
 
+const ADD_TOOL_SUGGESTION = QUICK_TAGS.find(t => t.label === '添加工具')!.suggestion
+
 function ChatInputInner() {
+  const [searchParams, setSearchParams] = useSearchParams()
   const { isStreaming } = useStore(store.chat)
   const controller = usePromptInputController()
   const attachments = usePromptInputAttachments()
+
+  useEffect(() => {
+    if (searchParams.get('intent') === 'add-tool') {
+      controller.textInput.setInput(ADD_TOOL_SUGGESTION)
+      setSearchParams({}, { replace: true })
+    }
+  }, [searchParams, setSearchParams, controller])
 
   const handleSubmit = useCallback(
     (message: { text: string, files: FileUIPart[] }) => {

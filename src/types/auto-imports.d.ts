@@ -96,6 +96,7 @@ declare global {
   const get_current_time: typeof import('../config/collectors').get_current_time
   const get_records: typeof import('../config/tools').get_records
   const get_records_by_source: typeof import('../config/tools').get_records_by_source
+  const get_settings: typeof import('../config/tools').get_settings
   const get_sources: typeof import('../config/tools').get_sources
   const get_tool: typeof import('../config/tools').get_tool
   const get_tools: typeof import('../config/tools').get_tools
@@ -122,6 +123,7 @@ declare global {
   const remove: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').remove
   const rename: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').rename
   const retry: typeof import('../utils/utility').retry
+  const set_settings: typeof import('../config/tools').set_settings
   const set_source: typeof import('../config/tools').set_source
   const set_tool: typeof import('../config/tools').set_tool
   const siteConfig: typeof import('../config/site').siteConfig

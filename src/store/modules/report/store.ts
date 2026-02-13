@@ -1,69 +1,14 @@
-import { createOpenAI } from '@ai-sdk/openai'
 import { addToast } from '@heroui/react'
-import { streamText } from 'ai'
 import dayjs from 'dayjs'
 import { defineStore } from 'valtio-define'
 import { queryClient } from '@/config/client'
 import { dailyReportPrompt, optimizeReportPrompt } from '@/config/prompts'
 import { store } from '@/store'
+import { streamGenerateContent } from './streaming'
+
+import { buildRecordSummaryPrompt } from './summary'
+import { createModel } from './utils'
 import 'valtio-define/types'
-
-export type RecordType = 'daily' | 'weekly' | 'monthly' | 'yearly'
-
-const MAX_DATA_SIZE = 2048
-
-function stringifyData(data: any): string | undefined {
-  if (!data)
-    return undefined
-  const json = typeof data === 'string' ? data : JSON.stringify(data)
-  if (json.length > MAX_DATA_SIZE)
-    return `${json.slice(0, MAX_DATA_SIZE)}...`
-  return json
-}
-
-function createModel() {
-  const { llmApiKey, llmBaseUrl, llmModel } = store.setting
-  if (!llmApiKey?.trim()) {
-    throw new Error('请先在设置中配置 LLM API Key')
-  }
-  return createOpenAI({
-    apiKey: llmApiKey,
-    baseURL: llmBaseUrl?.trim().replace(/\/$/, '') || undefined,
-  }).chat(llmModel || 'deepseek-chat')
-}
-
-async function buildRecordSummaryPrompt(): Promise<string> {
-  const sources = store.source.raw
-  const records = await db.record.findMany({ date: dayjs().toISOString() })
-
-  const sourceMap = new Map(sources.map(s => [s.id, s]))
-  const grouped = new Map<string, Array<{ summary: string, data: any }>>()
-
-  for (const rec of records) {
-    const key = rec.source
-    if (!grouped.has(key))
-      grouped.set(key, [])
-    grouped.get(key)!.push({ summary: rec.summary, data: rec.data })
-  }
-
-  if (grouped.size === 0)
-    return 'No record data available.'
-
-  const lines: string[] = []
-  for (const [sourceId, recs] of grouped) {
-    const source = sourceMap.get(sourceId)
-    const name = source?.name ?? sourceId
-    const tool = source?.tool ?? ''
-    lines.push(`${name} (${tool})\n`)
-    for (const r of recs) {
-      const dataStr = stringifyData(r.data)
-      lines.push(`- ${r.summary}`)
-      if (dataStr)
-        lines.push(`  data: ${dataStr}`)
-    }
-  }
-  return lines.join('\n')
-}
 
 export const report = defineStore({
   state: () => ({
@@ -87,15 +32,15 @@ export const report = defineStore({
     async streamGenerate(systemPrompt: string): Promise<string> {
       this.loading = true
       this.streamingContent = ''
-      const { textStream } = streamText({
-        model: createModel(),
-        system: systemPrompt,
-        prompt: '',
-      })
-      for await (const delta of textStream) {
-        this.streamingContent += delta
+      const model = createModel(store.setting)
+      try {
+        return await streamGenerateContent(model, systemPrompt, (delta) => {
+          this.streamingContent += delta
+        })
       }
-      return this.streamingContent
+      finally {
+        this.loading = false
+      }
     },
 
     /** 首次生成日报：收集数据摘要 → 流式生成 → 创建报告 */
@@ -116,7 +61,7 @@ export const report = defineStore({
         if (ws == null)
           throw new Error('未找到工作区，请先完成初始化')
 
-        const summary = await buildRecordSummaryPrompt()
+        const summary = await buildRecordSummaryPrompt(store.source.raw)
         if (!summary?.trim() || summary === 'No record data available.') {
           throw new Error('没有可用的记录数据')
         }
@@ -156,7 +101,7 @@ export const report = defineStore({
     /** 重新生成：基于最新数据重新生成并更新已有报告 */
     async regenerateReport(reportId: number | string) {
       try {
-        const summary = await buildRecordSummaryPrompt()
+        const summary = await buildRecordSummaryPrompt(store.source.raw)
         if (!summary?.trim() || summary === 'No record data available.') {
           throw new Error('没有可用的记录数据')
         }

@@ -12,6 +12,7 @@ import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
 function Page() {
+  const navigate = useNavigate()
   const [search, setSearch] = useState('')
   const debouncedSearch = useDebounce(search, 300)
 
@@ -46,6 +47,16 @@ function Page() {
               startContent={<Icon icon="lucide:search" className="text-default-400" />}
               className="flex-1"
             />
+            <Button
+              color="primary"
+              onPress={() => {
+                store.chat.prepareNewChat()
+                navigate('/chat?intent=add-tool')
+              }}
+              startContent={<Icon icon="lucide:bot-message-square" className="w-4 h-4" />}
+            >
+              添加配置
+            </Button>
             <Button
               variant="flat"
               onPress={onRefresh}

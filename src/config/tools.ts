@@ -319,6 +319,20 @@ export const generate_report = tool({
   execute: () => store.report.generateDailyReport(),
 })
 
+export const get_settings = tool({
+  description: '获取应用设置（LLM 模型、用户界面、通知、自动保存、日报生成时间）',
+  inputSchema: z.object({}),
+  execute: () => store.setting.$state,
+})
+
+export const set_settings = tool({
+  description: '设置应用设置',
+  inputSchema: z.object({
+    patchSettings: z.record(z.string(), z.any()).describe('应用设置'),
+  }),
+  execute: ({ patchSettings }) => store.setting.$patch(patchSettings),
+})
+
 // add_source
 // set_source
 // get_sources

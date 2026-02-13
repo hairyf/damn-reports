@@ -1,11 +1,16 @@
 import { Button, Card, CardBody, ScrollShadow } from '@heroui/react'
 import { Icon } from '@iconify/react'
+import { useOverlay } from '@overlastic/react'
 import clsx from 'clsx'
+import { useMount } from 'react-use'
 import { useStore } from 'valtio-define'
+import { Dialog } from '@/components/dialog'
 import { store } from '@/store'
+import { MAIN_SESSION_ID } from '@/store/modules/chat'
 
 export function ChatSessions() {
   const { sessions, activeSession } = useStore(store.chat)
+  const openDialog = useOverlay(Dialog)
 
   function handleNewSession() {
     store.chat.prepareNewChat()
@@ -14,6 +19,20 @@ export function ChatSessions() {
   function handleDeleteSession(id: string) {
     store.chat.deleteSession(id)
   }
+
+  async function handleClearMainSession() {
+    const confirmed = await openDialog({
+      title: '清空主会话',
+      message: '确定要清空主会话的消息吗？此操作无法撤销。',
+      confirmText: '清空',
+      cancelText: '取消',
+    })
+    if (!confirmed)
+      return
+    store.chat.clearSessionMessages(MAIN_SESSION_ID)
+  }
+
+  useMount(store.chat.ensureMainSession)
 
   return (
     <Card className="w-56 flex-shrink-0 h-full" shadow="none">
@@ -48,16 +67,32 @@ export function ChatSessions() {
                       {item.title || '未命名会话'}
                     </div>
                   </div>
-                  <Button
-                    isIconOnly
-                    size="sm"
-                    as="span"
-                    variant="light"
-                    className="hover:!bg-white/50"
-                    onPress={() => handleDeleteSession(item.id)}
-                  >
-                    <Icon icon="lucide:trash-2" className="w-3 h-3" />
-                  </Button>
+                  {item.id === MAIN_SESSION_ID
+                    ? (
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          as="span"
+                          variant="light"
+                          className="hover:!bg-white/50"
+                          title="清空主会话"
+                          onPress={handleClearMainSession}
+                        >
+                          <Icon icon="lucide:eraser" className="w-3 h-3" />
+                        </Button>
+                      )
+                    : (
+                        <Button
+                          isIconOnly
+                          size="sm"
+                          as="span"
+                          variant="light"
+                          className="hover:!bg-white/50"
+                          onPress={() => handleDeleteSession(item.id)}
+                        >
+                          <Icon icon="lucide:trash-2" className="w-3 h-3" />
+                        </Button>
+                      )}
                 </Button>
               )
             })}

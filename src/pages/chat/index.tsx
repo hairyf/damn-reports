@@ -1,4 +1,3 @@
-import { Card, CardBody } from '@heroui/react'
 import { ChatInput } from '@/ui/chat-input'
 import { ChatMessages } from '@/ui/chat-messages'
 import { ChatSessions } from '@/ui/chat-sessions'
@@ -9,11 +8,7 @@ function Page() {
       <ChatSessions />
       <div className="flex-1 relative">
         <div className="flex flex-col h-full absolute inset-0 overflow-hidden gap-4">
-          <Card shadow="none" className="flex-1 min-h-0 rounded-xl overflow-hidden">
-            <CardBody className="p-6 pr-3">
-              <ChatMessages />
-            </CardBody>
-          </Card>
+          <ChatMessages />
           <ChatInput />
         </div>
       </div>
