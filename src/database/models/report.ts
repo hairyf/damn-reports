@@ -3,7 +3,6 @@ import dayjs from 'dayjs'
 import { Model } from '../model'
 
 export interface ReportFindManyInput {
-  workspace?: number
   search?: string
   type?: string
   page?: number
@@ -12,7 +11,6 @@ export interface ReportFindManyInput {
 
 export interface ReportFindByTypeInput {
   type: 'daily' | 'weekly' | 'monthly' | 'yearly'
-  workspace?: number
 }
 
 export class Report extends Model<DB, 'report'> {
@@ -21,7 +19,7 @@ export class Report extends Model<DB, 'report'> {
   }
 
   findMany(input: ReportFindManyInput) {
-    const { search, type, workspace, page = 1, pageSize = 10 } = input
+    const { search, type, page = 1, pageSize = 10 } = input
     let query = this.db.selectFrom('report')
       .selectAll()
 
@@ -41,10 +39,6 @@ export class Report extends Model<DB, 'report'> {
       query = query.where('type', '=', type)
     }
 
-    if (typeof workspace === 'number') {
-      query = query.where('workspaceId', '=', workspace)
-    }
-
     // 排序
     query = query.orderBy('createdAt', 'desc')
 
@@ -58,7 +52,7 @@ export class Report extends Model<DB, 'report'> {
   }
 
   async findFirstByType(input: ReportFindByTypeInput) {
-    const { type, workspace } = input
+    const { type } = input
     // 根据类型计算时间范围
     let startTime: dayjs.Dayjs
     let endTime: dayjs.Dayjs
@@ -84,16 +78,11 @@ export class Report extends Model<DB, 'report'> {
 
     try {
       // 查询匹配的报告
-      let query = db
+      const query = db
         .selectFrom('report')
         .selectAll()
         .where('type', '=', type)
-
-      if (typeof workspace === 'number') {
-        query = query.where('workspaceId', '=', workspace)
-      }
-
-      query = query.where('createdAt', '>=', startTime.toDate() as any)
+        .where('createdAt', '>=', startTime.toDate() as any)
         .where('createdAt', '<=', endTime.toDate() as any)
         .orderBy('createdAt', 'desc')
         .limit(1)

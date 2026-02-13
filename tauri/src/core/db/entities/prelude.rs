@@ -4,4 +4,3 @@
 pub use super::record::Entity as Record;
 // pub use super::report::Entity as Report;
 // pub use super::source::Entity as Source;
-// pub use super::workspace::Entity as Workspace;

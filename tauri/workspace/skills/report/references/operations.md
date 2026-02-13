@@ -21,7 +21,6 @@
 
 1. 若用户未指定具体查询，默认优先查询**当天**报告：
    - `SELECT * FROM report WHERE DATE(createdAt) = DATE('now') ORDER BY createdAt DESC`
-   - 若有 `workspaceId` 上下文，加上 `AND workspaceId = ?`
 
 2. 若用户指定了条件（如“最近 5 条”“按 type 查”），按其意图构建 SQL。
 
@@ -69,7 +68,7 @@
 **输入（概念）**
 
 根据操作类型而定：
-- **INSERT**: `name`, `type`, `content`, `workspaceId`
+- **INSERT**: `name`, `type`, `content`
 - **UPDATE**: `id` 或条件，以及要更新的字段（如 `content`, `name`, `type`）
 - **DELETE**: `id` 或 WHERE 条件
 
@@ -78,8 +77,8 @@
 1. 根据用户意图构造相应的 SQL：
    - **INSERT**:
      ```sql
-     INSERT INTO report (name, type, content, workspaceId, createdAt, updatedAt)
-     VALUES ('报告名', 'daily', '...', 1, datetime('now'), datetime('now'));
+     INSERT INTO report (name, type, content, createdAt, updatedAt)
+     VALUES ('报告名', 'daily', '...', datetime('now'), datetime('now'));
      ```
    - **UPDATE**:
      ```sql
@@ -98,5 +97,4 @@
 **注意事项**
 
 - `content` 为长文本，若包含单引号需转义为 `''`。
-- `workspaceId` 通常为 1，或从 workspace 上下文获取。
 - UPDATE 时建议同时更新 `updatedAt = datetime('now')`。

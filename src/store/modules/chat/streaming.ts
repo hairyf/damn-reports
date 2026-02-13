@@ -60,14 +60,10 @@ export async function runStream(options: RunStreamOptions): Promise<void> {
     baseURL: llmBaseUrl?.trim().replace(/\/$/, '') || undefined,
   })
 
-  const ws = await db.workspace.findFirst()
   const agent = new ToolLoopAgent({
     model: openai.chat(llmModel || 'deepseek-chat'),
     instructions: [
-      { role: 'system', content: [
-        `Current System: ${navigator.userAgent}`,
-        `Current Workspace ID: ${ws?.id}`,
-      ].join('\n') },
+      { role: 'system', content: `Current System: ${navigator.userAgent}` },
       { role: 'system', content: await readTextFile('AGENTS.md') },
     ],
     tools,

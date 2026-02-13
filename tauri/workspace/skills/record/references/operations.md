@@ -23,7 +23,7 @@
    - 输入: `{"sql": "<SELECT 语句>"}`
 
 2. 根据用户意图构建 SQL，例如：
-   - 最近 N 条: `SELECT * FROM record WHERE workspaceId = ? ORDER BY createdAt DESC LIMIT N`
+   - 最近 N 条: `SELECT * FROM record ORDER BY createdAt DESC LIMIT N`
    - 按 source: `SELECT * FROM record WHERE source = ? ORDER BY createdAt DESC`
    - 自由查询: 用户给出条件，组装成合法 SELECT。
 
@@ -68,13 +68,12 @@
 - `summary`（string）– 摘要
 - `data`（object/any）– 数据，会序列化为 JSON 存入 `data` 列
 - `source`（string）– 数据源
-- `workspaceId`（number）– 所属 workspace
 
 **实现**
 
 1. 构造 INSERT 语句：
    - `tool` 必须为 `"ai"`
-   - `id`、`summary`、`data`、`source`、`workspaceId` 由用户或上下文提供
+   - `id`、`summary`、`data`、`source` 由用户或上下文提供
    - `data` 需序列化为 JSON 字符串，SQL 中正确转义单引号
 
 2. 调用 `exec_sql`：
@@ -83,14 +82,13 @@
 3. 示例 SQL（SQLite 使用 `datetime('now')` 填充时间戳）：
 
 ```sql
-INSERT INTO record (id, summary, data, source, tool, workspaceId, createdAt, updatedAt)
+INSERT INTO record (id, summary, data, source, tool, createdAt, updatedAt)
 VALUES (
   'unique-id-123',
   '摘要内容',
   '{"key": "value"}',
   'manual',
   'ai',
-  1,
   datetime('now'),
   datetime('now')
 );

@@ -20,26 +20,9 @@ pub struct Model {
     pub created_at: String,
     #[sea_orm(column_name = "updatedAt", column_type = "custom(\"DATETIME\")")]
     pub updated_at: String,
-    #[sea_orm(column_name = "workspaceId")]
-    pub workspace_id: i32,
 }
 
 #[derive(Copy, Clone, Debug, EnumIter, DeriveRelation)]
-pub enum Relation {
-    #[sea_orm(
-        belongs_to = "super::workspace::Entity",
-        from = "Column::WorkspaceId",
-        to = "super::workspace::Column::Id",
-        on_update = "Cascade",
-        on_delete = "Restrict"
-    )]
-    Workspace,
-}
-
-impl Related<super::workspace::Entity> for Entity {
-    fn to() -> RelationDef {
-        Relation::Workspace.def()
-    }
-}
+pub enum Relation {}
 
 impl ActiveModelBehavior for ActiveModel {}

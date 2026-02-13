@@ -76,11 +76,6 @@ export const source = defineStore({
       if (sources.length === 0)
         return 0
 
-      const ws = await db.workspace.findFirst()
-      if (!ws)
-        throw new Error('Workspace not found')
-
-      const workspaceId = ws.id as number
       const allRecords: Array<{
         id: string
         summary: string
@@ -89,7 +84,6 @@ export const source = defineStore({
         updatedAt: string
         source: string
         tool: string
-        workspaceId: number
       }> = []
 
       for (const src of sources) {
@@ -119,7 +113,6 @@ export const source = defineStore({
               updatedAt: iso,
               source: src.id,
               tool: src.tool,
-              workspaceId,
             })
           }
         }

@@ -61,10 +61,6 @@ export const report = defineStore({
           throw new Error('未收集到任何数据')
         }
 
-        const ws = await db.workspace.findFirst()
-        if (ws == null)
-          throw new Error('未找到工作区，请先完成初始化')
-
         const summary = await buildRecordSummaryPrompt(store.source.raw)
         if (!summary?.trim() || summary === 'No record data available.') {
           throw new Error('没有可用的记录数据')
@@ -76,7 +72,6 @@ export const report = defineStore({
           name: `日报 ${new Date().toLocaleDateString('sv-SE')}`,
           type: 'daily',
           content,
-          workspaceId: ws.id as number,
           updatedAt: new Date().toISOString(),
         })
 

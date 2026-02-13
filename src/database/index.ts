@@ -16,5 +16,4 @@ const connection = new Kysely<DB>({
 export const db = Object.assign(connection, {
   record: new models.Record(connection),
   report: new models.Report(connection),
-  workspace: new models.Workspace(connection),
 })

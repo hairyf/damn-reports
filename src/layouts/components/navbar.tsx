@@ -1,4 +1,3 @@
-import { If } from '@hairy/react-lib'
 import {
   BreadcrumbItem,
   Breadcrumbs,
@@ -9,7 +8,6 @@ import {
   NavbarItem,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useQuery } from '@tanstack/react-query'
 import { getCurrentWindow } from '@tauri-apps/api/window'
 import { useEffect, useState } from 'react'
 
@@ -35,11 +33,6 @@ export function Navbar() {
     })
   }
 
-  const { data: workspace } = useQuery({
-    queryKey: ['workspace'],
-    queryFn: () => db.workspace.findFirst(),
-  })
-
   async function handleMinimize() {
     const appWindow = getCurrentWindow()
     await appWindow.minimize()
@@ -63,23 +56,20 @@ export function Navbar() {
       <HeroUINavbar maxWidth="full" position="sticky" className="relative bg-transparent backdrop-filter-none">
         <div className="absolute h-[64px] w-full" data-tauri-drag-region />
         <NavbarContent justify="start" className="hidden min-[768px]:flex">
-          <If cond={!!workspace}>
-            <NavbarItem>
-              <Breadcrumbs
-                itemClasses={{
-                  separator: 'px-2 text-default-500',
-                  item: 'text-sm text-default-500',
-                }}
-                separator="/"
-              >
-                <BreadcrumbItem>
-                  <Icon icon="lucide:layout-dashboard" className="w-4 h-4 mt-[1.5px]" />
-                  <span className="text-sm">默认工作区</span>
-                </BreadcrumbItem>
-              </Breadcrumbs>
-            </NavbarItem>
-
-          </If>
+          <NavbarItem>
+            <Breadcrumbs
+              itemClasses={{
+                separator: 'px-2 text-default-500',
+                item: 'text-sm text-default-500',
+              }}
+              separator="/"
+            >
+              <BreadcrumbItem>
+                <Icon icon="lucide:layout-dashboard" className="w-4 h-4 mt-[1.5px]" />
+                <span className="text-sm">默认工作区</span>
+              </BreadcrumbItem>
+            </Breadcrumbs>
+          </NavbarItem>
         </NavbarContent>
         <NavbarContent justify="end">
           <NavbarItem className="hidden sm:flex gap-2">

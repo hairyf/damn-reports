@@ -6,7 +6,6 @@ export interface RecordFindManyInput {
   search?: string
   source?: string
   sourceIds?: string[]
-  workspace?: number
   date?: string
 }
 
@@ -18,7 +17,6 @@ export interface RecordRow {
   updatedAt: string | number
   source: string
   tool: string
-  workspaceId: number
 }
 
 export interface RecordInJoined extends RecordRow {
@@ -72,11 +70,10 @@ export class Record extends Model<DB, 'record'> {
   }
 
   findManyQuery(input: RecordFindManyInput) {
-    const { search, source, sourceIds, workspace, date } = input
+    const { search, source, sourceIds, date } = input
 
     let query = this.db
       .selectFrom('record')
-      .innerJoin('workspace', 'workspace.id', 'record.workspaceId')
       .selectAll('record')
 
     if (search) {
@@ -93,10 +90,6 @@ export class Record extends Model<DB, 'record'> {
     }
     else if (sourceIds && sourceIds.length > 0) {
       query = query.where('record.source', 'in', sourceIds)
-    }
-
-    if (typeof workspace === 'number') {
-      query = query.where('workspace.id', '=', workspace)
     }
 
     if (date) {

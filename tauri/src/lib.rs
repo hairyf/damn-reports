@@ -128,6 +128,12 @@ fn migrations() -> tauri_plugin_sql::Builder {
             sql: include_str!("../prisma/migrations/20260212100001/migration.sql"),
             kind: MigrationKind::Up,
         },
+        Migration {
+            version: 6,
+            description: "remove workspace table",
+            sql: include_str!("../prisma/migrations/20260213000000/migration.sql"),
+            kind: MigrationKind::Up,
+        },
     ];
     for migration in &migrations {
         log::info!("Migration: {}", migration.description);

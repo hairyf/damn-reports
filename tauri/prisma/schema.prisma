@@ -15,9 +15,6 @@ model Report {
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  workspaceId Int
-
   @@map("report")
 }
 
@@ -31,20 +28,6 @@ model Record {
 
   source    String
   tool      String
-  workspace   Workspace @relation(fields: [workspaceId], references: [id])
-  workspaceId Int
 
   @@map("record")
-}
-
-model Workspace {
-  id       Int      @id @default(autoincrement())
-
-  workflow String  @unique
-  name     String
-
-  reports Report[]
-  records Record[]
-
-  @@map("workspace")
 }

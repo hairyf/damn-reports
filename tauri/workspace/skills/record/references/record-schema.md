@@ -13,17 +13,12 @@
 | updatedAt | TEXT | 更新时间，ISO 8601 |
 | source | TEXT | 数据源标识 |
 | tool | TEXT | 采集工具标识 |
-| workspaceId | INTEGER | 所属 workspace，FK |
-
-## 关系
-
-- `workspaceId` → `workspace.id`
 
 ## 常见查询示例
 
 ```sql
--- 按 workspace 查询最近 10 条
-SELECT * FROM record WHERE workspaceId = 1 ORDER BY createdAt DESC LIMIT 10;
+-- 最近 10 条
+SELECT * FROM record ORDER BY createdAt DESC LIMIT 10;
 
 -- 按 source 筛选
 SELECT * FROM record WHERE source = 'git_directory' ORDER BY createdAt DESC;

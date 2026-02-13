@@ -12,11 +12,6 @@
 | content | TEXT | 报告正文，支持 Markdown |
 | createdAt | TEXT | 创建时间，ISO 8601 |
 | updatedAt | TEXT | 更新时间，ISO 8601 |
-| workspaceId | INTEGER | 所属 workspace，FK |
-
-## 关系
-
-- `workspaceId` → `workspace.id`
 
 ## 常见查询示例
 
@@ -26,8 +21,8 @@ SELECT * FROM report
 WHERE DATE(createdAt) = DATE('now')
 ORDER BY createdAt DESC;
 
--- 按 workspace 查询最近 10 条
-SELECT * FROM report WHERE workspaceId = 1 ORDER BY createdAt DESC LIMIT 10;
+-- 最近 10 条
+SELECT * FROM report ORDER BY createdAt DESC LIMIT 10;
 
 -- 按 type 筛选
 SELECT * FROM report WHERE type = 'daily' ORDER BY createdAt DESC;

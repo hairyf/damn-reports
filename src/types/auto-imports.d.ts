@@ -186,7 +186,7 @@ declare global {
   export type { Model } from '../database/model'
   import('../database/model')
   // @ts-ignore
-  export type { Generated, Timestamp, Record, Report, Workspace, DB } from '../database/types'
+  export type { Generated, Timestamp, Record, Report, DB } from '../database/types'
   import('../database/types')
   // @ts-ignore
   export type { SiteConfig } from '../config/site'
