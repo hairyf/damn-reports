@@ -3,7 +3,6 @@ import { defineStore } from 'valtio-define'
 export interface Tool {
   name: string
   description: string
-  enable?: boolean
   type: string
   definition?: Record<string, any>
   executor?: Record<string, any>

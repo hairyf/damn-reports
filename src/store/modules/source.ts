@@ -8,6 +8,7 @@ import { executeCollector } from '@/utils/exec'
 export interface Source {
   id: string
   name: string
+  description: string
   tool: string
   enable?: boolean
   params: Record<string, any>
@@ -100,11 +101,6 @@ export const source = defineStore({
         const toolDef = tools[src.tool]
         if (!toolDef) {
           console.warn(`Tool "${src.tool}" not found in tools.json, skipping source "${src.name}"`)
-          continue
-        }
-
-        if (toolDef.enable === false) {
-          console.info(`Tool "${src.tool}" is disabled, skipping source "${src.name}"`)
           continue
         }
 

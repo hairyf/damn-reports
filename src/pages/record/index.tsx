@@ -16,19 +16,9 @@ import {
 import { Icon } from '@iconify/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { createElement, useState } from 'react'
+import { useState } from 'react'
 import { useStore } from 'valtio-define'
-import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
 import { store } from '@/store'
-
-const iconMapping: Record<string, { icon: any, label: string }> = {
-  git: { icon: GitIcon, label: 'Git' },
-  git_directory: { icon: GitIcon, label: 'Git' },
-  clickup: { icon: ClickupIcon, label: 'Clickup' },
-  slack: { icon: SlackIcon, label: 'Slack' },
-  gmail: { icon: GmailIcon, label: 'Gmail' },
-  alimail: { icon: AlimailIcon, label: 'Alimail' },
-}
 
 function Page() {
   const [search, setSearch] = useState('')
@@ -144,7 +134,7 @@ function Page() {
               <TableRow key={record.id}>
                 <TableCell>
                   <div className="flex items-center gap-2">
-                    {createElement(iconMapping[record.tool]?.icon ?? GitIcon, { size: 20 })}
+                    <ToolIcon type={record.tool} size={20} />
                     <span>{record.tool}</span>
                   </div>
                 </TableCell>

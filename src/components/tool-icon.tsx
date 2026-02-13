@@ -1,3 +1,4 @@
+import { Icon } from '@iconify/react'
 import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
 
 const iconMap = {
@@ -21,6 +22,6 @@ export interface ToolIconProps {
 export function ToolIcon({ type, size = 24 }: ToolIconProps) {
   const IconComponent = iconMap[type as keyof IconMap]
   if (!IconComponent)
-    return <div className="i-lucide-circle" />
+    return <Icon icon="lucide:bubbles" className="text-cyan-500" style={{ width: size, height: size }} />
   return <IconComponent size={size} />
 }

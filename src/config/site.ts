@@ -22,8 +22,12 @@ export const siteConfig = {
       href: '/chat',
     },
     {
-      label: '数据源',
+      label: '来源',
       href: '/source/',
+    },
+    {
+      label: '工具',
+      href: '/tool',
     },
     {
       label: '设置',

@@ -1,8 +1,7 @@
 {
   "git_directory": {
-    "name": "Git Directory Reader",
+    "name": "Git Directory",
     "description": "Read Git commits and diffs from a local Git repository",
-    "enable": true,
     "type": "exec",
     "definition": {
       "repository": { "type": "string", "description": "The local Git repository path" },
@@ -15,9 +14,8 @@
     "transformer": "$split($, \"\n\")[$ != \"\"].($p := $split($, \"\t\"); $count($p) >= 4 ? {\"id\": $p[0], \"summary\": $p[1], \"createdAt\": $number($p[3]) * 1000, \"data\": {\"id\": $p[0], \"message\": $p[1], \"author\": $p[2], \"date\": $number($p[3])}} : null)[$]"
   },
   "clickup": {
-    "name": "ClickUp Tasks Reader",
+    "name": "ClickUp Tasks",
     "description": "Read ClickUp tasks updated on the current day and assigned to the specified user",
-    "enable": true,
     "type": "http",
     "definition": {
       "token": { "type": "string", "description": "ClickUp API Token" },
@@ -44,7 +42,6 @@
   "test_nodejs": {
     "name": "Test Node.js",
     "description": "Use Node.js to execute commands",
-    "enable": true,
     "type": "exec",
     "files": ["tools/get_current_time.js"],
     "executor": {

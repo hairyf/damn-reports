@@ -1,17 +1,6 @@
 import { Select, SelectItem } from '@heroui/react'
-import { createElement } from 'react'
 import { useStore } from 'valtio-define'
-import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
 import { store } from '@/store'
-
-const iconByToolId: Record<string, any> = {
-  git_directory: GitIcon,
-  git: GitIcon,
-  clickup: ClickupIcon,
-  slack: SlackIcon,
-  gmail: GmailIcon,
-  alimail: AlimailIcon,
-}
 
 export interface SourceSelectProps {
   onChange?: (value: string) => void
@@ -47,7 +36,7 @@ export function SourceSelect(props: SourceSelectProps) {
       {options.map(option => (
         <SelectItem
           key={option.id}
-          startContent={iconByToolId[option.id] ? createElement(iconByToolId[option.id], { size: 16 }) : null}
+          startContent={<ToolIcon type={option.id} size={16} />}
         >
           {option.name}
         </SelectItem>

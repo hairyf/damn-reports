@@ -45,7 +45,7 @@ export function SourceItem(props: SourceItemProps) {
               <span className="font-medium">{item.name}</span>
             </div>
             <div className="text-sm text-default-500">
-              {item.tool}
+              {item.description}
             </div>
           </div>
           <div className="flex items-center gap-2">
