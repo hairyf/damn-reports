@@ -1,4 +1,5 @@
 import { chat } from './modules/chat'
+import { cron } from './modules/cron'
 import { llm } from './modules/llm'
 import { report } from './modules/report'
 import { setting } from './modules/setting'
@@ -10,6 +11,7 @@ export const store = {
   source,
   tool,
   chat,
+  cron,
   setting,
   llm,
   updater,

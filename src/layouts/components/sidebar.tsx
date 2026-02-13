@@ -12,6 +12,7 @@ const iconMap: Record<string, string> = {
   '/chat': 'lucide:bot-message-square',
   '/source': 'lucide:radar',
   '/tool': 'lucide:wrench',
+  '/hook': 'lucide:webhook',
   '/workflow': 'lucide:workflow',
   '/setting': 'lucide:settings',
 }

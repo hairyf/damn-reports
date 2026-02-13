@@ -1,0 +1,129 @@
+# crons.json 与单个任务格式
+
+本文描述 `crons.json` 的顶层结构及单个定时任务条目的预期格式。
+
+## crons.json 顶层结构
+
+- 文件 `crons.json` 为 **JSON 对象**，包含两个字段：
+  - `version`（number）：固定为 `1`。
+  - `jobs`（array）：定时任务数组。
+
+示例（简化）：
+
+```json
+{
+  "version": 1,
+  "jobs": [
+    {
+      "id": "builtin_daily_report",
+      "name": "每日报告生成",
+      "description": "在设定时间自动收集数据并生成日报",
+      "enabled": true,
+      "schedule": { "kind": "cron", "expr": "0 18 * * 1-5" },
+      "payload": { "kind": "report" },
+      "state": {},
+      "createdAtMs": 1739000000000,
+      "updatedAtMs": 1739000000000
+    }
+  ]
+}
+```
+
+## 单个任务定义
+
+每个任务包含以下字段。添加时**必填**：`id`、`name`、`enabled`、`schedule`、`payload`。
+
+- `id`（string）
+  - 唯一标识符。建议格式：`cron_<timestamp>_<random8>`。
+  - 内置任务使用 `builtin_` 前缀。
+
+- `name`（string）
+  - 人类可读名称。
+
+- `description`（string，可选）
+  - 任务的简短描述。
+
+- `enabled`（boolean）
+  - 是否启用。为 `false` 时不会被调度执行。
+
+- `deleteAfterRun`（boolean，可选）
+  - 仅对 `at` 类型有效。为 `true` 时，一次性任务成功后自动删除。
+
+- `schedule`（object）
+  - 调度配置，三种类型之一：
+
+  **cron 表达式**：
+  ```json
+  { "kind": "cron", "expr": "0 18 * * 1-5", "tz": "Asia/Shanghai" }
+  ```
+  - `expr`：标准 cron 表达式（分 时 日 月 周）。
+  - `tz`（可选）：时区，默认系统时区。
+
+  **固定间隔**：
+  ```json
+  { "kind": "every", "everyMs": 3600000, "anchorMs": 1739000000000 }
+  ```
+  - `everyMs`：间隔毫秒数。
+  - `anchorMs`（可选）：锚点时间戳。
+
+  **一次性**：
+  ```json
+  { "kind": "at", "at": "2026-03-01T10:00:00Z" }
+  ```
+  - `at`：ISO 8601 时间字符串。
+
+- `payload`（object）
+  - 执行动作，四种类型之一：
+
+  **收集数据**：
+  ```json
+  { "kind": "collect" }
+  ```
+
+  **生成报告**：
+  ```json
+  { "kind": "report" }
+  ```
+
+  **AI 对话**（发送消息到主会话）：
+  ```json
+  { "kind": "agentTurn", "message": "储存今天的记忆" }
+  ```
+
+  **执行命令**：
+  ```json
+  { "kind": "command", "command": "node ./tools/my_script.js" }
+  ```
+
+- `state`（object）
+  - 运行时状态，由调度器自动管理。添加时设为 `{}`。
+  - 包含：`nextRunAtMs`、`lastRunAtMs`、`lastStatus`、`lastError`、`lastDurationMs`、`consecutiveErrors`。
+  - **不要手动修改 state**，除非需要重置错误计数。
+
+- `createdAtMs`（number）
+  - 创建时间戳（毫秒）。
+
+- `updatedAtMs`（number）
+  - 最后更新时间戳（毫秒）。
+
+## 常用 Cron 表达式参考
+
+| 表达式 | 含义 |
+|--------|------|
+| `0 18 * * 1-5` | 工作日 18:00 |
+| `0 0 * * *` | 每天零点 |
+| `*/30 * * * *` | 每 30 分钟 |
+| `0 9,18 * * *` | 每天 9:00 和 18:00 |
+| `0 0 * * 1` | 每周一零点 |
+| `0 0 1 * *` | 每月 1 号零点 |
+
+## 常用间隔参考
+
+| 毫秒数 | 含义 |
+|--------|------|
+| `60000` | 1 分钟 |
+| `300000` | 5 分钟 |
+| `900000` | 15 分钟 |
+| `1800000` | 30 分钟 |
+| `3600000` | 1 小时 |
+| `86400000` | 1 天 |

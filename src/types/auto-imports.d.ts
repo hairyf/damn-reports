@@ -11,6 +11,7 @@ declare global {
   const BaseDirectory: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').BaseDirectory
   const ClickupIcon: typeof import('../components/icons').ClickupIcon
   const CornerActions: typeof import('../components/corner-actions').CornerActions
+  const CronForm: typeof import('../components/cron-form').CronForm
   const DefinitionFields: typeof import('../components/definition-fields').DefinitionFields
   const Dialog: typeof import('../components/dialog').Dialog
   const Ellipsis: typeof import('../components/ellipsis').Ellipsis
@@ -73,6 +74,7 @@ declare global {
   const create: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').create
   const createContext: typeof import('react').createContext
   const createRef: typeof import('react').createRef
+  const cron_tool: typeof import('../config/tools').cron_tool
   const current_time: typeof import('../config/collectors').current_time
   const dailyReportPrompt: typeof import('../config/prompts').dailyReportPrompt
   const db: typeof import('../database/index').db
@@ -175,6 +177,7 @@ declare global {
   const useState: typeof import('react').useState
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
   const useTransition: typeof import('react').useTransition
+  const useUpdater: typeof import('../hooks/use-updater').useUpdater
   const watch: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watch
   const watchImmediate: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watchImmediate
   const write: typeof import('../config/tools').write

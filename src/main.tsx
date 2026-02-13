@@ -1,4 +1,3 @@
-import { listen } from '@tauri-apps/api/event'
 import ReactDOM from 'react-dom/client'
 import { BrowserRouter } from 'react-router-dom'
 import valtio from 'valtio-define'
@@ -6,16 +5,12 @@ import persistent from 'valtio-define/plugins/persistent'
 import App from './App.tsx'
 import { Provider } from './provider.tsx'
 import { store } from './store'
-import { MAIN_SESSION_ID } from './store/modules/chat'
 import './styles/main.css'
 
 valtio.use(persistent())
 
-listen('trigger_generate_daily_report', () => store.report.generate())
-listen('trigger_main_memory_storage', async () => {
-  await store.chat.send('储存今天的记忆')
-  store.chat.clearMessages(MAIN_SESSION_ID)
-})
+// Start cron service (replaces Rust scheduler)
+store.cron.start().catch(err => console.error('[cron] failed to start:', err))
 
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <BrowserRouter>

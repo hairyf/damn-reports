@@ -36,6 +36,7 @@ export const write = tool({
       await fs.writeFile(path, encoder.encode(content))
       store.tool.sync()
       store.source.sync()
+      store.cron.sync()
       return `Successfully written to ${path}`
     }
     catch (error) {
@@ -74,6 +75,7 @@ export const edit = tool({
       await fs.writeFile(path, encoder.encode(updatedText))
       store.tool.sync()
       store.source.sync()
+      store.cron.sync()
       return `Updated ${path}`
     }
     catch (error) {
@@ -321,6 +323,8 @@ export const generate_report = tool({
   inputSchema: z.object({}),
   execute: () => store.report.generate(),
 })
+
+
 
 export const get_settings = tool({
   description: '获取应用设置（LLM 模型、用户界面、通知、自动保存、日报生成时间）',

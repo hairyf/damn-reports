@@ -59,6 +59,7 @@
     "ai": "^6.0.79",
     "ai-elements": "workspace:*",
     "clsx": "^2.1.1",
+    "croner": "^10.0.1",
     "dayjs": "^1.11.19",
     "framer-motion": "^12.29.0",
     "front-matter": "^4.0.2",

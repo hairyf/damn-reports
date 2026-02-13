@@ -1,7 +1,6 @@
 use std::sync::atomic::{AtomicBool, Ordering};
 
 use crate::core::db::connection;
-use crate::service::scheduler;
 
 // 全局标志，确保数据库连接成功只运行一次
 static DATABASE_LOADED: AtomicBool = AtomicBool::new(false);
@@ -16,6 +15,6 @@ pub async fn database_loaded(app_handle: tauri::AppHandle) -> Result<(), String>
     }
     let _db = connection::connect(&app_handle).await;
     log::info!("Database Connection Successful");
-    scheduler::start(&app_handle);
+    // Scheduler moved to frontend TypeScript cron service
     Ok(())
 }

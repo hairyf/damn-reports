@@ -18,7 +18,7 @@ pub struct Setting {
     pub is_llm_env_configured: bool,
 }
 
-impl Setting {
+impl Default for Setting {
     fn default() -> Self {
         Self {
             language: "zh-CN".to_string(),
@@ -46,6 +46,7 @@ pub fn set_store_dat_setting(app_handle: &tauri::AppHandle, setting: Setting) {
         .expect("Failed to emit event");
 }
 
+#[allow(dead_code)]
 pub fn get_store_dat_setting(app_handle: &tauri::AppHandle) -> Setting {
     let store = app_handle
         .store(STORE_DAT_FILE)

@@ -4,3 +4,6 @@
 [submodule "sources/opencode"]
 	path = sources/opencode
 	url = https://github.com/anomalyco/opencode
+[submodule "sources/openclaw"]
+	path = sources/openclaw
+	url = https://github.com/openclaw/openclaw.git

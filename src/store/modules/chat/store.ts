@@ -3,6 +3,7 @@ import type { ChatMessage, ChatSession } from './types'
 import { defineStore } from 'valtio-define'
 import { store } from '@/store'
 import { buildMessagesForModel } from '../llm'
+import { MAIN_SESSION_SYSTEM_PROMPT } from './prompts'
 import { MAIN_SESSION_ID, NEW_SESSION_ID } from './types'
 import { createId, createMainSession, updateTimestamp } from './utils'
 import 'valtio-define/types'
@@ -215,6 +216,7 @@ export const chat = defineStore(
           await store.llm.streamChat({
             messagesForModel,
             abortSignal: controller.signal,
+            ...(sessionId === MAIN_SESSION_ID && { extraSystemInstructions: MAIN_SESSION_SYSTEM_PROMPT }),
             callbacks: {
               onTextDelta: (delta, opts) =>
                 applyStreamDelta(this.sessions, sessionId, assistantMessageId, delta, opts),
