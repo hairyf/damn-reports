@@ -1,5 +1,5 @@
 import type { FileUIPart, LanguageModel } from 'ai'
-import type { ChatMessage } from './chat/types'
+import type { ChatMessage } from '../chat/types'
 import { createOpenAI } from '@ai-sdk/openai'
 import { generateText, streamText, ToolLoopAgent } from 'ai'
 import { defineStore } from 'valtio-define'
