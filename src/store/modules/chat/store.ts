@@ -5,7 +5,7 @@ import { store } from '@/store'
 
 import { buildMessagesForModel, generateSessionTitle, runStream } from './streaming'
 import { MAIN_SESSION_ID } from './types'
-import { createId, createMainSession, MS_PER_DAY, updateTimestamp } from './utils'
+import { createId, createMainSession, updateTimestamp } from './utils'
 import 'valtio-define/types'
 
 // 不放在 state 里，避免被持久化
@@ -95,10 +95,6 @@ export const chat = defineStore(
           if (idx > 0) {
             this.sessions.splice(idx, 1)
             this.sessions.unshift(main)
-          }
-          const lastCleared = main.lastClearedAt ? new Date(main.lastClearedAt).getTime() : 0
-          if (Date.now() - lastCleared >= MS_PER_DAY && main.messages.length > 0) {
-            this.clearSessionMessages(MAIN_SESSION_ID)
           }
         }
       },

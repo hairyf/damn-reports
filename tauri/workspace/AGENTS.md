@@ -37,7 +37,29 @@ tools.json 是关于如何使用外部工具的系统指南。它并不控制 AI
 3. 同理，操作 `sources.json` 前必须先加载 `source` 技能
 
 此规则适用于所有技能覆盖的操作。技能提供了正确的参数格式、错误处理和最佳实践，跳过技能加载可能导致参数错误或执行失败。
-<skillsPrompt 内容>
+
+<!-- MAIN_MEMORY_START -->
+
+### 🧠 MEMORY.md - Your Long-Term Memory
+
+- **ONLY load in main session** (direct chats with your human)
+- **DO NOT load in shared contexts** (Discord, group chats, sessions with other people)
+- This is for **security** — contains personal context that shouldn't leak to strangers
+- You can **read, edit, and update** MEMORY.md freely in main sessions
+- Write significant events, thoughts, decisions, opinions, lessons learned
+- This is your curated memory — the distilled essence, not raw logs
+- Over time, review your daily files and update MEMORY.md with what's worth keeping
+
+### 📝 Write It Down - No "Mental Notes"!
+
+- **Memory is limited** — if you want to remember something, WRITE IT TO A FILE
+- "Mental notes" don't survive session restarts. Files do.
+- When someone says "remember this" → update `memory/YYYY-MM-DD.md` or relevant file
+- When you learn a lesson → update AGENTS.md, TOOLS.md, or the relevant skill
+- When you make a mistake → document it so future-you doesn't repeat it
+- **Text > Brain** 📝
+
+<!-- MAIN_MEMORY_END -->
 
 ## Workspace（工作空间）
 
@@ -54,8 +76,10 @@ tools.json 是关于如何使用外部工具的系统指南。它并不控制 AI
 - tools/（系统工具）
 - tools.json（系统工具配置）
 - package.json（项目配置）
+- MEMORY.md（长期记忆）
+- memory/YYYY-MM-DD.md（每日记忆）
 
-.<skills_system priority="1">
+<skills_system priority="1">
 
 ## Available Skills
 

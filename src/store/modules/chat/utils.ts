@@ -1,8 +1,6 @@
 import type { ChatSession } from './types'
 import { MAIN_SESSION_ID } from './types'
 
-export const MS_PER_DAY = 24 * 60 * 60 * 1000
-
 export function createMainSession(): ChatSession {
   const now = new Date().toISOString()
   return {
