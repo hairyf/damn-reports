@@ -319,7 +319,7 @@ export const sync_records = tool({
 export const generate_report = tool({
   description: '同步记录并生成、保存当天的日报',
   inputSchema: z.object({}),
-  execute: () => store.report.generateDailyReport(),
+  execute: () => store.report.generate(),
 })
 
 export const get_settings = tool({
@@ -328,9 +328,9 @@ export const get_settings = tool({
   execute: () => ({
     ...store.setting.$state,
     llm: store.llm.$state,
-    effectiveLlmApiKey: store.llm.effectiveApiKey ? '(已配置)' : '',
-    effectiveLlmBaseUrl: store.llm.effectiveBaseUrl,
-    llmModel: store.llm.effectiveModel,
+    effectiveLlmApiKey: store.llm.resolvedApiKey ? '(已配置)' : '',
+    effectiveLlmBaseUrl: store.llm.resolvedBaseUrl,
+    llmModel: store.llm.resolvedModel,
   }),
 })
 

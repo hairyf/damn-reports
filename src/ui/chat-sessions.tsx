@@ -13,11 +13,11 @@ export function ChatSessions() {
   const openDialog = useOverlay(Dialog)
 
   function handleNewSession() {
-    store.chat.prepareNewChat()
+    store.chat.prepareNew()
   }
 
   function handleDeleteSession(id: string) {
-    store.chat.deleteSession(id)
+    store.chat.remove(id)
   }
 
   async function handleClearMainSession() {
@@ -29,10 +29,10 @@ export function ChatSessions() {
     })
     if (!confirmed)
       return
-    store.chat.clearSessionMessages(MAIN_SESSION_ID)
+    store.chat.clearMessages(MAIN_SESSION_ID)
   }
 
-  useMount(store.chat.ensureMainSession)
+  useMount(store.chat.ensureMain)
 
   return (
     <Card className="w-56 flex-shrink-0 h-full" shadow="none">
@@ -60,7 +60,7 @@ export function ChatSessions() {
                       ? 'bg-primary/10 text-primary'
                       : 'hover:bg-default-100 text-default-400',
                   )}
-                  onPress={() => store.chat.setActiveSession(item.id)}
+                  onPress={() => store.chat.activate(item.id)}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="truncate font-medium text-foreground">

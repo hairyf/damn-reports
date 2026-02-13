@@ -12,8 +12,8 @@ export interface Source {
   tool: string
   enable?: boolean
   params: Record<string, any>
-  createAt: string
-  updateAt: string
+  createdAt: string
+  updatedAt: string
 }
 
 export const source = defineStore({
@@ -41,20 +41,20 @@ export const source = defineStore({
       return this.raw.find(s => s.id === id)
     },
 
-    async create(input: Omit<Source, 'id' | 'createAt' | 'updateAt'>): Promise<Source> {
+    async create(input: Omit<Source, 'id' | 'createdAt' | 'updatedAt'>): Promise<Source> {
       const now = new Date().toISOString()
       const id = `source_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`
-      const item: Source = { ...input, enable: input.enable ?? true, id, createAt: now, updateAt: now }
+      const item: Source = { ...input, enable: input.enable ?? true, id, createdAt: now, updatedAt: now }
       this.raw.push(item)
       await this.save()
       return item
     },
 
-    async update(id: string, input: Partial<Omit<Source, 'id' | 'createAt'>>): Promise<Source | null> {
+    async update(id: string, input: Partial<Omit<Source, 'id' | 'createdAt'>>): Promise<Source | null> {
       const index = this.raw.findIndex(s => s.id === id)
       if (index === -1)
         return null
-      const updated: Source = { ...this.raw[index], ...input, updateAt: new Date().toISOString() }
+      const updated: Source = { ...this.raw[index], ...input, updatedAt: new Date().toISOString() }
       this.raw[index] = updated
       await this.save()
       return updated

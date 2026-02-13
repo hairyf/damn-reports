@@ -51,7 +51,7 @@
 
 - `source`（object）– 符合 `schema.md` 的数据源定义，必须包含 `id`。
 - 若省略 `enable`，默认为 `true`。
-- 若省略 `createAt`/`updateAt`，设为当前 ISO 8601 时间。
+- 若省略 `createdAt`/`updatedAt`，设为当前 ISO 8601 时间。
 
 **交互式添加时的必问项（不可遗漏）**
 
@@ -74,7 +74,7 @@
 2. 将文本解析为数组 `sources`。
 3. 检查是否存在相同 `id` 的条目：
    - 若存在，返回错误或“id 已存在”，不添加。
-4. 为新数据源补全缺失的 `createAt` 和 `updateAt`。
+4. 为新数据源补全缺失的 `createdAt` 和 `updatedAt`。
 5. 追加：`sources.push(source)`（或等效写法）。
 6. 将 `sources` 序列化为 JSON 字符串（如可能，格式化输出）。
 7. 调用 `write` 持久化：
@@ -162,7 +162,7 @@
 3. 找到 `item.id === id` 的下标；若不存在，返回错误或“未找到”，避免误增。
 4. 替换或合并：
    - **替换**：`sources[index] = source`（保持或统一设置 `id`）。
-   - **合并**：`sources[index] = { ...sources[index], ...source }`，可选更新 `updateAt`。
+   - **合并**：`sources[index] = { ...sources[index], ...source }`，可选更新 `updatedAt`。
 5. 将 `sources` 序列化为 JSON 字符串。
 6. 调用 `write`：
    - 输入：`{"path": "sources.json", "content": "<序列化后的 sources>"}`

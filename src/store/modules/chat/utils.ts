@@ -20,3 +20,7 @@ export function createId(): string {
 export function updateTimestamp(session: ChatSession): void {
   session.updatedAt = new Date().toISOString()
 }
+
+export function isMainSession(session: ChatSession): boolean {
+  return session.id === MAIN_SESSION_ID
+}

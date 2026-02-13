@@ -21,7 +21,7 @@ import { MAIN_SESSION_ID } from '@/store/modules/chat'
 import { ChatToolItem } from './chat-tool-item'
 
 export function ChatMessages() {
-  const { activeSession, isStreaming } = useStore(store.chat)
+  const { activeSession, streaming } = useStore(store.chat)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {
@@ -44,7 +44,7 @@ export function ChatMessages() {
               const isLastMessage = index === activeSession.messages.length - 1
               const isAssistantLoading = message.role === 'assistant'
                 && !message.content
-                && isStreaming
+                && streaming
                 && isLastMessage
               // const isCurrentMessageStreaming = message.role === 'assistant' && isLastMessage && isStreaming
               const contentClassName = 'max-w-[75%] text-sm whitespace-pre-wrap group-[.is-user]:rounded-2xl group-[.is-user]:px-3 group-[.is-user]:py-2 group-[.is-user]:bg-primary group-[.is-user]:text-primary-foreground'

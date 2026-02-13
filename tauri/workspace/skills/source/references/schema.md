@@ -22,8 +22,8 @@
       "repository": "D:/damn-reports",
       "author": "hairyf"
     },
-    "createAt": "2026-02-12T00:00:00.000Z",
-    "updateAt": "2026-02-12T00:00:00.000Z"
+    "createdAt": "2026-02-12T00:00:00.000Z",
+    "updatedAt": "2026-02-12T00:00:00.000Z"
   }
 ]
 ```
@@ -52,10 +52,10 @@
   - 该数据源的参数；键由对应工具的 `definition` 决定。
   - 例如 `git_directory` 工具：`repository`、`author` 等。
 
-- `createAt`（string）
+- `createdAt`（string）
   - ISO 8601 时间戳，创建时间。
 
-- `updateAt`（string）
+- `updatedAt`（string）
   - ISO 8601 时间戳，最后更新时间。
 
 ## 与 tools.json 的关系

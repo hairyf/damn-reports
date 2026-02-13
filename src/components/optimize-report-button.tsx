@@ -26,12 +26,12 @@ export function OptimizeReportButton({
     mutationFn: async (userInstruction?: string) => {
       if (!reportId || !text)
         return
-      await store.report.optimizeReport(reportId, text, userInstruction)
+      await store.report.optimize(reportId, text, userInstruction)
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['reports'] }),
         queryClient.invalidateQueries({ queryKey: ['report', reportId] }),
       ])
-      store.report.clearStreaming()
+      store.report.resetStream()
     },
     onError: (err: Error) => {
       addToast({ title: '优化失败', description: err.message, color: 'danger' })

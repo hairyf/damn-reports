@@ -11,10 +11,10 @@ import './styles/main.css'
 
 valtio.use(persistent())
 
-listen('trigger_generate_daily_report', () => store.report.generateDailyReport())
+listen('trigger_generate_daily_report', () => store.report.generate())
 listen('trigger_main_memory_storage', async () => {
-  await store.chat.startStreaming('储存今天的记忆')
-  store.chat.clearSessionMessages(MAIN_SESSION_ID)
+  await store.chat.send('储存今天的记忆')
+  store.chat.clearMessages(MAIN_SESSION_ID)
 })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

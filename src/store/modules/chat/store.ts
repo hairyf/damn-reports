@@ -3,19 +3,85 @@ import type { ChatMessage, ChatSession } from './types'
 import { defineStore } from 'valtio-define'
 import { store } from '@/store'
 import { buildMessagesForModel } from '../llm'
-import { MAIN_SESSION_ID } from './types'
+import { MAIN_SESSION_ID, NEW_SESSION_ID } from './types'
 import { createId, createMainSession, updateTimestamp } from './utils'
 import 'valtio-define/types'
 
 // 不放在 state 里，避免被持久化
-let currentAbortController: AbortController | null = null
+let abortController: AbortController | null = null
+
+/** 流式更新 assistant 消息内容（模块内部使用） */
+function applyStreamDelta(
+  sessions: ChatSession[],
+  sessionId: string,
+  messageId: string,
+  delta: string,
+  opts?: { replace?: boolean, toolCallIndex?: number },
+) {
+  const session = sessions.find(s => s.id === sessionId)
+  if (!session)
+    return
+  const last = session.messages[session.messages.length - 1]
+  if (!last || last.id !== messageId)
+    return
+  if (opts?.replace && opts.toolCallIndex != null) {
+    const toolCall = last.toolCalls?.[opts.toolCallIndex]
+    if (toolCall)
+      toolCall.result = last.content
+    last.content = delta
+  }
+  else {
+    last.content += delta
+  }
+  updateTimestamp(session)
+}
+
+/** 流式添加工具调用（模块内部使用） */
+function appendToolCall(
+  sessions: ChatSession[],
+  sessionId: string,
+  messageId: string,
+  toolName: string,
+  args: Record<string, unknown>,
+) {
+  const session = sessions.find(s => s.id === sessionId)
+  if (!session)
+    return
+  const last = session.messages[session.messages.length - 1]
+  if (!last || last.id !== messageId)
+    return
+  if (!last.toolCalls)
+    last.toolCalls = []
+  last.toolCalls.push({ toolName, args, result: '' })
+  updateTimestamp(session)
+}
+
+/** 首轮对话后自动生成会话标题 */
+async function autoGenerateTitle(sessions: ChatSession[], sessionId: string) {
+  const target = sessions.find(s => s.id === sessionId)
+  if (!target || target.messages.length < 2)
+    return
+  try {
+    const conversationText = target.messages
+      .map(m => `${m.role === 'user' ? '用户' : '助手'}: ${m.content}`)
+      .join('\n')
+    const newTitle = await store.llm.generateTitle(conversationText)
+    if (newTitle) {
+      target.title = newTitle
+      updateTimestamp(target)
+    }
+  }
+  catch {
+    // 标题生成失败不影响正常对话，静默忽略
+  }
+}
 
 export const chat = defineStore(
   {
     state: () => ({
       sessions: [] as ChatSession[],
       activeSessionId: null as string | null,
-      isStreaming: false,
+      streaming: false,
     }),
     persist: {
       key: 'chat',
@@ -23,7 +89,7 @@ export const chat = defineStore(
     },
     getters: {
       activeSession(): ChatSession | null {
-        if (this.activeSessionId === '__new__')
+        if (this.activeSessionId === NEW_SESSION_ID)
           return null
         if (!this.activeSessionId)
           return this.sessions[0] ?? null
@@ -31,13 +97,16 @@ export const chat = defineStore(
       },
     },
     actions: {
-      prepareNewChat() {
-        this.activeSessionId = '__new__'
+      /** 切换到"新建会话"状态 */
+      prepareNew() {
+        this.activeSessionId = NEW_SESSION_ID
       },
-      createSession() {
+
+      /** 创建新会话，插入到主会话之后 */
+      create() {
         const now = new Date().toISOString()
         const id = createId()
-        const newSession: ChatSession = {
+        const session: ChatSession = {
           id,
           title: '新会话',
           createdAt: now,
@@ -46,58 +115,20 @@ export const chat = defineStore(
         }
         const mainIdx = this.sessions.findIndex(s => s.id === MAIN_SESSION_ID)
         if (mainIdx === 0)
-          this.sessions.splice(1, 0, newSession)
+          this.sessions.splice(1, 0, session)
         else
-          this.sessions.unshift(newSession)
+          this.sessions.unshift(session)
         this.activeSessionId = id
-        return newSession
+        return session
       },
-      setActiveSession(id: string) {
+
+      /** 切换活跃会话 */
+      activate(id: string) {
         this.activeSessionId = id
       },
-      /** 流式更新 assistant 消息内容（由 startStreaming 通过 callbacks 调用） */
-      applyStreamDelta(
-        sessionId: string,
-        assistantMessageId: string,
-        delta: string,
-        opts?: { replace?: boolean, toolCallIndex?: number },
-      ) {
-        const target = this.sessions.find(s => s.id === sessionId)
-        if (!target)
-          return
-        const last = target.messages[target.messages.length - 1]
-        if (!last || last.id !== assistantMessageId)
-          return
-        if (opts?.replace && opts.toolCallIndex != null) {
-          const toolCall = last.toolCalls?.[opts.toolCallIndex]
-          if (toolCall)
-            toolCall.result = last.content
-          last.content = delta
-        }
-        else {
-          last.content += delta
-        }
-        updateTimestamp(target)
-      },
-      /** 流式添加工具调用（由 startStreaming 通过 callbacks 调用） */
-      addStreamToolCall(
-        sessionId: string,
-        assistantMessageId: string,
-        toolName: string,
-        args: Record<string, unknown>,
-      ) {
-        const target = this.sessions.find(s => s.id === sessionId)
-        if (!target)
-          return
-        const last = target.messages[target.messages.length - 1]
-        if (!last || last.id !== assistantMessageId)
-          return
-        if (!last.toolCalls)
-          last.toolCalls = []
-        last.toolCalls.push({ toolName, args, result: '' })
-        updateTimestamp(target)
-      },
-      deleteSession(id: string) {
+
+      /** 删除会话（主会话不可删除） */
+      remove(id: string) {
         if (id === MAIN_SESSION_ID)
           return
         const index = this.sessions.findIndex(s => s.id === id)
@@ -108,7 +139,9 @@ export const chat = defineStore(
           this.activeSessionId = this.sessions[0]?.id ?? null
         }
       },
-      clearSessionMessages(id: string) {
+
+      /** 清空会话消息 */
+      clearMessages(id: string) {
         const target = this.sessions.find(s => s.id === id)
         if (!target)
           return
@@ -118,7 +151,9 @@ export const chat = defineStore(
         if (id === MAIN_SESSION_ID)
           target.lastClearedAt = now
       },
-      ensureMainSession() {
+
+      /** 确保主会话存在且置顶 */
+      ensureMain() {
         let main = this.sessions.find(s => s.id === MAIN_SESSION_ID)
         if (!main) {
           main = createMainSession()
@@ -132,21 +167,20 @@ export const chat = defineStore(
           }
         }
       },
-      async startStreaming(userContent: string, files: FileUIPart[] = []) {
+
+      /** 发送消息并开始流式生成回复 */
+      async send(userContent: string, files: FileUIPart[] = []) {
         const content = userContent.trim()
         if (!content && files.length === 0)
           return
-        if (this.isStreaming) {
+        if (this.streaming)
           throw new Error('当前正在生成回复，请稍后再试')
-        }
-
-        if (!store.llm.effectiveApiKey?.trim()) {
+        if (!store.llm.resolvedApiKey?.trim())
           throw new Error('请先在设置中配置 LLM API Key')
-        }
 
         let current = this.activeSession
         if (!current)
-          current = this.createSession()
+          current = this.create()
 
         const isFirstRound = current.messages.length === 0
         const sessionId = current.id
@@ -173,58 +207,43 @@ export const chat = defineStore(
 
         const messagesForModel = buildMessagesForModel(current.messages, content, files)
 
-        const abortController = new AbortController()
-        currentAbortController = abortController
-        this.isStreaming = true
+        const controller = new AbortController()
+        abortController = controller
+        this.streaming = true
 
         try {
-          await store.llm.createStream({
+          await store.llm.streamChat({
             messagesForModel,
-            abortSignal: abortController.signal,
+            abortSignal: controller.signal,
             callbacks: {
               onTextDelta: (delta, opts) =>
-                this.applyStreamDelta(sessionId, assistantMessageId, delta, opts),
+                applyStreamDelta(this.sessions, sessionId, assistantMessageId, delta, opts),
               onToolCall: (toolName, args) =>
-                this.addStreamToolCall(sessionId, assistantMessageId, toolName, args),
+                appendToolCall(this.sessions, sessionId, assistantMessageId, toolName, args),
               onToolResult: () => { /* 下一次 onTextDelta 会带 replace: true */ },
             },
           })
 
-          if (isFirstRound && sessionId !== MAIN_SESSION_ID) {
-            const target = this.sessions.find(s => s.id === sessionId)
-            if (target && target.messages.length >= 2) {
-              try {
-                const conversationText = target.messages
-                  .map(m => `${m.role === 'user' ? '用户' : '助手'}: ${m.content}`)
-                  .join('\n')
-
-                const newTitle = await store.llm.generateSessionTitle(conversationText)
-                if (newTitle) {
-                  target.title = newTitle
-                  updateTimestamp(target)
-                }
-              }
-              catch {
-                // 标题生成失败不影响正常对话，静默忽略
-              }
-            }
-          }
+          if (isFirstRound && sessionId !== MAIN_SESSION_ID)
+            await autoGenerateTitle(this.sessions, sessionId)
         }
         catch (error) {
           console.error(error)
           throw error
         }
         finally {
-          this.isStreaming = false
-          currentAbortController = null
+          this.streaming = false
+          abortController = null
         }
       },
-      stopStreaming() {
-        if (currentAbortController) {
-          currentAbortController.abort()
-          currentAbortController = null
+
+      /** 中止当前流式生成 */
+      abort() {
+        if (abortController) {
+          abortController.abort()
+          abortController = null
         }
-        this.isStreaming = false
+        this.streaming = false
       },
     },
   },

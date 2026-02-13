@@ -94,7 +94,7 @@ const ADD_TOOL_SUGGESTION = QUICK_TAGS.find(t => t.label === '添加工具')!.su
 
 function ChatInputInner() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { isStreaming } = useStore(store.chat)
+  const { streaming } = useStore(store.chat)
   const controller = usePromptInputController()
   const attachments = usePromptInputAttachments()
 
@@ -113,7 +113,7 @@ function ChatInputInner() {
       // 发送后立即清空输入框和附件，不等待流式结束
       controller.textInput.clear()
       attachments.clear()
-      store.chat.startStreaming(text, files)
+      store.chat.send(text, files)
     },
     [controller, attachments],
   )
@@ -135,8 +135,8 @@ function ChatInputInner() {
           {SHOW_ATTACHMENTS && <AttachButton />}
           <PromptInputSubmit
             className="cursor-pointer"
-            status={isStreaming ? 'streaming' : undefined}
-            onStop={() => store.chat.stopStreaming()}
+            status={streaming ? 'streaming' : undefined}
+            onStop={() => store.chat.abort()}
           />
         </div>
       </div>

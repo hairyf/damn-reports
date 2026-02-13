@@ -107,12 +107,12 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
     mutationFn: async () => {
       if (!reportId)
         return
-      await store.report.regenerateReport(reportId)
+      await store.report.regenerate(reportId)
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['reports'] }),
         queryClient.invalidateQueries({ queryKey: ['report', reportId] }),
       ])
-      store.report.clearStreaming()
+      store.report.resetStream()
     },
     onError: (err: Error) => {
       addToast({ title: '重新生成失败', description: err.message, color: 'danger' })

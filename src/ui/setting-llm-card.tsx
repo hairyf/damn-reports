@@ -7,7 +7,7 @@ import { LLM_PROVIDERS } from '@/store/modules/llm'
 
 export function SettingLlmCard() {
   const llm = useStore(store.llm)
-  const isEnvConfigured = store.llm.effectiveIsEnvConfigured
+  const isEnvConfigured = store.llm.envConfigured
 
   return (
     <Card shadow="none">
@@ -18,7 +18,7 @@ export function SettingLlmCard() {
         </div>
       </CardHeader>
       <CardBody className="gap-6 pt-0">
-        {!isEnvConfigured && llm.isCustomProvider && (
+        {!isEnvConfigured && llm.customProvider && (
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
               <Icon icon="lucide:link" className="w-4 h-4 text-default-500" />
@@ -87,7 +87,7 @@ export function SettingLlmCard() {
                   isDisabled={isEnvConfigured}
                 />
               )
-            : llm.modelOptions.length > 0
+            : llm.providerModels.length > 0
               ? (
                   <Select
                     selectedKeys={[llm.model]}
@@ -99,7 +99,7 @@ export function SettingLlmCard() {
                     placeholder="选择具体模型"
                     aria-label="选择具体模型"
                   >
-                    {llm.modelOptions.map(opt => (
+                    {llm.providerModels.map(opt => (
                       <SelectItem key={opt.value}>
                         {opt.label}
                       </SelectItem>
