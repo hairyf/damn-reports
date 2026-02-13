@@ -6,19 +6,19 @@ export const updater = defineStore({
   state: () => ({
     checked: false,
     updater: null as Update | null,
-    isNewVersion: false,
-    isDownloading: false,
+    available: false,
+    downloading: false,
     progress: 0,
   }),
   actions: {
     async check(): Promise<boolean> {
       this.updater = await check()
-      return this.isNewVersion = !!this.updater
+      return this.available = !!this.updater
     },
-    async update() {
+    async install() {
       if (!this.updater)
         return
-      this.isDownloading = true
+      this.downloading = true
       let downloaded = 0
       let contentLength = 0
       await this.updater.downloadAndInstall((event) => {
@@ -36,12 +36,12 @@ export const updater = defineStore({
             break
         }
       })
-      this.isDownloading = false
+      this.downloading = false
     },
     async checkAndInstall(): Promise<boolean> {
       await this.check()
-      await this.update()
-      return this.isNewVersion
+      await this.install()
+      return this.available
     },
   },
 })

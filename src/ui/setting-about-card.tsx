@@ -1,6 +1,5 @@
 import { Else, If, Then } from '@hairy/react-lib'
 import {
-  addToast,
   Button,
   Card,
   CardBody,
@@ -8,17 +7,19 @@ import {
   Switch,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useOverlay } from '@overlastic/react'
+// import { useOverlay } from '@overlastic/react'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { getVersion } from '@tauri-apps/api/app'
 import { useMount } from 'react-use'
 import { useStore } from 'valtio-define'
+// import { Modal } from '@/components/modal'
+import { useUpdater } from '@/hooks/use-updater'
 import { store } from '@/store'
 
 export function SettingAboutCard() {
   const setting = useStore(store.setting)
-  const updater = useStore(store.updater)
-  const openModal = useOverlay(Modal)
+  const updater = useUpdater()
+  // const openModal = useOverlay(Modal)
   // 获取应用版本号
   const { data: appVersion = '' } = useQuery({
     queryKey: ['appVersion'],
@@ -26,36 +27,22 @@ export function SettingAboutCard() {
   })
 
   const { mutate: checkForUpdate, isPending: checkingUpdate } = useMutation({
-    mutationFn: async () => {
-      const isUpdate = await store.updater.check()
-      if (isUpdate) {
-        await openModal({
-          title: '检测到新版本可用',
-          content: '是否更新版本？',
-          confirmText: '确认',
-          cancelText: '暂不更新',
-        })
-        await store.updater.update()
-      }
-      else {
-        addToast({ title: '暂无更新', description: '当前版本已是最新版本' })
-      }
-    },
+    mutationFn: updater.checkAndPromptInstall,
   })
 
-  const { mutate: reset, isPending: resetting } = useMutation({
-    mutationFn: async () => {
-      await openModal({
-        title: '重置数据',
-        content: '确定要重置数据吗？此操作将删除所有数据，并重置所有设置。',
-        confirmText: '确定',
-        cancelText: '取消',
-      })
+  // const { mutate: reset, isPending: resetting } = useMutation({
+  //   mutationFn: async () => {
+  //     await openModal({
+  //       title: '重置数据',
+  //       content: '确定要重置数据吗？此操作将删除所有数据，并重置所有设置。',
+  //       confirmText: '确定',
+  //       cancelText: '取消',
+  //     })
 
-      // TODO
-    },
+  //     // TODO
+  //   },
 
-  })
+  // })
 
   useMount(store.updater.check)
 
@@ -66,7 +53,7 @@ export function SettingAboutCard() {
           <Icon icon="lucide:info" className="w-5 h-5" />
           <p className="text-md font-semibold">关于</p>
         </div>
-        <If cond={updater.isNewVersion}>
+        <If cond={updater.available}>
           <div className="flex items-center gap-2 text-sm text-default-500">
             <Icon icon="tabler:sparkles" className="w-4 h-4" />
             <span>新版本可用</span>
@@ -106,7 +93,7 @@ export function SettingAboutCard() {
 
         {/* 检查更新按钮 */}
         <div className="flex gap-4">
-          <If cond={updater.isNewVersion}>
+          <If cond={updater.available}>
             <Then>
               <Button
                 color="primary"
@@ -136,7 +123,7 @@ export function SettingAboutCard() {
               </Button>
             </Else>
           </If>
-          <Button
+          {/* <Button
             color="danger"
             variant="flat"
             radius="full"
@@ -145,7 +132,7 @@ export function SettingAboutCard() {
             isLoading={resetting}
           >
             重置数据
-          </Button>
+          </Button> */}
         </div>
       </CardBody>
     </Card>
