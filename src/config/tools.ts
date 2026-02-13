@@ -1,5 +1,6 @@
 import { tool } from 'ai'
 import matter from 'gray-matter'
+import { sql } from 'kysely'
 import { z } from 'zod'
 import { executeCollector, executeCommand } from '../utils/exec'
 import * as fs from '../utils/fs-extra'
@@ -136,7 +137,7 @@ export const http = tool({
 })
 
 export const exec = tool({
-  description: '执行命令',
+  description: '执行命令，Windows（powershell），Mac/inux（bash）',
   inputSchema: z.object({
     command: z.string().describe('要执行的命令'),
   }),
@@ -158,51 +159,13 @@ export const exec_tool = tool({
   },
 })
 
-interface WorkspaceSkill {
-  name: string
-  description: string
-  location: string
-  content: string
-}
-
-async function loadWorkspaceSkills(): Promise<WorkspaceSkill[]> {
-  const skills: WorkspaceSkill[] = []
-
-  async function scan(relativeDir: string) {
-    const entries = await fs.readDir(relativeDir)
-    for (const entry of entries) {
-      const childRelative = relativeDir ? `${relativeDir}/${entry.name}` : entry.name
-      if (entry.isDirectory) {
-        await scan(childRelative)
-      }
-      else if (entry.name === 'SKILL.md') {
-        const data = await fs.readFile(childRelative)
-        const text = decoder.decode(data)
-        const skill = parseSkillFromMarkdown(text, childRelative)
-        if (skill)
-          skills.push(skill)
-      }
-    }
-  }
-
-  // skills 目录位于 workspace 根目录下，location 基于 workspace 相对路径（例如 skills/tool/SKILL.md）
-  await scan('skills')
-  return skills
-}
-
-function parseSkillFromMarkdown(markdown: string, location: string): WorkspaceSkill | null {
-  const { data, content } = matter(markdown)
-  const frontmatter = data as { name?: string, description?: string }
-  if (!frontmatter.name)
-    return null
-
-  return {
-    name: String(frontmatter.name),
-    description: frontmatter.description ? String(frontmatter.description) : '',
-    location,
-    content: content.trim(),
-  }
-}
+export const exec_sql = tool({
+  description: '执行 SQL 命令',
+  inputSchema: z.object({
+    sql: z.string().describe('要执行的 SQL 命令'),
+  }),
+  execute: async ({ sql: sqlString }) => sql`${sqlString}`.execute(db),
+})
 
 export const skill = tool({
   description: '加载 workspace/skills 下指定的 Skill，并返回其内容和相关文件列表',
@@ -210,7 +173,7 @@ export const skill = tool({
     name: z.string().describe('要加载的 Skill 名称（来自 SKILL.md 的 name 字段）'),
   }),
   execute: async ({ name }) => {
-    const skills = await loadWorkspaceSkills()
+    const skills = await getWorkspaceSkills()
     const skill = skills.find(s => s.name === name)
 
     if (!skill) {
@@ -221,13 +184,12 @@ export const skill = tool({
     const lastSlash = skill.location.lastIndexOf('/')
     const dir = lastSlash === -1 ? skill.location : skill.location.slice(0, lastSlash)
 
-    let files: string[] = []
-    const entries = await fs.readDir(dir)
-    files = entries
-      .filter(e => !e.isDirectory && e.name !== 'SKILL.md')
-      .slice(0, 10)
-      .map(e => `${dir}/${e.name}`)
-
+    const files = await fs.readDir(dir, { recursive: true }).then(entries =>
+      entries
+        .filter(e => !e.isDirectory && e.name !== 'SKILL.md')
+        .slice(0, 10)
+        .map(e => `${dir}/${e.name}`),
+    )
     return {
       title: `Loaded skill: ${skill.name}`,
       output: [

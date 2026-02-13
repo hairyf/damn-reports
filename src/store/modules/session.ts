@@ -176,7 +176,10 @@ export const session = defineStore(
           // 创建 ToolLoopAgent 实例
           const agent = new ToolLoopAgent({
             model: openai.chat(llmModel || 'deepseek-chat'),
-            instructions: await readTextFile('AGENTS.md'),
+            instructions: [
+              { role: 'system', content: `Current System: ${navigator.userAgent}` },
+              { role: 'system', content: await readTextFile('AGENTS.md') },
+            ],
             tools,
           })
 

@@ -1,6 +1,6 @@
 ---
 name: tool
-description: Manage workspace collector tools defined in tools.json: read all tools, add or update a single tool definition, inspect a single tool, and execute a tool via exec_tool. Use when you need to maintain or run collectors stored in tools.json from the Tauri workspace.
+description: "Manage workspace collector tools defined in tools.json: read all tools, add or update a single tool definition, inspect a single tool, and execute a tool via exec_tool. Use when you need to maintain or run collectors stored in tools.json from the Tauri workspace."
 ---
 
 # Tool Skill

@@ -1,6 +1,6 @@
 ---
 name: jsonata
-description: JSONata query and transformation language for JSON. Use when writing or debugging JSONata expressions, embedding in JS/Node, or transforming JSON data.
+description: "JSONata query and transformation language for JSON. Use when writing or debugging JSONata expressions, embedding in JS/Node, or transforming JSON data."
 ---
 
 # JSONata Skill

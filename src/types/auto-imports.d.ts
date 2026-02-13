@@ -75,6 +75,7 @@ declare global {
   const edit: typeof import('../config/tools').edit
   const exe_tool: typeof import('../config/tools').exe_tool
   const exec: typeof import('../config/tools').exec
+  const exec_sql: typeof import('../config/tools').exec_sql
   const exec_tool: typeof import('../config/tools').exec_tool
   const executeCollector: typeof import('../utils/exec').executeCollector
   const executeCommand: typeof import('../utils/exec').executeCommand
@@ -87,6 +88,7 @@ declare global {
   const generate_report: typeof import('../config/tools').generate_report
   const getBeijingDayRange: typeof import('../config/source-tools').getBeijingDayRange
   const getTools: typeof import('../utils/tool').getTools
+  const getWorkspaceSkills: typeof import('../utils/skills').getWorkspaceSkills
   const get_current_time: typeof import('../config/collectors').get_current_time
   const get_records: typeof import('../config/tools').get_records
   const get_records_by_source: typeof import('../config/tools').get_records_by_source
@@ -103,6 +105,7 @@ declare global {
   const memo: typeof import('react').memo
   const mkdir: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').mkdir
   const open: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').open
+  const parseSkill: typeof import('../utils/skills').parseSkill
   const queryClient: typeof import('../config/client').queryClient
   const read: typeof import('../config/tools').read
   const readDir: typeof import('../utils/fs-extra').readDir
@@ -118,6 +121,7 @@ declare global {
   const siteConfig: typeof import('../config/site').siteConfig
   const size: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').size
   const skill: typeof import('../config/tools').skill
+  const skills: typeof import('../utils/skills').skills
   const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition
   const stat: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').stat
@@ -214,6 +218,12 @@ declare global {
   // @ts-ignore
   export type { Collector } from '../utils/exec'
   import('../utils/exec')
+  // @ts-ignore
+  export type { ReadDirOptions } from '../utils/fs-extra'
+  import('../utils/fs-extra')
+  // @ts-ignore
+  export type { Skill } from '../utils/skills'
+  import('../utils/skills')
   // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
