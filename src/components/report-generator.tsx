@@ -12,7 +12,7 @@ export interface ReportGeneratorProps {
 
 export function ReportGenerator({ generating, onGeneratingChange }: ReportGeneratorProps) {
   const queryClient = useQueryClient()
-  const { loading: llmLoading } = useStore(store.llm)
+  const { loading } = useStore(store.report)
   const generateMutation = useMutation({
     mutationFn: async () => {
       await store.source.collect()
@@ -27,16 +27,19 @@ export function ReportGenerator({ generating, onGeneratingChange }: ReportGenera
       }
 
       onGeneratingChange?.(true)
-      await store.llm.generateDailyReport()
-      queryClient.invalidateQueries({ queryKey: ['reports'] })
-      queryClient.invalidateQueries({ queryKey: ['records'] })
+      await store.report.generateDailyReport()
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['reports'] }),
+        queryClient.invalidateQueries({ queryKey: ['records'] }),
+      ])
+      store.report.clearStreaming()
     },
     onError: (err: Error) => {
       addToast({ title: '生成失败', description: err.message, color: 'danger' })
     },
   })
 
-  const isGenerating = generateMutation.isPending || llmLoading || generating
+  const isGenerating = generateMutation.isPending || loading || generating
 
   return (
     <Card className="flex-1 relative" shadow="none">

@@ -20,7 +20,7 @@ import { store } from '@/store'
 import { ChatToolItem } from './chat-tool-item'
 
 export function ChatMessages() {
-  const { activeSession, isStreaming } = useStore(store.session)
+  const { activeSession, isStreaming } = useStore(store.chat)
   const messagesEndRef = useRef<HTMLDivElement | null>(null)
 
   useEffect(() => {

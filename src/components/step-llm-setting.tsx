@@ -1,11 +1,15 @@
 import { Button, Card, CardBody, Input } from '@heroui/react'
 import { Icon } from '@iconify/react'
 
-export function StepDeepSeekApiKey() {
+export function StepLlmSetting() {
   const [apiKey, setApiKey] = useState('')
+  const [baseUrl, setBaseUrl] = useState('https://api.deepseek.com')
+  const [model, setModel] = useState('deepseek-chat')
 
   function onConfirm() {
     store.setting.llmApiKey = apiKey
+    store.setting.llmBaseUrl = baseUrl
+    store.setting.llmModel = model
   }
 
   return (
@@ -16,20 +20,42 @@ export function StepDeepSeekApiKey() {
             <Icon icon="lucide:brain-circuit" className="text-indigo-600 w-6 h-6" />
           </div>
           <div>
-            <h2 className="text-2xl font-bold">配置 DeepSeek API</h2>
-            <p className="text-gray-500 dark:text-white/60 text-sm">连接大模型以增强自动化能力</p>
+            <h2 className="text-2xl font-bold">LLM 设置</h2>
+            <p className="text-gray-500 dark:text-white/60 text-sm">配置大语言模型以增强自动化能力</p>
           </div>
         </div>
         <div className="space-y-4">
           <div className="space-y-2">
             <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
-              DeepSeek API Key
+              API Key
             </label>
             <Input
               type="text"
               value={apiKey}
               onChange={e => setApiKey(e.target.value)}
               placeholder="sk-..."
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
+              Base URL
+            </label>
+            <Input
+              type="text"
+              value={baseUrl}
+              onChange={e => setBaseUrl(e.target.value)}
+              placeholder="https://api.deepseek.com"
+            />
+          </div>
+          <div className="space-y-2">
+            <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
+              Model
+            </label>
+            <Input
+              type="text"
+              value={model}
+              onChange={e => setModel(e.target.value)}
+              placeholder="deepseek-chat"
             />
           </div>
           <div className="flex space-x-3">

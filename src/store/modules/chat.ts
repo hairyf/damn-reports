@@ -35,7 +35,7 @@ function updateTimestamp(session: ChatSession) {
 // 不放在 state 里，避免被持久化
 let currentAbortController: AbortController | null = null
 
-export const session = defineStore(
+export const chat = defineStore(
   {
     state: () => ({
       sessions: [] as ChatSession[],
@@ -43,7 +43,7 @@ export const session = defineStore(
       isStreaming: false,
     }),
     persist: {
-      key: 'session',
+      key: 'chat',
       storage,
     },
     getters: {
@@ -57,7 +57,7 @@ export const session = defineStore(
       },
     },
     actions: {
-      /** 仅切换到“新对话”状态：清空聊天区，不创建会话；发送第一条消息时会创建会话 */
+      /** 仅切换到"新对话"状态：清空聊天区，不创建会话；发送第一条消息时会创建会话 */
       prepareNewChat() {
         this.activeSessionId = '__new__'
       },
@@ -243,9 +243,7 @@ export const session = defineStore(
 
                 const { text } = await generateText({
                   model: openai.chat(llmModel || 'deepseek-chat'),
-                  system: '你是一个标题生成助手，会为用户和 AI 的对话生成简洁的中文标题。',
-                  prompt: `根据下面这段用户与 AI 的对话内容，生成一个不超过 12 个汉字的对话标题。\n\n`
-                    + `要求：\n- 只返回标题本身，不要任何解释、标点或引号。\n- 尽量简洁，但能概括本轮对话的主要目的。\n\n对话内容：\n${conversationText}`,
+                  ...generateTitlePrompt(conversationText),
                 })
 
                 const newTitle = text.trim().split('\n')[0]?.slice(0, 30)

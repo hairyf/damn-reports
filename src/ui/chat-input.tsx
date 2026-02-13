@@ -86,7 +86,7 @@ function MessageAreaExtras() {
 }
 
 function ChatInputInner() {
-  const { isStreaming } = useStore(store.session)
+  const { isStreaming } = useStore(store.chat)
   const controller = usePromptInputController()
   const attachments = usePromptInputAttachments()
 
@@ -98,7 +98,7 @@ function ChatInputInner() {
       // 发送后立即清空输入框和附件，不等待流式结束
       controller.textInput.clear()
       attachments.clear()
-      const p = store.session.startStreaming(text, files)
+      const p = store.chat.startStreaming(text, files)
       if (p && typeof p.then === 'function') {
         p.catch((error: unknown) => {
           const msg = error instanceof Error ? error.message : '发送失败，请稍后重试'
@@ -131,7 +131,7 @@ function ChatInputInner() {
           <PromptInputSubmit
             className="cursor-pointer"
             status={isStreaming ? 'streaming' : undefined}
-            onStop={() => store.session.stopStreaming()}
+            onStop={() => store.chat.stopStreaming()}
           />
         </div>
       </div>

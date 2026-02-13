@@ -11,7 +11,7 @@ import './styles/main.css'
 valtio.use(persistent())
 
 listen('trigger_generate_daily_report', () => {
-  store.llm.generateDailyReport()
+  store.report.generateDailyReport()
 })
 
 ReactDOM.createRoot(document.getElementById('root')!).render(

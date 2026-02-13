@@ -39,6 +39,7 @@ declare global {
   const N8N_WEBHOOK_ID: typeof import('../config/constants').N8N_WEBHOOK_ID
   const NavLink: typeof import('react-router-dom').NavLink
   const Navigate: typeof import('react-router-dom').Navigate
+  const OptimizeReportButton: typeof import('../components/optimize-report-button').OptimizeReportButton
   const Outlet: typeof import('react-router-dom').Outlet
   const ReportCountdown: typeof import('../components/report-countdown').ReportCountdown
   const ReportEditor: typeof import('../components/report-editor').ReportEditor
@@ -52,7 +53,7 @@ declare global {
   const SourceIcon: typeof import('../components/source-icon').SourceIcon
   const SourceItem: typeof import('../components/source-item').SourceItem
   const SourceSelect: typeof import('../components/source-select').SourceSelect
-  const StepDeepSeekApiKey: typeof import('../components/step-deepseek-api-key').StepDeepSeekApiKey
+  const StepLlmSetting: typeof import('../components/step-llm-setting').StepLlmSetting
   const StepStatus: typeof import('../components/step-status').StepStatus
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const Suspense: typeof import('react').Suspense
@@ -87,6 +88,7 @@ declare global {
   const fetch_http: typeof import('../config/tools').fetch_http
   const find: typeof import('../config/tools').find
   const forwardRef: typeof import('react').forwardRef
+  const generateTitlePrompt: typeof import('../config/prompts').generateTitlePrompt
   const generate_report: typeof import('../config/tools').generate_report
   const getBeijingDayRange: typeof import('../config/source-tools').getBeijingDayRange
   const getTools: typeof import('../utils/tool').getTools
@@ -107,6 +109,7 @@ declare global {
   const memo: typeof import('react').memo
   const mkdir: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').mkdir
   const open: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').open
+  const optimizeReportPrompt: typeof import('../config/prompts').optimizeReportPrompt
   const parseSkill: typeof import('../utils/skills').parseSkill
   const queryClient: typeof import('../config/client').queryClient
   const read: typeof import('../config/tools').read
@@ -202,6 +205,9 @@ declare global {
   // @ts-ignore
   export type { ModalProps } from '../components/modal'
   import('../components/modal')
+  // @ts-ignore
+  export type { OptimizeReportButtonProps } from '../components/optimize-report-button'
+  import('../components/optimize-report-button')
   // @ts-ignore
   export type { ReportEditorProps } from '../components/report-editor'
   import('../components/report-editor')

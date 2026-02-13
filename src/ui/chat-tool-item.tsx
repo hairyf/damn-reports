@@ -1,4 +1,4 @@
-import type { ChatMessage } from '@/store/modules/session'
+import type { ChatMessage } from '@/store/modules/chat'
 import { Badge, Chip } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { AnimatePresence, motion } from 'framer-motion'

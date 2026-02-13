@@ -20,12 +20,13 @@ function Page() {
   const tools = useMemo(() => {
     const entries = Object.entries(raw).map(([id, def]) => ({ id, ...def }))
     if (!debouncedSearch)
-      return entries
+      return entries.filter(t => t.enable !== false)
     const q = debouncedSearch.toLowerCase()
     return entries.filter(t =>
-      t.id.toLowerCase().includes(q)
-      || t.name.toLowerCase().includes(q)
-      || t.description?.toLowerCase().includes(q),
+      t.enable !== false
+      && (t.id.toLowerCase().includes(q)
+        || t.name.toLowerCase().includes(q)
+        || t.description?.toLowerCase().includes(q)),
     )
   }, [raw, debouncedSearch])
 

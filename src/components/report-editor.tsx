@@ -4,6 +4,7 @@ import {
   Button,
   Card,
   CardBody,
+  Tooltip,
 } from '@heroui/react'
 import { input } from '@heroui/theme'
 import { Icon } from '@iconify/react'
@@ -14,11 +15,12 @@ import { EditorContent, useEditor } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import dayjs from 'dayjs'
 import relativeTime from 'dayjs/plugin/relativeTime'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useInterval, useKey } from 'react-use'
 import { Markdown } from 'tiptap-markdown'
 import { useStore } from 'valtio-define'
 import { Dialog } from '@/components/dialog'
+import { OptimizeReportButton } from '@/components/optimize-report-button'
 import { store } from '@/store'
 
 dayjs.extend(relativeTime)
@@ -35,6 +37,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
   const openDialog = useOverlay(Dialog)
   const [text, setText] = useState('')
   const setting = useStore(store.setting)
+  const { isStreaming, streamingContent } = useStore(store.report)
 
   const editor = useEditor({
     extensions: [
@@ -47,6 +50,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
     // eslint-disable-next-line ts/ban-ts-comment
     // @ts-expect-error
     onUpdate: ({ editor }) => setText(editor.storage.markdown.getMarkdown()),
+    editable: !isStreaming,
     editorProps: {
       attributes: {
         class: 'prose prose-sm max-w-none focus:outline-none min-h-[400px] px-4 py-3 text-sm',
@@ -67,6 +71,17 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
     setText(report.content || '')
   }, { immediate: true })
 
+  // 流式生成时，实时同步内容到编辑器
+  useEffect(() => {
+    if (isStreaming && editor) {
+      editor.setEditable(false)
+      editor.commands.setContent(streamingContent)
+    }
+    else if (editor) {
+      editor.setEditable(true)
+    }
+  }, [isStreaming, streamingContent, editor])
+
   const isUnsaved = useMemo(() => {
     if (!report)
       return false
@@ -85,6 +100,22 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reports'] })
       queryClient.invalidateQueries({ queryKey: ['report', reportId] })
+    },
+  })
+
+  const regenerateMutation = useMutation({
+    mutationFn: async () => {
+      if (!reportId)
+        return
+      await store.report.regenerateReport(reportId)
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['reports'] }),
+        queryClient.invalidateQueries({ queryKey: ['report', reportId] }),
+      ])
+      store.report.clearStreaming()
+    },
+    onError: (err: Error) => {
+      addToast({ title: '重新生成失败', description: err.message, color: 'danger' })
     },
   })
 
@@ -157,10 +188,10 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
       <div className="flex justify-between items-center px-4 mb-3">
         <div className="flex flex-col gap-1">
           <div className="flex items-center gap-2">
-            <h3 className="text-lg font-semibold">
-              {report?.name}
+            <h3 className={`text-lg font-semibold${isStreaming ? ' animate-pulse' : ''}`}>
+              {isStreaming ? '正在生成报告...' : report?.name}
             </h3>
-            {isUnsaved && (
+            {!isStreaming && isUnsaved && (
               <div className="flex items-center gap-2">
                 <div className="w-2 h-2 rounded-full bg-warning" />
                 <span className="text-xs text-default-500">未保存</span>
@@ -168,19 +199,18 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
             )}
           </div>
           <div className="flex items-center gap-2">
-
             <div className="flex items-center gap-1 text-xs text-default-500">
               <Icon icon="lucide:calendar" />
               <div className="flex items-center gap-1">
                 <span className="mt-0.5">
-                  {dayjs(report?.createdAt).format('YYYY-MM-DD HH:mm')}
+                  {report?.createdAt ? dayjs(report.createdAt).format('YYYY-MM-DD HH:mm') : '-'}
                 </span>
               </div>
             </div>
             <div className="flex items-center gap-1 text-xs text-default-500">
               <Icon icon="lucide:edit" />
               <span>
-                {report?.updatedAt ? dayjs(report.updatedAt).fromNow() : ''}
+                {report?.updatedAt ? dayjs(report.updatedAt).fromNow() : '-'}
               </span>
             </div>
           </div>
@@ -189,7 +219,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
           onPress={onCopy}
           variant="flat"
           radius="full"
-          isDisabled={!text}
+          isDisabled={!text || isStreaming}
           startContent={<Icon icon="lucide:copy" className="w-4 h-4" />}
         >
           复制
@@ -207,7 +237,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
                 variant="light"
                 radius="full"
                 onPress={() => deleteMutation.mutate()}
-                isDisabled={deleteMutation.isPending}
+                isDisabled={deleteMutation.isPending || isStreaming}
                 startContent={<Icon icon="lucide:trash" className="w-4 h-4" />}
               >
                 删除
@@ -219,15 +249,31 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
                   variant="light"
                   onPress={onCancel}
                   radius="full"
+                  isDisabled={isStreaming}
                 >
                   返回
                 </Button>
               </If>
 
+              <Tooltip content="重新生成">
+                <Button
+                  isIconOnly
+                  variant="light"
+                  onPress={() => regenerateMutation.mutate()}
+                  isDisabled={isStreaming || !reportId}
+                >
+                  <Icon icon="lucide:refresh-cw" className="w-4 h-4" />
+                </Button>
+              </Tooltip>
+              <OptimizeReportButton
+                reportId={reportId}
+                text={text}
+                isStreaming={isStreaming}
+              />
               <Button
                 color="primary"
                 onPress={() => saveMutation.mutate()}
-                isDisabled={!isUnsaved || saveMutation.isPending}
+                isDisabled={!isUnsaved || saveMutation.isPending || isStreaming}
                 radius="full"
                 startContent={<Icon icon="lucide:save" className="w-4 h-4" />}
               >

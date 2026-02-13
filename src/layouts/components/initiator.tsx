@@ -1,6 +1,6 @@
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
-import { StepDeepSeekApiKey } from '@/components/step-deepseek-api-key'
+import { StepLlmSetting } from '@/components/step-llm-setting'
 import { Main } from './main'
 import { Navbar } from './navbar'
 
@@ -18,7 +18,7 @@ export function Initiator() {
               exit={{ opacity: 0, y: -10 }}
               transition={{ duration: 0.4 }}
             >
-              <StepDeepSeekApiKey />
+              <StepLlmSetting />
             </motion.div>
           </AnimatePresence>
         </Main>

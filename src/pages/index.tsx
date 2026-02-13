@@ -3,9 +3,13 @@ import { closeAll } from '@heroui/react'
 import { useQuery } from '@tanstack/react-query'
 import { listen } from '@tauri-apps/api/event'
 import { useLocalStorage } from 'react-use'
+import { useStore } from 'valtio-define'
+import { store } from '@/store'
 
 function Page() {
   const [generating, setGenerating] = useLocalStorage('report_generating', false)
+  const { streamingContent } = useStore(store.report)
+
   const { data: generatedReportsCount = 0 } = useQuery({
     queryKey: ['reports'],
     queryFn: () => db.report.count(),
@@ -42,7 +46,7 @@ function Page() {
         <TrendCard title="收集的数据项" value={`${collectedItemsCount} 项`} />
       </div>
 
-      <If cond={detail}>
+      <If cond={detail || streamingContent}>
         <Then>
           <ReportEditor
             reportId={detail?.id ?? 0}

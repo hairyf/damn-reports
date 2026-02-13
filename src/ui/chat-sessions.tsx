@@ -5,14 +5,14 @@ import { useStore } from 'valtio-define'
 import { store } from '@/store'
 
 export function ChatSessions() {
-  const { sessions, activeSession } = useStore(store.session)
+  const { sessions, activeSession } = useStore(store.chat)
 
   function handleNewSession() {
-    store.session.prepareNewChat()
+    store.chat.prepareNewChat()
   }
 
   function handleDeleteSession(id: string) {
-    store.session.deleteSession(id)
+    store.chat.deleteSession(id)
   }
 
   return (
@@ -41,7 +41,7 @@ export function ChatSessions() {
                       ? 'bg-primary/10 text-primary'
                       : 'hover:bg-default-100 text-default-400',
                   )}
-                  onPress={() => store.session.setActiveSession(item.id)}
+                  onPress={() => store.chat.setActiveSession(item.id)}
                 >
                   <div className="flex-1 min-w-0">
                     <div className="truncate font-medium text-foreground">

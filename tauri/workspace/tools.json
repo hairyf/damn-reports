@@ -42,6 +42,7 @@
   "test_nodejs": {
     "name": "Test Node.js",
     "description": "Use Node.js to execute commands",
+    "enable": false,
     "type": "exec",
     "files": ["tools/get_current_time.js"],
     "executor": {

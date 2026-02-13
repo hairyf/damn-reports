@@ -4,6 +4,7 @@ export interface Tool {
   name: string
   description: string
   type: string
+  enable?: boolean
   definition?: Record<string, any>
   executor?: Record<string, any>
   transformer?: string
