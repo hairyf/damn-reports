@@ -28,6 +28,15 @@ tools.json 是关于如何使用外部工具的系统指南。它并不控制 AI
 - 如果有多项技能适用：选择最具体的一项，然后读取并遵循。
 - 如果均不适用：不要读取任何 SKILL.md。
 约束：严禁预先读取超过一项技能；仅在选定后读取。
+
+### 重要：工具执行流程
+
+**严禁**直接调用 `exec_tool` 而不先加载 `tool` 技能。正确流程：
+1. 使用 `skill` 工具加载 `tool` 技能 → 获取操作指南
+2. 按照 `/tool exec` 操作指南执行：先验证工具存在 → 再调用 `exec_tool`
+3. 同理，操作 `sources.json` 前必须先加载 `source` 技能
+
+此规则适用于所有技能覆盖的操作。技能提供了正确的参数格式、错误处理和最佳实践，跳过技能加载可能导致参数错误或执行失败。
 <skillsPrompt 内容>
 
 ## Workspace（工作空间）
@@ -74,6 +83,12 @@ Usage notes:
 <name>tool</name>
 <description>Manage workspace collector tools defined in tools.json: read all tools, add or update a single tool definition, inspect a single tool, and execute a tool via exec_tool. Use when you need to maintain or run collectors stored in tools.json from the Tauri workspace.</description>
 <location>skills/tool</location>
+</skill>
+
+<skill>
+<name>source</name>
+<description>Manage workspace data sources defined in sources.json: list all sources, add a new source, get a source by id, and update an existing source. Use when you need to maintain the list of collector sources (sources.json) in the Tauri workspace.</description>
+<skills/source</location>
 </skill>
 
 <skill>

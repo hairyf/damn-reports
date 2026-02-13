@@ -3,6 +3,11 @@ import { Command } from '@tauri-apps/plugin-shell'
 import jsonata from 'jsonata'
 import mustache from 'mustache'
 
+// Disable Mustache's default HTML escaping — all templates here are for
+// command-line arguments and URLs, not HTML content.
+// Without this, paths like "D:/projects" become "D:&#x2F;projects".
+mustache.escape = (text: string) => text
+
 export interface Collector {
   name: string
   description: string
@@ -57,17 +62,48 @@ export async function executeCommandExpression(collector: Collector, config: Rec
   const renderedCommand = mustache.render(command, config)
   const renderedArgs = args.map((arg: string) => mustache.render(String(arg), config))
 
+  // Properly quote arguments that contain spaces or special characters
+  const quotedArgs = renderedArgs.map((arg: string) => {
+    if (/[\s"'`$\\!&|;(){}]/.test(arg) && !arg.startsWith('"') && !arg.startsWith('\''))
+      return `"${arg.replace(/"/g, '\\"')}"`
+    return arg
+  })
+
   // Build full command string for executeCommand
-  const fullCommand = [renderedCommand, ...renderedArgs].join(' ')
-  const result = await executeCommand(fullCommand)
+  const fullCommand = [renderedCommand, ...quotedArgs].join(' ')
 
-  // Apply transformer if provided
-  if (collector.transformer) {
-    const expression = jsonata(collector.transformer)
-    return await expression.evaluate(result)
+  try {
+    const result = await executeCommand(fullCommand)
+
+    // Apply transformer if provided
+    if (collector.transformer) {
+      try {
+        const expression = jsonata(collector.transformer)
+        return await expression.evaluate(result)
+      }
+      catch (transformError) {
+        const errMsg = transformError instanceof Error ? transformError.message : String(transformError)
+        throw new Error(
+          `Transformer failed for command "${renderedCommand}".\n`
+          + `Transformer expression: ${collector.transformer}\n`
+          + `Raw output (first 500 chars): ${String(result).slice(0, 500)}\n`
+          + `Error: ${errMsg}`,
+        )
+      }
+    }
+
+    return result
   }
-
-  return result
+  catch (error) {
+    const errMsg = error instanceof Error ? error.message : String(error)
+    // Re-throw with enriched context if not already enriched
+    if (errMsg.includes('Transformer failed'))
+      throw error
+    throw new Error(
+      `exec_tool failed for command: ${fullCommand}\n`
+      + `Error: ${errMsg}`,
+    )
+  }
 }
 
 export async function executeHttpRequestExpression(collector: Collector, config: Record<string, any>) {
@@ -126,9 +162,18 @@ export async function executeCommand(command: string) {
 
     let cmd: any
     if (isWindows) {
-      // Use PowerShell on Windows for better UTF-8 support
-      // Set output encoding to UTF-8 and change to working directory
-      const psCommand = `[Console]::OutputEncoding = [System.Text.Encoding]::UTF8; Set-Location '${cwd}'; ${command}`
+      // Use PowerShell on Windows with comprehensive UTF-8 support
+      // - $OutputEncoding: affects encoding for piped output to native commands
+      // - [Console]::OutputEncoding: affects how PowerShell reads native command stdout
+      // - chcp 65001: sets the console code page to UTF-8 for child processes
+      const psCommand = [
+        'chcp 65001 | Out-Null',
+        '$OutputEncoding = [System.Text.Encoding]::UTF8',
+        '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8',
+        '[Console]::InputEncoding = [System.Text.Encoding]::UTF8',
+        `Set-Location '${cwd}'`,
+        command,
+      ].join('; ')
       cmd = Command.create('powershell', ['-Command', psCommand])
     }
     else {
@@ -139,7 +184,13 @@ export async function executeCommand(command: string) {
     const output = await cmd.execute()
 
     if (output.code !== 0) {
-      throw new Error(`Command failed with exit code ${output.code}\nstderr: ${output.stderr}\nstdout: ${output.stdout}`)
+      throw new Error(
+        `Command failed (exit code ${output.code})\n`
+        + `Command: ${command}\n`
+        + `Working directory: ${cwd}\n${
+          output.stderr ? `stderr: ${output.stderr}\n` : ''
+        }${output.stdout ? `stdout: ${output.stdout}` : ''}`,
+      )
     }
 
     return output.stdout

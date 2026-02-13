@@ -11,6 +11,7 @@ declare global {
   const BaseDirectory: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').BaseDirectory
   const ClickupIcon: typeof import('../components/icons').ClickupIcon
   const CornerActions: typeof import('../components/corner-actions').CornerActions
+  const DefinitionFields: typeof import('../components/definition-fields').DefinitionFields
   const Dialog: typeof import('../components/dialog').Dialog
   const Ellipsis: typeof import('../components/ellipsis').Ellipsis
   const FileHandle: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').FileHandle
@@ -56,6 +57,7 @@ declare global {
   const SunFilledIcon: typeof import('../components/icons').SunFilledIcon
   const Suspense: typeof import('react').Suspense
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
+  const ToolIcon: typeof import('../components/tool-icon').ToolIcon
   const TrendCard: typeof import('../components/trend-card').TrendCard
   const UpdateStatus: typeof import('../components/update-status').UpdateStatus
   const add_source: typeof import('../config/tools').add_source
@@ -186,6 +188,9 @@ declare global {
   export type { TauriStorageDriverOptions } from '../config/storage.driver'
   import('../config/storage.driver')
   // @ts-ignore
+  export type { FieldSchema, DefinitionFieldsProps } from '../components/definition-fields'
+  import('../components/definition-fields')
+  // @ts-ignore
   export type { DialogProps } from '../components/dialog'
   import('../components/dialog')
   // @ts-ignore
@@ -204,9 +209,6 @@ declare global {
   export type { ReportGeneratorProps } from '../components/report-generator'
   import('../components/report-generator')
   // @ts-ignore
-  export type { IconMap, SourceIconProps } from '../components/source-icon'
-  import('../components/source-icon')
-  // @ts-ignore
   export type { SourceItemProps } from '../components/source-item'
   import('../components/source-item')
   // @ts-ignore
@@ -215,6 +217,9 @@ declare global {
   // @ts-ignore
   export type { ThemeSwitchProps } from '../components/theme-switch'
   import('../components/theme-switch')
+  // @ts-ignore
+  export type { IconMap, ToolIconProps } from '../components/tool-icon'
+  import('../components/tool-icon')
   // @ts-ignore
   export type { Collector } from '../utils/exec'
   import('../utils/exec')

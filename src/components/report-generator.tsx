@@ -1,4 +1,3 @@
-import { collectRecords } from '@/api/collect-records'
 import { addToast, Button, Card, CardBody } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -16,7 +15,7 @@ export function ReportGenerator({ generating, onGeneratingChange }: ReportGenera
   const { loading: llmLoading } = useStore(store.llm)
   const generateMutation = useMutation({
     mutationFn: async () => {
-      await collectRecords()
+      await store.source.collect()
 
       const records = await db.record.findMany({
         date: dayjs().startOf('day').toISOString(),

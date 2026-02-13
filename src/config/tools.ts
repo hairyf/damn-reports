@@ -1,5 +1,6 @@
+/* eslint-disable no-console */
 import { tool } from 'ai'
-import matter from 'gray-matter'
+import dayjs from 'dayjs'
 import { sql } from 'kysely'
 import { z } from 'zod'
 import { executeCollector, executeCommand } from '../utils/exec'
@@ -151,20 +152,85 @@ export const exec_tool = tool({
     params: z.record(z.string(), z.any()).describe('工具参数').optional(),
   }),
   execute: async ({ toolid, params = {} }) => {
-    const tools = await fs.readJson('tools.json')
-    const data = await executeCollector(tools[toolid], params)
-    // eslint-disable-next-line no-console
-    console.log('Tool execution result:', data)
-    return data
+    // 1. Read tools.json
+    let tools: Record<string, any>
+    try {
+      tools = await fs.readJson('tools.json')
+    }
+    catch (error) {
+      const msg = error instanceof Error ? error.message : String(error)
+      throw new Error(`Failed to read tools.json: ${msg}`)
+    }
+
+    // 2. Validate tool existence
+    const toolDef = tools[toolid]
+    if (!toolDef) {
+      const available = Object.keys(tools).join(', ')
+      throw new Error(
+        `Tool "${toolid}" not found in tools.json.\n`
+        + `Available tools: ${available}`,
+      )
+    }
+
+    // 3. Validate required parameters
+    if (toolDef.definition) {
+      const missing = Object.entries(toolDef.definition)
+        .filter(([key]) => params[key] === undefined || params[key] === '')
+        .map(([key, schema]: [string, any]) => `  - ${key}: ${schema.description || schema.type}`)
+      if (missing.length > 0) {
+        throw new Error(
+          `Missing required parameters for tool "${toolid}":\n${missing.join('\n')}\n`
+          + `Provided params: ${JSON.stringify(params)}`,
+        )
+      }
+    }
+
+    // 4. Execute the tool
+    try {
+      const data = await executeCollector(toolDef, params)
+
+      console.log('Tool execution result:', data)
+      return data
+    }
+    catch (error) {
+      const msg = error instanceof Error ? error.message : String(error)
+      throw new Error(
+        `exec_tool "${toolid}" (${toolDef.name || toolDef.type}) failed.\n`
+        + `Type: ${toolDef.type}\n`
+        + `Params: ${JSON.stringify(params)}\n`
+        + `Error: ${msg}`,
+      )
+    }
   },
 })
 
 export const exec_sql = tool({
-  description: '执行 SQL 命令',
+  description: [
+    '在应用内置 SQLite 数据库（main.db）上执行 SQL。数据库已由应用自动管理，无需创建或查找数据库文件。',
+    '',
+    'Schema:',
+    '  record(id TEXT, summary TEXT, data TEXT, createdAt TEXT, updatedAt TEXT, source TEXT, tool TEXT, workspaceId INTEGER)',
+    '  report(id INTEGER PK AUTO, name TEXT, type TEXT, content TEXT, createdAt TEXT, updatedAt TEXT, workspaceId INTEGER)',
+    '  workspace(id INTEGER PK AUTO, workflow TEXT, name TEXT)',
+    '',
+    '常见用法: SELECT * FROM record WHERE workspaceId = 1 ORDER BY createdAt DESC LIMIT 10',
+  ].join('\n'),
   inputSchema: z.object({
-    sql: z.string().describe('要执行的 SQL 命令'),
+    sql: z.string().describe('要执行的 SQL 语句（SELECT/INSERT/UPDATE/DELETE）'),
   }),
-  execute: async ({ sql: sqlString }) => sql`${sqlString}`.execute(db),
+  execute: async ({ sql: sqlString }) => {
+    try {
+      const result = await sql`${sql.raw(sqlString)}`.execute(db)
+      // Convert BigInt values to Number to avoid "Do not know how to serialize a BigInt"
+      // when the AI SDK calls JSON.stringify on tool results
+      return JSON.parse(JSON.stringify(result, (_key, value) =>
+        typeof value === 'bigint' ? Number(value) : value))
+    }
+    catch (error) {
+      console.log(error)
+      throw error
+    }
+  },
 })
 
 export const skill = tool({
@@ -214,6 +280,12 @@ export const skill = tool({
       },
     }
   },
+})
+
+export const get_records = tool({
+  description: '同步数据源并获取数据库中今天的记录',
+  inputSchema: z.object({}),
+  execute: async () => db.record.findMany({ date: dayjs().toISOString() }),
 })
 
 // add_source

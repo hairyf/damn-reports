@@ -1,16 +1,16 @@
-import type { SourceJson } from '@/api/sources'
-import { deleteSource } from '@/api/sources'
+import type { Source } from '@/store/modules/source'
 import {
   Button,
   Card,
   CardBody,
+  Switch,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useOverlay } from '@overlastic/react'
-import { SourceIcon } from './source-icon'
+import { store } from '@/store'
 
 export interface SourceItemProps {
-  item: SourceJson
+  item: Source
   onDeleted?: (id: string) => void
 }
 
@@ -19,13 +19,17 @@ export function SourceItem(props: SourceItemProps) {
   const openDialog = useOverlay(Dialog)
   const { item } = props
 
+  async function onToggleEnable(enabled: boolean) {
+    await store.source.update(item.id, { enable: enabled })
+  }
+
   async function onDelete() {
     await openDialog({
       title: '删除数据源',
       message: '确定要删除这个数据源吗？此操作无法撤销。',
       confirmText: '删除',
     })
-    await deleteSource(item.id)
+    await store.source.remove(item.id)
     queryClient.invalidateQueries({ queryKey: ['sources'] })
     props.onDeleted?.(item.id)
   }
@@ -34,7 +38,7 @@ export function SourceItem(props: SourceItemProps) {
       <CardBody>
         <div className="flex items-center gap-4">
           <div className="flex-shrink-0">
-            <SourceIcon type={item.tool} size={24} />
+            <ToolIcon type={item.tool} size={24} />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
@@ -45,6 +49,11 @@ export function SourceItem(props: SourceItemProps) {
             </div>
           </div>
           <div className="flex items-center gap-2">
+            <Switch
+              size="sm"
+              isSelected={item.enable !== false}
+              onValueChange={onToggleEnable}
+            />
             <Button
               size="sm"
               variant="light"

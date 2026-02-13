@@ -1,8 +1,8 @@
-import { getToolOptions } from '@/api/tools'
-import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
 import { Select, SelectItem } from '@heroui/react'
-import { useQuery } from '@tanstack/react-query'
 import { createElement } from 'react'
+import { useStore } from 'valtio-define'
+import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
+import { store } from '@/store'
 
 const iconByToolId: Record<string, any> = {
   git_directory: GitIcon,
@@ -21,10 +21,7 @@ export interface SourceSelectProps {
   isClearable?: boolean
 }
 export function SourceSelect(props: SourceSelectProps) {
-  const { data: options = [] } = useQuery({
-    queryKey: ['tool-options'],
-    queryFn: getToolOptions,
-  })
+  const { options } = useStore(store.tool)
 
   return (
     <Select
@@ -47,7 +44,7 @@ export function SourceSelect(props: SourceSelectProps) {
         )
       }}
     >
-      {options.map((option) => (
+      {options.map(option => (
         <SelectItem
           key={option.id}
           startContent={iconByToolId[option.id] ? createElement(iconByToolId[option.id], { size: 16 }) : null}

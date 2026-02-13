@@ -16,6 +16,7 @@ Example (simplified):
     "id": "damn_reports_git_directory",
     "name": "Damn Reports Git Directory",
     "tool": "git_directory",
+    "enable": true,
     "params": {
       "repository": "D:/damn-reports",
       "author": "hairyf"
@@ -38,6 +39,10 @@ Each source definition has the following fields:
 
 - `tool` (string)  
   - Associated collector type (tool id in `tools.json`).
+
+- `enable` (boolean, optional)  
+  - Whether this source is enabled. Defaults to `true` when omitted.  
+  - When `false`, the source is skipped during collection.
 
 - `params` (object)  
   - Parameters for this source; keys are determined by the corresponding tool’s `definition`.  

@@ -16,11 +16,10 @@ import {
 import { Icon } from '@iconify/react'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import { createElement, useMemo, useState } from 'react'
-import { collectRecords } from '@/api/collect-records'
-
-import { getSources } from '@/api/sources'
+import { createElement, useState } from 'react'
+import { useStore } from 'valtio-define'
 import { AlimailIcon, ClickupIcon, GitIcon, GmailIcon, SlackIcon } from '@/components/icons'
+import { store } from '@/store'
 
 const iconMapping: Record<string, { icon: any, label: string }> = {
   git: { icon: GitIcon, label: 'Git' },
@@ -42,19 +41,10 @@ function Page() {
   const debouncedSearch = useDebounce(search, 300)
   const debouncedSourceFilter = useDebounce(sourceFilter, 300)
 
-  const { data: sources = [] } = useQuery({
-    queryKey: ['sources'],
-    queryFn: getSources,
-  })
-  const sourceMap = useMemo(() => {
-    const m = new Map<string, { name: string, tool: string }>()
-    for (const s of sources)
-      m.set(s.id, { name: s.name, tool: s.tool })
-    return m
-  }, [sources])
+  const { raw: sources, map: sourceMap } = useStore(store.source)
 
   const { data: records = [], isLoading } = useQuery({
-    queryKey: ['records', debouncedSearch, debouncedSourceFilter, pagination.page, pagination.pageSize, sourceMap.size],
+    queryKey: ['records', debouncedSearch, debouncedSourceFilter, pagination.page, pagination.pageSize, sources.length],
     queryFn: async () => {
       const { data, total } = await db.record.findManyPageWithSources(
         {
@@ -72,7 +62,7 @@ function Page() {
 
   const syncMutation = useMutation({
     mutationFn: async () => {
-      return await collectRecords()
+      return await store.source.collect()
     },
     onSuccess: (count) => {
       queryClient.invalidateQueries({ queryKey: ['records'] })
@@ -155,7 +145,7 @@ function Page() {
                 <TableCell>
                   <div className="flex items-center gap-2">
                     {createElement(iconMapping[record.tool]?.icon ?? GitIcon, { size: 20 })}
-                    <span>{record.sourceName}</span>
+                    <span>{record.tool}</span>
                   </div>
                 </TableCell>
                 <TableCell>{dayjs(typeof record.createdAt === 'number' ? record.createdAt * 1000 : record.createdAt).format('YYYY-MM-DD')}</TableCell>

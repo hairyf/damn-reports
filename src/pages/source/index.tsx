@@ -1,4 +1,3 @@
-import { getSources } from '@/api/sources'
 import { Else, If, Then, useDebounce } from '@hairy/react-lib'
 import {
   Button,
@@ -7,9 +6,10 @@ import {
   Input,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
-import { useQuery } from '@tanstack/react-query'
 import { useMemo } from 'react'
 import { useNavigate } from 'react-router-dom'
+import { useStore } from 'valtio-define'
+import { store } from '@/store'
 
 function Page() {
   const navigate = useNavigate()
@@ -18,14 +18,9 @@ function Page() {
   const debouncedSearch = useDebounce(search, 300)
   const [toolFilter, setToolFilter] = useState<string>('')
 
-  const { data: allSources } = useQuery({
-    queryKey: ['sources'],
-    queryFn: getSources,
-  })
+  const { raw: allSources } = useStore(store.source)
 
   const sources = useMemo(() => {
-    if (!allSources)
-      return []
     let list = allSources
     if (debouncedSearch) {
       const q = debouncedSearch.toLowerCase()

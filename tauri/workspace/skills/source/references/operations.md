@@ -49,6 +49,7 @@ Add a new source entry to `sources.json`.
 **Inputs (conceptual)**
 
 - `source` (object) – Source definition conforming to `source-schema.md`, must include `id`.
+- If `enable` is omitted, default to `true`.
 - If `createAt` / `updateAt` are omitted, set them to current ISO 8601 time.
 
 **Preferred implementation (read–modify–write)**

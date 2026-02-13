@@ -1,52 +1,36 @@
-import type { SourceJson } from '@/api/sources'
-import { createSource, getSourceById, updateSource } from '@/api/sources'
-import { getToolOptions } from '@/api/tools'
-import { If, useWatch, useWhenever } from '@hairy/react-lib'
+import type { Source } from '@/store/modules/source'
+import { If, useWhenever } from '@hairy/react-lib'
 import { isEqual } from '@hairy/utils'
 import { addToast, Button, Card, CardBody, CardHeader, Divider, Input } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useForm } from 'react-hook-form'
 import { useKey } from 'react-use'
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/form'
-import { SourceFormClickup } from '@/components/souce-form-clickup'
-import { SourceFormGit } from '@/components/souce-form-git'
-import { useQuery } from '@tanstack/react-query'
+import { store } from '@/store'
 
 function Page() {
   const navigate = useNavigate()
   const [searchParams] = useSearchParams()
   const sourceId = searchParams.get('id')
-  const [configs, setConfigs] = useState<Record<string, any>>({})
-  const [originalData, setOriginalData] = useState<Partial<SourceJson> | null>(null)
-  const { data: toolOptions = [] } = useQuery({ queryKey: ['tool-options'], queryFn: getToolOptions })
+  const [originalData, setOriginalData] = useState<Partial<Source> | null>(null)
   const form = useForm({
     defaultValues: {
       name: '',
       tool: '',
-      config: {} as Record<string, any>,
+      params: {} as Record<string, any>,
     },
   })
 
   const tool = form.watch('tool')
-  const config = form.watch('config')
   const formValues = form.watch()
-
-  useWatch(tool, (t, oldTool) => {
-    if (!oldTool)
-      return
-    setConfigs(prev => ({ ...prev, [oldTool]: config }))
-    form.setValue('config', configs[t] || {})
-  })
 
   async function reset() {
     if (!sourceId)
       return
-    const source = await getSourceById(sourceId)
+    const source = store.source.find(sourceId)
     if (!source)
       return
-    const parsed = { name: source.name, tool: source.tool, config: source.config }
+    const parsed = { name: source.name, tool: source.tool, params: source.params }
     form.reset(parsed)
-    setConfigs(prev => ({ ...prev, [parsed.tool]: parsed.config }))
     setOriginalData(parsed)
   }
 
@@ -57,7 +41,7 @@ function Page() {
 
   const onSubmit = form.handleSubmit(async (data) => {
     if (sourceId) {
-      await updateSource(sourceId, { name: data.name, tool: data.tool, config: data.config })
+      await store.source.update(sourceId, { name: data.name, tool: data.tool, params: data.params })
       reset()
       addToast({
         title: 'Success',
@@ -67,7 +51,7 @@ function Page() {
       })
     }
     else {
-      await createSource({ name: data.name, tool: data.tool, config: data.config })
+      await store.source.create({ name: data.name, tool: data.tool, params: data.params })
       addToast({
         title: 'Success',
         description: 'Source created successfully',
@@ -87,6 +71,10 @@ function Page() {
     },
     { event: 'keydown' },
   )
+
+  // 获取当前 tool 的 definition
+  const toolDef = store.tool.raw[tool]
+  const definition = toolDef?.definition as Record<string, { type?: string, description?: string }> | undefined
 
   return (
     <Form {...form}>
@@ -116,7 +104,7 @@ function Page() {
                 color="primary"
                 radius="full"
                 className="flex-1"
-                isDisabled={sourceId ? !hasChanges : !hasChanges}
+                isDisabled={!hasChanges}
                 startContent={<Icon icon="lucide:save" className="w-4 h-4" />}
               >
                 {sourceId ? '更新' : '创建'}
@@ -157,7 +145,7 @@ function Page() {
                   rules={{ required: 'Please select a tool' }}
                   render={({ field }) => (
                     <FormItem className="flex-1">
-                      <FormLabel>Tool</FormLabel>
+                      <FormLabel>数据源工具</FormLabel>
                       <FormControl>
                         <SourceSelect onChange={field.onChange} value={field.value} />
                       </FormControl>
@@ -171,23 +159,14 @@ function Page() {
           <If cond={tool}>
             <Card shadow="none">
               <CardHeader className="flex gap-1">
-                <SourceIcon type={tool} size={18} />
+                <Icon icon="lucide:settings" className="text-lg mt-0.3" />
                 <p className="text-md flex gap-1">
-                  <span>
-                    {toolOptions.find(o => o.id === tool)?.name ?? tool}
-                  </span>
-                  <span>配置</span>
+                  <span>参数配置</span>
                 </p>
               </CardHeader>
               <Divider className="opacity-30 shadow" />
-
               <CardBody className="flex flex-col gap-4">
-                <If cond={tool === 'git_directory' || tool === 'git'}>
-                  <SourceFormGit />
-                </If>
-                <If cond={tool === 'clickup'}>
-                  <SourceFormClickup />
-                </If>
+                <DefinitionFields definition={definition} />
               </CardBody>
             </Card>
           </If>

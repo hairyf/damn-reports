@@ -1,4 +1,5 @@
 import type { Kysely } from 'kysely'
+import dayjs from 'dayjs'
 import { Model } from '../model'
 
 export interface RecordFindManyInput {
@@ -99,9 +100,8 @@ export class Record extends Model<DB, 'record'> {
     }
 
     if (date) {
-      const startStr = new Date(date).toISOString()
-      const endDate = new Date(new Date(date).getTime() + 24 * 60 * 60 * 1000)
-      const endStr = endDate.toISOString()
+      const startStr = dayjs(date).startOf('day').toISOString()
+      const endStr = dayjs(date).endOf('day').toISOString()
       query = query
         .where('record.createdAt', '>=', startStr)
         .where('record.createdAt', '<', endStr)

@@ -2,6 +2,7 @@
   "git_directory": {
     "name": "Git Directory Reader",
     "description": "Read Git commits and diffs from a local Git repository",
+    "enable": true,
     "type": "exec",
     "definition": {
       "repository": { "type": "string", "description": "The local Git repository path" },
@@ -16,6 +17,7 @@
   "clickup": {
     "name": "ClickUp Tasks Reader",
     "description": "Read ClickUp tasks updated on the current day and assigned to the specified user",
+    "enable": true,
     "type": "http",
     "definition": {
       "token": { "type": "string", "description": "ClickUp API Token" },
@@ -42,11 +44,12 @@
   "test_nodejs": {
     "name": "Test Node.js",
     "description": "Use Node.js to execute commands",
+    "enable": true,
     "type": "exec",
-    "files": ["tool/get_current_time.js"],
+    "files": ["tools/get_current_time.js"],
     "executor": {
       "command": "node",
-      "args": ["./tool/get_current_time.js"]
+      "args": ["./tools/get_current_time.js"]
     },
     "transformer": "{\"id\": \"$now()\", \"summary\": \"Currency Date\", \"createdAt\": $now(), \"data\": $eval($)}"
   }

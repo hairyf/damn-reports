@@ -13,12 +13,12 @@ const iconMap = {
 
 export type IconMap = typeof iconMap
 
-export interface SourceIconProps {
+export interface ToolIconProps {
   type: string
   size?: number
 }
 
-export function SourceIcon({ type, size = 24 }: SourceIconProps) {
+export function ToolIcon({ type, size = 24 }: ToolIconProps) {
   const IconComponent = iconMap[type as keyof IconMap]
   if (!IconComponent)
     return <div className="i-lucide-circle" />

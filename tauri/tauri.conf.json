@@ -39,9 +39,9 @@
       "icons/icon.icns",
       "icons/icon.ico"
     ],
-    "resources": {
-      "workspace/*": "workspace/"
-    }
+    "resources": [
+      "workspace/"
+    ]
   },
   "plugins": {
     "updater": {

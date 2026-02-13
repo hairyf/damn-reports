@@ -226,6 +226,34 @@ Execute a tool defined in `tools.json` using the runtime `exec_tool` bridge.
     - `createdAt` – timestamp in milliseconds.
     - `data` – raw/structured data payload.
 
+**Error handling**
+
+- `exec_tool` will return detailed error messages on failure, including:
+  - The tool id and name
+  - The tool type (`exec` / `http`)
+  - The provided parameters
+  - The underlying error message (command failure, transformer failure, etc.)
+- For `exec` type tools: if the command fails, the error will include
+  the exit code, stderr, and stdout of the command.
+- For transformer failures: the error will include the raw output preview
+  and the JSONata expression that failed.
+- If a tool is not found in `tools.json`, the error will list all available
+  tool ids.
+- If required parameters are missing, the error will list the missing
+  parameters with their descriptions.
+
+**Troubleshooting common issues**
+
+- **UTF-8 encoding errors** (Windows): The exec layer sets `chcp 65001`,
+  `$OutputEncoding`, `[Console]::OutputEncoding` and `[Console]::InputEncoding`
+  to UTF-8. If encoding issues persist, check if the tool's output contains
+  non-UTF-8 characters from the system locale.
+- **Path not found**: Ensure the `executor.args` paths are relative to the
+  workspace root (e.g. `./tools/script.js`, not `./tool/script.js`).
+  Also ensure the `files` array matches the actual paths.
+- **Command not found**: The exec layer uses PowerShell on Windows and sh
+  on Unix. Ensure the command is available in the system PATH.
+
 **Working with JSONata**
 
 - When adjusting the `transformer` for a tool:
