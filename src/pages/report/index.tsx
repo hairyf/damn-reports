@@ -115,10 +115,10 @@ function Page() {
 
       <Table aria-label="Reports table" shadow="none">
         <TableHeader>
-          <TableColumn minWidth={120}>日期</TableColumn>
+          <TableColumn maxWidth={80}>日期</TableColumn>
           {/* <TableColumn minWidth={80}>类型</TableColumn> */}
           <TableColumn minWidth={300}>内容</TableColumn>
-          <TableColumn minWidth={120}>操作</TableColumn>
+          <TableColumn maxWidth={80}>操作</TableColumn>
         </TableHeader>
         <TableBody
           items={reports}

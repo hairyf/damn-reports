@@ -1,3 +1,5 @@
+import type { SystemModelMessage } from 'ai'
+
 export type LlmProvider = 'deepseek' | 'openai' | 'anthropic' | 'moonshot' | 'openrouter' | 'vercel' | 'custom'
 
 export interface LlmProviderConfig {
@@ -19,6 +21,7 @@ export interface CreateStreamOptions {
   messagesForModel: Array<{ role: 'user' | 'assistant', content: string | Array<{ type: 'text', text: string } | { type: 'file', data: string, mediaType: string, filename?: string }> }>
   abortSignal: AbortController['signal']
   callbacks: StreamCallbacks
+  instructions: (SystemModelMessage | false)[]
   /** 主会话专用：额外系统提示（身份、记忆体系等） */
   extraSystemInstructions?: string
 }

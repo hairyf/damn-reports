@@ -1,6 +1,7 @@
 import type { DirEntry } from '@tauri-apps/plugin-fs'
 import {
   BaseDirectory,
+  exists as existsFs,
   readDir as readDirFs,
   readFile as readFileFs,
   readTextFile as readTextFileFs,
@@ -9,6 +10,9 @@ import {
 } from '@tauri-apps/plugin-fs'
 import pathe from 'pathe'
 
+export async function exists(path: string) {
+  return existsFs(pathe.join('workspace', path), { baseDir: BaseDirectory.Resource })
+}
 export async function readFile(path: string) {
   return readFileFs(pathe.join('workspace', path), { baseDir: BaseDirectory.Resource })
 }

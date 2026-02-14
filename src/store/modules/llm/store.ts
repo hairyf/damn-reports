@@ -2,7 +2,6 @@ import type { LanguageModel, SystemModelMessage } from 'ai'
 import type { CreateStreamOptions, LlmProvider } from './types'
 import { createOpenAI } from '@ai-sdk/openai'
 import { generateText, streamText, ToolLoopAgent } from 'ai'
-import dayjs from 'dayjs'
 import { defineStore } from 'valtio-define'
 import { generateTitlePrompt } from '@/config/prompts'
 import * as tools from '@/config/tools'
@@ -88,25 +87,11 @@ export const llm = defineStore({
 
     /** 执行 AI 流式对话（chat），通过 callbacks 将增量推送给调用方 */
     async streamChat(options: CreateStreamOptions): Promise<void> {
-      const { messagesForModel, abortSignal, callbacks, extraSystemInstructions } = options
-
-      const baseInstructions: SystemModelMessage[] = [
-        {
-          role: 'system',
-          content: [
-            `「当前系统：${navigator.userAgent}」`,
-            `「当前时间：${dayjs().format('YYYY-MM-DD HH:mm:ss')}」`,
-          ].join('\n'),
-        },
-        { role: 'system', content: await readTextFile('AGENTS.md') },
-      ]
-      if (extraSystemInstructions?.trim()) {
-        baseInstructions.push({ role: 'system', content: extraSystemInstructions.trim() })
-      }
+      const { messagesForModel, abortSignal, callbacks, instructions } = options
 
       const agent = new ToolLoopAgent({
         model: this.createModel(),
-        instructions: baseInstructions.filter(Boolean) as SystemModelMessage[],
+        instructions: instructions.filter(Boolean) as SystemModelMessage[],
         tools,
       })
 

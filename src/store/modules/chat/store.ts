@@ -1,7 +1,9 @@
 import type { FileUIPart } from 'ai'
 import type { ChatMessage, ChatSession } from './types'
+import dayjs from 'dayjs'
 import { defineStore } from 'valtio-define'
 import { store } from '@/store'
+import * as fs from '@/utils/fs-extra'
 import { buildMessagesForModel } from '../llm'
 import { MAIN_SESSION_SYSTEM_PROMPT } from './prompts'
 import { MAIN_SESSION_ID, NEW_SESSION_ID } from './types'
@@ -211,12 +213,30 @@ export const chat = defineStore(
         const controller = new AbortController()
         abortController = controller
         this.streaming = true
+        const isMainSession = sessionId === MAIN_SESSION_ID
+        const isExistsYesterdayMemory = await fs.exists(`memory/${dayjs().format('YYYY-MM-DD')}.md`)
+        const isExistsBootstrap = await fs.exists('BOOTSTRAP.md')
+        const systemPrompt = [
+          `「当前系统：${navigator.userAgent}」\n「当前时间：${dayjs().format('YYYY-MM-DD HH:mm:ss')}」`,
+          isMainSession
+          && `「Read MAIN_SESSION_SYSTEM_PROMPT」\n${MAIN_SESSION_SYSTEM_PROMPT}`,
+          `「Read AGENTS.md」\n${await readTextFile('AGENTS.md')}`,
+          `「Read IDENTITY.md」\n${await readTextFile('IDENTITY.md')}`,
+          `「Read USER.md」\n${await readTextFile('USER.md')}`,
+          `「Read MEMORY.md」\n${await readTextFile('MEMORY.md')}`,
+          isExistsYesterdayMemory
+          && `「Read memory/YYYY-MM-DD.md」\n${await readTextFile(`memory/${dayjs().format('YYYY-MM-DD')}.md`)}`,
+          isExistsBootstrap
+          && `「Read BOOTSTRAP.md」\n${await readTextFile('BOOTSTRAP.md')}`,
+        ].filter(Boolean).join('\n\n')
 
+        // eslint-disable-next-line no-console
+        console.log(systemPrompt)
         try {
           await store.llm.streamChat({
             messagesForModel,
             abortSignal: controller.signal,
-            ...(sessionId === MAIN_SESSION_ID && { extraSystemInstructions: MAIN_SESSION_SYSTEM_PROMPT }),
+            instructions: [{ role: 'system', content: systemPrompt }],
             callbacks: {
               onTextDelta: (delta, opts) =>
                 applyStreamDelta(this.sessions, sessionId, assistantMessageId, delta, opts),

@@ -1,5 +1,6 @@
 /* eslint-disable no-console */
 import { tool } from 'ai'
+import dayjs from 'dayjs'
 import { sql } from 'kysely'
 import { z } from 'zod'
 import { executeCollector, executeCommand } from '../utils/exec'
@@ -156,6 +157,12 @@ export const http = tool({
     const response = await fetch(input, init)
     return response.text()
   },
+})
+
+export const date = tool({
+  description: '获取当前日期',
+  inputSchema: z.object({}),
+  execute: () => dayjs().format('YYYY-MM-DD HH:mm:ss'),
 })
 
 export const exec = tool({
@@ -323,8 +330,6 @@ export const generate_report = tool({
   inputSchema: z.object({}),
   execute: () => store.report.generate(),
 })
-
-
 
 export const get_settings = tool({
   description: '获取应用设置（LLM 模型、用户界面、通知、自动保存、日报生成时间）',

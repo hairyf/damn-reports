@@ -30,10 +30,6 @@ export const siteConfig = {
       href: '/tool',
     },
     {
-      label: '钩子',
-      href: '/hook',
-    },
-    {
       label: '设置',
       href: '/setting',
     },

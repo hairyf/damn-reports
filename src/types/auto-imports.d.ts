@@ -77,6 +77,7 @@ declare global {
   const cron_tool: typeof import('../config/tools').cron_tool
   const current_time: typeof import('../config/collectors').current_time
   const dailyReportPrompt: typeof import('../config/prompts').dailyReportPrompt
+  const date: typeof import('../config/tools').date
   const db: typeof import('../database/index').db
   const edit: typeof import('../config/tools').edit
   const exe_tool: typeof import('../config/tools').exe_tool
@@ -87,7 +88,7 @@ declare global {
   const executeCommand: typeof import('../utils/exec').executeCommand
   const executeCommandExpression: typeof import('../utils/exec').executeCommandExpression
   const executeHttpRequestExpression: typeof import('../utils/exec').executeHttpRequestExpression
-  const exists: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').exists
+  const exists: typeof import('../utils/fs-extra').exists
   const fetch_http: typeof import('../config/tools').fetch_http
   const find: typeof import('../config/tools').find
   const forwardRef: typeof import('react').forwardRef

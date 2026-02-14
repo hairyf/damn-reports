@@ -91,6 +91,7 @@ function MessageAreaExtras() {
 }
 
 const ADD_TOOL_SUGGESTION = QUICK_TAGS.find(t => t.label === '添加工具')!.suggestion
+const SEARCH_HOOK_SUGGESTION = '帮我添加或配置一个定时任务 Hook'
 
 function ChatInputInner() {
   const [searchParams, setSearchParams] = useSearchParams()
@@ -99,8 +100,13 @@ function ChatInputInner() {
   const attachments = usePromptInputAttachments()
 
   useEffect(() => {
-    if (searchParams.get('intent') === 'add-tool') {
+    const intent = searchParams.get('intent')
+    if (intent === 'add-tool') {
       controller.textInput.setInput(ADD_TOOL_SUGGESTION)
+      setSearchParams({}, { replace: true })
+    }
+    else if (intent === 'search-hook') {
+      controller.textInput.setInput(SEARCH_HOOK_SUGGESTION)
       setSearchParams({}, { replace: true })
     }
   }, [searchParams, setSearchParams, controller])
