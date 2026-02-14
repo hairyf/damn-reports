@@ -128,14 +128,8 @@ export const grep = tool({
     limit: z.number().describe('最大匹配数').optional(),
     glob: z.string().describe('文件过滤如 *.ts').optional(),
   }),
-  execute: async ({ path, pattern, literal, ignoreCase, context, limit, glob }) => {
-    return fs.grep(path || '.', pattern, {
-      literal,
-      ignoreCase,
-      context,
-      limit,
-      glob,
-    })
+  execute: async ({ path, pattern, ...options }) => {
+    return fs.grep(path || '.', pattern, options)
   },
 })
 

@@ -1,6 +1,7 @@
 import { defineStore } from 'valtio-define'
 
 export interface Tool {
+  id: string
   name: string
   description: string
   type: string
