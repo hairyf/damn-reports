@@ -9,7 +9,52 @@ permissions:
   contents: write
 
 jobs:
+  changelog:
+    name: Generate Changelog
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: lts/*
+          cache: pnpm
+          cache-dependency-path: pnpm-lock.yaml
+
+      - name: Generate GitHub Changelog
+        id: changelogithub
+        run: pnpx changelogithub
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Append Artifacts section to release
+        if: steps.changelogithub.outcome == 'success'
+        run: |
+          gh release view ${{ github.ref_name }} --json body -q .body > release_notes.md
+          cat >> release_notes.md << 'EOF'
+
+          ### 📦 Artifacts
+          - **macOS (M1/M2/M3)**: download `aarch64.dmg`
+          - **macOS (Intel)**: download `x64.dmg`
+          - **Windows**: download `.exe`
+          - **Linux**: download `.AppImage`
+          EOF
+          gh release edit ${{ github.ref_name }} --notes-file release_notes.md
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
   publish:
+    needs: changelog
     permissions:
       contents: write
     strategy:
@@ -33,31 +78,6 @@ jobs:
         uses: actions/checkout@v4
         with:
           fetch-depth: 0
-      # 使用自动化工具生成 Changelog（COMMIT 模式：基于 Conventional Commits，不依赖 PR）
-      - name: Generate Changelog
-        id: github_release
-        uses: mikepenz/release-changelog-builder-action@v4
-        with:
-          commitMode: 'true'
-          configurationJson: |
-            {
-              "template": "#{{CHANGELOG}}\n\n#{{UNCATEGORIZED}}",
-              "categories": [
-                {"title": "## ✨ Features", "labels": ["feat", "feature"]},
-                {"title": "## 🐛 Bug Fixes", "labels": ["fix", "bug"]},
-                {"title": "## 📦 Dependencies", "labels": ["chore", "build", "ci", "deps"]},
-                {"title": "## 📝 Other", "labels": ["docs", "style", "refactor", "perf", "test", "ui"]}
-              ],
-              "label_extractor": [
-                {
-                  "pattern": "^(feat|fix|chore|build|ci|docs|style|refactor|perf|test|ui)(\\([\\w\\-\\.]+\\))?(!)?: .*",
-                  "on_property": "title",
-                  "target": "$1"
-                }
-              ]
-            }
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Install pnpm
         uses: pnpm/action-setup@v4
@@ -94,14 +114,6 @@ jobs:
         with:
           tagName: ${{ github.ref_name }}
           releaseName: 'Damn Reports ${{ github.ref_name }}'
-          releaseBody: |
-            ${{ steps.github_release.outputs.changelog }}
-
-            ### 📦 Artifacts
-            - **macOS (M1/M2/M3)**: download `aarch64.dmg`
-            - **macOS (Intel)**: download `x64.dmg`
-            - **Windows**: download `.exe`
-            - **Linux**: download `.AppImage`
           releaseDraft: false
           prerelease: false
           includeUpdaterJson: true
