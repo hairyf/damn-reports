@@ -47,9 +47,41 @@
 
 向 `sources.json` 添加新数据源条目。
 
+**⚠️ 写入前必含字段（严禁遗漏）**
+
+每条写入 `sources.json` 的数据源对象**必须**包含以下全部字段，缺一不可：
+
+| 字段 | 必填 | 说明 |
+|------|------|------|
+| `id` | ✅ | 唯一标识，从 name/tool 生成，如 `damn_reports_git_directory` |
+| `name` | ✅ | 人类可读名称 |
+| `description` | ✅ | 简短描述 |
+| `tool` | ✅ | tools.json 中的工具 id |
+| `params` | ✅ | 对象，键由 tool 的 definition 决定 |
+| `enable` | 可选 | 省略时默认 `true` |
+| `createdAt` | ✅ | ISO 8601，当前时间 |
+| `updatedAt` | ✅ | ISO 8601，当前时间 |
+
+**正确示例**（写入前必须达到此结构）：
+
+```json
+{
+  "id": "damn_reports_git_directory",
+  "name": "Damn Reports Git",
+  "description": "读取本地 Git 提交",
+  "tool": "git_directory",
+  "enable": true,
+  "params": { "repository": "D:/projects/damn-daily-reports", "author": "hairyf" },
+  "createdAt": "2026-02-14T12:00:00.000Z",
+  "updatedAt": "2026-02-14T12:00:00.000Z"
+}
+```
+
+**错误示例**：仅含 `name`、`description`、`tool`、`params` 而缺 `id`、`createdAt`、`updatedAt` —— 会导致采集时报错。
+
 **输入（概念）**
 
-- `source`（object）– 符合 `schema.md` 的数据源定义，必须包含 `id`。
+- `source`（object）– 符合上述必含字段的完整定义。
 - 若省略 `enable`，默认为 `true`。
 - 若省略 `createdAt`/`updatedAt`，设为当前 ISO 8601 时间。
 
@@ -65,21 +97,22 @@
    - 查阅 `tools.json` 中对应 tool 的 `definition`，按需询问每个参数的取值（如 `git_directory` 的 `repository`、`author` 等）
 
 - 询问时请**同时**覆盖元信息与 params，不要只根据 tools.json 列出 tool 参数。
-- `id`：无须用户未提供，从 `name` 或工具类型合理生成（如 `project_git_directory`）
+- `id`：如用户未提供，必须从 `name` 或工具类型生成（如 `damn_reports_git_directory`），写入时**不能省略**
 
 **推荐实现（读–改–写）**
 
 1. 调用 `/source get_all`（或直接 `read`）获取当前 JSON 文本。
    - `read` 输入：`{"path": "sources.json"}`
 2. 将文本解析为数组 `sources`。
-3. 检查是否存在相同 `id` 的条目：
+3. 构建新数据源对象，**确保包含必含字段表中的全部字段**。
+4. 检查是否存在相同 `id` 的条目：
    - 若存在，返回错误或“id 已存在”，不添加。
-4. 为新数据源补全缺失的 `createdAt` 和 `updatedAt`。
-5. 追加：`sources.push(source)`（或等效写法）。
-6. 将 `sources` 序列化为 JSON 字符串（如可能，格式化输出）。
-7. 调用 `write` 持久化：
+5. 补全：`enable` 缺则 `true`，`createdAt`/`updatedAt` 缺则当前 ISO 8601。
+6. 追加：`sources.push(source)`（或等效写法）。
+7. 将 `sources` 序列化为 JSON 字符串（如可能，格式化输出）。
+8. 调用 `write` 持久化：
    - 输入：`{"path": "sources.json", "content": "<序列化后的 sources>"}`
-8. 验证：通常无需再次 `read`；若上一步在内存中正确追加，写入后即可认为成功。仅在需向用户展示写入结果时再读取。
+9. 验证：通常无需再次 `read`；若上一步在内存中正确追加，写入后即可认为成功。仅在需向用户展示写入结果时再读取。
 
 **测试建议（可选，仅 exec_tool）**
 

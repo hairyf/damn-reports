@@ -30,7 +30,18 @@ export const source = defineStore({
   },
   actions: {
     async sync() {
-      this.raw = await readJson('sources.json').catch(() => [])
+      const data = await readJson('sources.json').catch(() => [])
+      const arr = Array.isArray(data) ? data : []
+      const now = new Date().toISOString()
+      this.raw = arr.map((item: any) => {
+        const id = item?.id ?? `source_${Date.now()}_${crypto.randomUUID().slice(0, 8)}`
+        const createdAt = item?.createdAt ?? now
+        const updatedAt = item?.updatedAt ?? now
+        const enable = item?.enable ?? true
+        return { ...item, id, createdAt, updatedAt, enable }
+      })
+      if (arr.some((item: any) => !item?.id || !item?.createdAt || !item?.updatedAt))
+        await this.save()
     },
 
     async save() {
@@ -92,6 +103,12 @@ export const source = defineStore({
           continue
         }
 
+        const sourceId = src.id ?? ''
+        if (!sourceId) {
+          console.warn(`Source "${src.name}" has no id, skipping`)
+          continue
+        }
+
         const toolDef = tools[src.tool]
         if (!toolDef) {
           console.warn(`Tool "${src.tool}" not found in tools.json, skipping source "${src.name}"`)
@@ -111,8 +128,8 @@ export const source = defineStore({
               data: r.data,
               createdAt: iso,
               updatedAt: iso,
-              source: src.id,
-              tool: src.tool,
+              source: sourceId,
+              tool: src.tool ?? '',
             })
           }
         }

@@ -6,7 +6,61 @@ import { defineStore } from 'valtio-define'
 import { generateTitlePrompt } from '@/config/prompts'
 import * as tools from '@/tools'
 import { LLM_PROVIDERS } from './providers'
+import { TOOLS_NONE_PLACEHOLDER } from './tools-none-placeholder'
 import 'valtio-define/types'
+
+const DEBUG_STREAM = false // 设为 true 可打开流式调试日志
+
+/** 将 fullStream 转为仅 yield text 的 AsyncIterable，遇到 error/abort 时抛出，避免 textStream 吞掉错误 */
+async function* pipeFullStreamToText(
+  stream: AsyncIterable<{ type: string, text?: string, error?: unknown }>,
+): AsyncIterable<string> {
+  const start = Date.now()
+  let partCount = 0
+  let lastChunkAt = 0
+  const partTypes = new Map<string, number>()
+  if (DEBUG_STREAM)
+    console.warn('[stream] start')
+
+  try {
+    for await (const part of stream) {
+      partCount++
+      partTypes.set(part.type, (partTypes.get(part.type) ?? 0) + 1)
+      if (part.type === 'text-delta') {
+        lastChunkAt = Date.now()
+        if (DEBUG_STREAM && part.text) {
+          console.warn('[stream] text-delta', `+${(part.text as string).length} chars`)
+        }
+      }
+      else if (DEBUG_STREAM && part.type !== 'text-delta') {
+        console.warn('[stream] part', part.type, part)
+      }
+
+      if (part.type === 'text-delta' && part.text) {
+        yield part.text
+      }
+      else if (part.type === 'error') {
+        console.error('[stream] error part', part.error)
+        throw part.error
+      }
+      else if (part.type === 'abort') {
+        console.warn('[stream] abort part')
+        throw new Error('Stream aborted')
+      }
+    }
+  }
+  finally {
+    if (DEBUG_STREAM) {
+      const elapsed = Date.now() - start
+      console.warn('[stream] done', {
+        elapsed: `${elapsed}ms`,
+        partCount,
+        byType: Object.fromEntries(partTypes),
+        lastChunkAgo: lastChunkAt ? `${Date.now() - lastChunkAt}ms` : 'never',
+      })
+    }
+  }
+}
 
 /** 从 Vite 环境变量读取 LLM 配置（需 VITE_ 前缀） */
 const envLlmApiKey = import.meta.env.VITE_LLM_API_KEY as string | undefined
@@ -70,19 +124,25 @@ export const llm = defineStore({
       }).chat(this.resolvedModel || 'deepseek-chat')
     },
 
-    /** 流式生成文本（report 等），通过 onDelta 回调实时推送增量，返回最终完整文本 */
-    async streamGenerate(systemPrompt: string, onDelta?: (delta: string) => void): Promise<string> {
-      let full = ''
-      const { textStream } = streamText({
+    /** 流式生成文本（report 等），通过 fullStream 处理 text-delta/error/abort，避免 textStream 吞掉错误导致 loading 卡死。未传 tools 时默认禁用工具调用。 */
+    streamGenerate(options: Omit<Parameters<typeof streamText>[0], 'model'>): AsyncIterable<string> {
+      const toolsProvided = options.tools != null && Object.keys(options.tools).length > 0
+      const resolvedOptions = !toolsProvided
+        ? { ...options, toolChoice: 'none' as const, tools: TOOLS_NONE_PLACEHOLDER }
+        : options
+
+      const result = streamText({
         model: this.createModel(),
-        system: systemPrompt,
-        prompt: '',
+        ...resolvedOptions as any,
+        onError: e => console.error('[streamGenerate] onError', e),
+        onFinish: DEBUG_STREAM
+          ? ({ finishReason, usage }) => { console.warn('[streamGenerate] onFinish', { finishReason, usage }) }
+          : undefined,
+        onStepFinish: DEBUG_STREAM
+          ? ({ finishReason }) => { console.warn('[streamGenerate] onStepFinish', { finishReason }) }
+          : undefined,
       })
-      for await (const delta of textStream) {
-        full += delta
-        onDelta?.(delta)
-      }
-      return full
+      return pipeFullStreamToText(result.fullStream)
     },
 
     /** 执行 AI 流式对话（chat），通过 callbacks 将增量推送给调用方 */
