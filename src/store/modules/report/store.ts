@@ -5,6 +5,7 @@ import { queryClient } from '@/config/client'
 import { dailyReportPrompt, optimizeReportPrompt } from '@/config/prompts'
 import { notifyReportGenerated } from '@/cron/report-hook'
 import { store } from '@/store'
+import { writeTextFile } from '@/utils/fs-extra'
 import { buildRecordSummaryPrompt } from './utils'
 import 'valtio-define/types'
 
@@ -53,6 +54,12 @@ async function ensureSummary(): Promise<string> {
   return summary
 }
 
+/** 将报告内容写入 memory/reports/YYYY-MM-DD.md */
+async function writeReportToMemory(content: string, date?: string): Promise<void> {
+  const reportPath = `memory/reports/${date ?? dayjs().format('YYYY-MM-DD')}.md`
+  await writeTextFile(reportPath, content)
+}
+
 export const report = defineStore({
   state: () => ({
     loading: false,
@@ -91,6 +98,12 @@ export const report = defineStore({
         this.resetStream()
 
         notifyReportGenerated(content, options?.fromScheduled ?? false)
+
+        try {
+          await writeReportToMemory(content)
+        }
+        catch (err) { console.warn('writeReportToMemory failed', err) }
+
         return content
       }
       catch (error) {
@@ -108,10 +121,18 @@ export const report = defineStore({
         const summary = await ensureSummary()
         const content = await streamGenerate(this, dailyReportPrompt(summary))
 
+        const existing = await db.report.findUnique(Number(reportId) as never)
+        const reportDate = existing?.createdAt ? dayjs(existing.createdAt).format('YYYY-MM-DD') : undefined
+
         await db.report.update(reportId, {
           content,
           updatedAt: new Date().toISOString(),
         })
+
+        try {
+          await writeReportToMemory(content, reportDate)
+        }
+        catch (err) { console.warn('writeReportToMemory failed', err) }
       }
       catch (error) {
         console.error('regenerate error', error)
@@ -126,10 +147,18 @@ export const report = defineStore({
     async optimize(reportId: string, currentContent: string, userInstruction?: string) {
       try {
         const content = await streamGenerate(this, optimizeReportPrompt(currentContent, userInstruction))
+        const existing = await db.report.findUnique(Number(reportId) as never)
+        const reportDate = existing?.createdAt ? dayjs(existing.createdAt).format('YYYY-MM-DD') : undefined
+
         await db.report.update(reportId, {
           content,
           updatedAt: new Date().toISOString(),
         })
+
+        try {
+          await writeReportToMemory(content, reportDate)
+        }
+        catch (err) { console.warn('writeReportToMemory failed', err) }
       }
       catch (error) {
         console.error('optimize error', error)
