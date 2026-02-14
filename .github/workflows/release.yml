@@ -43,11 +43,11 @@ jobs:
           gh release view ${{ github.ref_name }} --json body -q .body > release_notes.md
           cat >> release_notes.md << 'EOF'
 
-          ### 📦 Artifacts
-          - **macOS (M1/M2/M3)**: download `aarch64.dmg`
-          - **macOS (Intel)**: download `x64.dmg`
-          - **Windows**: download `.exe`
-          - **Linux**: download `.AppImage`
+             ### 📦 Artifacts
+             - **macOS (M1/M2/M3)**: download `aarch64.dmg`
+             - **macOS (Intel)**: download `x64.dmg`
+             - **Windows**: download `.exe`
+             - **Linux**: download `.AppImage`
           EOF
           gh release edit ${{ github.ref_name }} --notes-file release_notes.md
         env:
