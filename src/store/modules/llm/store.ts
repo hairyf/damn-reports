@@ -4,7 +4,7 @@ import { createOpenAI } from '@ai-sdk/openai'
 import { generateText, streamText, ToolLoopAgent } from 'ai'
 import { defineStore } from 'valtio-define'
 import { generateTitlePrompt } from '@/config/prompts'
-import * as tools from '@/config/tools'
+import * as tools from '@/tools'
 import { LLM_PROVIDERS } from './providers'
 import 'valtio-define/types'
 

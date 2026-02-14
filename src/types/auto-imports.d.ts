@@ -77,23 +77,23 @@ declare global {
   const cron_tool: typeof import('../config/tools').cron_tool
   const current_time: typeof import('../config/collectors').current_time
   const dailyReportPrompt: typeof import('../config/prompts').dailyReportPrompt
-  const date: typeof import('../config/tools').date
+  const date: typeof import('../tools/date').date
   const db: typeof import('../database/index').db
-  const edit: typeof import('../config/tools').edit
+  const edit: typeof import('../tools/file').edit
   const exe_tool: typeof import('../config/tools').exe_tool
-  const exec: typeof import('../config/tools').exec
-  const exec_sql: typeof import('../config/tools').exec_sql
-  const exec_tool: typeof import('../config/tools').exec_tool
+  const exec: typeof import('../tools/exec').exec
+  const exec_sql: typeof import('../tools/sql').exec_sql
+  const exec_tool: typeof import('../tools/exec-tool').exec_tool
   const executeCollector: typeof import('../utils/exec').executeCollector
   const executeCommand: typeof import('../utils/exec').executeCommand
   const executeCommandExpression: typeof import('../utils/exec').executeCommandExpression
   const executeHttpRequestExpression: typeof import('../utils/exec').executeHttpRequestExpression
   const exists: typeof import('../utils/fs-extra').exists
   const fetch_http: typeof import('../config/tools').fetch_http
-  const find: typeof import('../config/tools').find
+  const find: typeof import('../tools/file').find
   const forwardRef: typeof import('react').forwardRef
   const generateTitlePrompt: typeof import('../config/prompts').generateTitlePrompt
-  const generate_report: typeof import('../config/tools').generate_report
+  const generate_report: typeof import('../tools/app').generate_report
   const getBeijingDayRange: typeof import('../config/source-tools').getBeijingDayRange
   const getSkills: typeof import('../utils/skills').getSkills
   const getTools: typeof import('../utils/tool').getTools
@@ -101,16 +101,16 @@ declare global {
   const get_current_time: typeof import('../config/collectors').get_current_time
   const get_records: typeof import('../config/tools').get_records
   const get_records_by_source: typeof import('../config/tools').get_records_by_source
-  const get_settings: typeof import('../config/tools').get_settings
+  const get_settings: typeof import('../tools/app').get_settings
   const get_sources: typeof import('../config/tools').get_sources
   const get_tool: typeof import('../config/tools').get_tool
   const get_tools: typeof import('../config/tools').get_tools
   const git_directory: typeof import('../config/collectors').git_directory
-  const grep: typeof import('../config/tools').grep
-  const http: typeof import('../config/tools').http
+  const grep: typeof import('../tools/file').grep
+  const http: typeof import('../tools/http').http
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
-  const ls: typeof import('../config/tools').ls
+  const ls: typeof import('../tools/file').ls
   const lstat: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').lstat
   const memo: typeof import('react').memo
   const mkdir: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').mkdir
@@ -118,7 +118,7 @@ declare global {
   const optimizeReportPrompt: typeof import('../config/prompts').optimizeReportPrompt
   const parseSkill: typeof import('../utils/skills').parseSkill
   const queryClient: typeof import('../config/client').queryClient
-  const read: typeof import('../config/tools').read
+  const read: typeof import('../tools/file').read
   const readDir: typeof import('../utils/fs-extra').readDir
   const readFile: typeof import('../utils/fs-extra').readFile
   const readJson: typeof import('../utils/fs-extra').readJson
@@ -128,12 +128,12 @@ declare global {
   const remove: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').remove
   const rename: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').rename
   const retry: typeof import('../utils/utility').retry
-  const set_settings: typeof import('../config/tools').set_settings
+  const set_settings: typeof import('../tools/app').set_settings
   const set_source: typeof import('../config/tools').set_source
   const set_tool: typeof import('../config/tools').set_tool
   const siteConfig: typeof import('../config/site').siteConfig
   const size: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').size
-  const skill: typeof import('../config/tools').skill
+  const skill: typeof import('../tools/skill').skill
   const skills: typeof import('../utils/skills').skills
   const sourceOptions: typeof import('../config/options').sourceOptions
   const startTransition: typeof import('react').startTransition
@@ -141,7 +141,7 @@ declare global {
   const storage: typeof import('../config/storage').storage
   const store: typeof import('../store/index').store
   const subtitle: typeof import('../components/primitives').subtitle
-  const sync_records: typeof import('../config/tools').sync_records
+  const sync_records: typeof import('../tools/app').sync_records
   const tauriStorageDriver: typeof import('../config/storage.driver').tauriStorageDriver
   const test_node_js: typeof import('../config/source-tools').test_node_js
   const title: typeof import('../components/primitives').title
@@ -181,7 +181,7 @@ declare global {
   const useUpdater: typeof import('../hooks/use-updater').useUpdater
   const watch: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watch
   const watchImmediate: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').watchImmediate
-  const write: typeof import('../config/tools').write
+  const write: typeof import('../tools/file').write
   const writeFile: typeof import('../utils/fs-extra').writeFile
   const writeJson: typeof import('../utils/fs-extra').writeJson
   const writeTextFile: typeof import('../utils/fs-extra').writeTextFile

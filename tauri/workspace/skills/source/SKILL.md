@@ -26,8 +26,6 @@ description: "Manage App Workspace data sources defined in sources.json: list al
 
 ## 使用的工具
 
-这些工具在 `src/config/tools.ts` 中定义并暴露给 agent：
-
 - `read`
   - 读取工作区下的文本文件。
   - 内部会将给定路径与 `workspace` 目录拼接。
