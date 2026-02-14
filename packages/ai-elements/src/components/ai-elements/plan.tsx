@@ -136,7 +136,6 @@ export type PlanTriggerProps = ComponentProps<typeof CollapsibleTrigger>
 export function PlanTrigger({ className, ...props }: PlanTriggerProps) {
   return (
     <CollapsibleTrigger asChild>
-      {/* @ts-expect-error React 18/19 ref type compatibility */}
       <Button
         className={cn('size-8', className)}
         data-slot="plan-trigger"

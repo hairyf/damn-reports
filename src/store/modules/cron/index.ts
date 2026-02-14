@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import type { CronJob, CronJobPatch, CronStoreFile } from '@/cron/types'
 import { defineStore } from 'valtio-define'
-import { setReportEndHandler } from '@/cron/report-hook'
+import { offReportGenerated, onReportGenerated } from '@/cron/report'
 import { CronService } from '@/cron/service'
 import { store } from '@/store'
 import { MAIN_SESSION_ID } from '@/store/modules/chat'
@@ -42,6 +42,7 @@ const DEFAULT_CRONS: CronStoreFile = {
 // ── Singleton service ──
 
 let service: CronService | null = null
+let reportEndHandler: ((payload: { content: string, fromScheduled: boolean }) => void) | null = null
 
 export const cron = defineStore({
   state: () => ({
@@ -118,14 +119,18 @@ export const cron = defineStore({
 
       await service.start()
       this.running = true
-      setReportEndHandler((content, fromScheduled) => {
-        service?.triggerReportEndJobs(content, fromScheduled)
-      })
+      reportEndHandler = (payload) => {
+        service?.triggerReportEndJobs(payload.content, payload.fromScheduled)
+      }
+      onReportGenerated(reportEndHandler)
       await this.sync()
     },
 
     stop() {
-      setReportEndHandler(null)
+      if (reportEndHandler) {
+        offReportGenerated(reportEndHandler)
+        reportEndHandler = null
+      }
       service?.stop()
       service = null
       this.running = false

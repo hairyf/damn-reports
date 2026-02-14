@@ -114,7 +114,6 @@ export function ContextTrigger({ children, ...props }: ContextTriggerProps) {
 
   return (
     <HoverCardTrigger asChild>
-      {/* @ts-expect-error React 18/19 ReactNode type compatibility */}
       {children ?? (
         <Button type="button" variant="ghost" {...props}>
           <span className="font-medium text-muted-foreground">

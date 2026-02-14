@@ -13,7 +13,6 @@ export type SourcesProps = ComponentProps<'div'>
 
 export function Sources({ className, ...props }: SourcesProps) {
   return (
-    // @ts-expect-error React 18/19 ReactNode type compatibility
     <Collapsible
       className={cn('not-prose mb-4 text-primary text-xs', className)}
       {...props}

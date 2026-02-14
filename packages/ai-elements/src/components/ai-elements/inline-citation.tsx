@@ -96,7 +96,6 @@ export function InlineCitationCardBody({
   className,
   ...props
 }: InlineCitationCardBodyProps) {
-  // @ts-expect-error React 18/19 ReactNode type compatibility
   return <HoverCardContent className={cn('relative w-80 p-0', className)} {...props} />
 }
 
