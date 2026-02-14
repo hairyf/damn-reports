@@ -1,4 +1,3 @@
-import type { CronJob, CronJobCreate } from '@/cron/types'
 import { Else, If, Then, useDebounce } from '@hairy/react-lib'
 import {
   Button,
@@ -9,7 +8,6 @@ import {
 import { Icon } from '@iconify/react'
 import { useMemo } from 'react'
 import { useStore } from 'valtio-define'
-import { CronForm } from '@/components/cron-form'
 import { store } from '@/store'
 import { HookItem } from './hook-item'
 
@@ -24,31 +22,25 @@ export function PageHooks() {
   const navigate = useNavigate()
   const { jobs } = useStore(store.cron)
   const [search, setSearch] = useState('')
-  const [editingJob, setEditingJob] = useState<CronJob | null>(null)
   const debouncedSearch = useDebounce(search, 300)
+
+  const visibleJobs = useMemo(() => jobs.filter(job => job.view !== false), [jobs])
 
   const filteredJobs = useMemo(() => {
     if (!debouncedSearch)
-      return jobs
+      return visibleJobs
     const q = debouncedSearch.toLowerCase()
-    return jobs.filter(job =>
+    return visibleJobs.filter(job =>
       job.name.toLowerCase().includes(q)
       || job.description?.toLowerCase().includes(q)
       || job.id.toLowerCase().includes(q)
       || (PAYLOAD_LABELS[job.payload.kind] ?? job.payload.kind).toLowerCase().includes(q),
     )
-  }, [jobs, debouncedSearch])
+  }, [visibleJobs, debouncedSearch])
 
   function goSearchHook() {
     store.chat.prepareNew()
     navigate('/chat?intent=search-hook')
-  }
-
-  async function handleEdit(data: CronJobCreate) {
-    if (!editingJob)
-      return
-    await store.cron.update(editingJob.id, data)
-    setEditingJob(null)
   }
 
   return (
@@ -66,7 +58,7 @@ export function PageHooks() {
             <Button
               color="primary"
               onPress={goSearchHook}
-              startContent={<Icon icon="lucide:plus" className="w-4 h-4" />}
+              startContent={<Icon icon="lucide:bot-message-square" className="w-4 h-4" />}
             >
               添加钩子
             </Button>
@@ -101,16 +93,6 @@ export function PageHooks() {
           </Else>
         </If>
       </div>
-
-      {/* Edit form */}
-      {editingJob && (
-        <CronForm
-          isOpen={!!editingJob}
-          onClose={() => setEditingJob(null)}
-          onSubmit={handleEdit}
-          initial={editingJob}
-        />
-      )}
     </>
   )
 }

@@ -1,7 +1,6 @@
 import { SettingAboutCard } from '@/ui/setting-about-card'
 import { SettingLlmCard } from '@/ui/setting-llm-card'
 import { SettingOtherCard } from '@/ui/setting-other-card'
-import { SettingReportCard } from '@/ui/setting-report-card'
 import { SettingUserInterfaceCard } from '@/ui/setting-user-interface-card'
 
 function Page() {
@@ -9,9 +8,6 @@ function Page() {
     <div className="columns-1 lg:columns-2 gap-4">
       <div className="break-inside-avoid mb-4">
         <SettingUserInterfaceCard />
-      </div>
-      <div className="break-inside-avoid mb-4">
-        <SettingReportCard />
       </div>
       <div className="break-inside-avoid mb-4">
         <SettingLlmCard />

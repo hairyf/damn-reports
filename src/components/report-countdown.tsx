@@ -1,3 +1,4 @@
+import type { CronJob } from '@/cron/types'
 import { Icon } from '@iconify/react'
 import dayjs from 'dayjs'
 import duration from 'dayjs/plugin/duration'
@@ -5,9 +6,28 @@ import { useStore } from 'valtio-define'
 
 dayjs.extend(duration)
 
+function getReportJobTime(jobs: readonly CronJob[]): string | null {
+  const job = jobs.find(j => j.id === 'builtin_daily_report')
+  if (!job || !job.enabled)
+    return null
+  const sch = job.schedule
+  if (sch.kind === 'workday' && sch.time)
+    return sch.time
+  if (sch.kind === 'at' && sch.at) {
+    const m = sch.at.match(/^\d{2}:\d{2}/)
+    return m ? m[0] : null
+  }
+  if (sch.kind === 'cron' && sch.expr) {
+    const parts = sch.expr.split(/\s+/)
+    if (parts.length >= 2)
+      return `${parts[1].padStart(2, '0')}:${parts[0].padStart(2, '0')}`
+  }
+  return null
+}
+
 export function ReportCountdown({ className }: { className?: string }) {
-  const { dailyReportTime } = useStore(store.setting)
-  const generateTime = dailyReportTime || '--:--'
+  const jobs = useStore(store.cron).jobs
+  const generateTime = getReportJobTime(jobs) || '--:--'
   const [generateCountdown, setGenerateCountdown] = useState('--:--')
 
   // 计算倒计时

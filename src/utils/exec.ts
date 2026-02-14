@@ -95,7 +95,7 @@ export async function executeCommandExpression(collector: Collector, config: Rec
     if (collector.transformer) {
       try {
         const expression = jsonata(collector.transformer)
-        return await expression.evaluate(result)
+        return await expression.evaluate(result) || []
       }
       catch (transformError) {
         const errMsg = transformError instanceof Error ? transformError.message : String(transformError)

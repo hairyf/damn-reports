@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import type { CronJob, CronStoreFile } from '@/cron/types'
+import type { CronJob, CronJobPatch, CronStoreFile } from '@/cron/types'
 import { defineStore } from 'valtio-define'
 import { CronService } from '@/cron/service'
 import { store } from '@/store'
@@ -15,6 +15,7 @@ const DEFAULT_CRONS: CronStoreFile = {
       name: '每日报告生成',
       description: '在设定时间自动收集数据并生成日报',
       enabled: true,
+      system: true,
       schedule: { kind: 'workday', time: '18:00', region: 'CN' },
       payload: { kind: 'report' },
       state: {},
@@ -26,6 +27,8 @@ const DEFAULT_CRONS: CronStoreFile = {
       name: '主会话记忆存储',
       description: '每日零点存储主会话记忆并清空',
       enabled: true,
+      system: true,
+      view: false,
       schedule: { kind: 'cron', expr: '0 0 * * *' },
       payload: { kind: 'agentTurn', message: '储存今天的记忆' },
       state: {},
@@ -65,6 +68,20 @@ export const cron = defineStore({
               if (job.id === 'builtin_daily_report' && isLegacyWorkday) {
                 job.schedule = { kind: 'workday', time: '18:00', region: 'CN' }
                 migrated = true
+              }
+              if (job.id === 'builtin_daily_report' && !job.system) {
+                job.system = true
+                migrated = true
+              }
+              if (job.id === 'builtin_memory_clear') {
+                if (!job.system) {
+                  job.system = true
+                  migrated = true
+                }
+                if (job.view !== false) {
+                  job.view = false
+                  migrated = true
+                }
               }
             }
             if (migrated)
@@ -126,6 +143,14 @@ export const cron = defineStore({
       if (!service)
         throw new Error('cron service not started')
       const result = await service.run(id)
+      await this.sync()
+      return result
+    },
+
+    async update(id: string, patch: CronJobPatch) {
+      if (!service)
+        throw new Error('cron service not started')
+      const result = await service.update(id, patch)
       await this.sync()
       return result
     },

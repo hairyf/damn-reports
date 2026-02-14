@@ -37,46 +37,6 @@ export function StepLlmSetting() {
           </div>
         </div>
         <div className="space-y-4">
-          <div className="space-y-2">
-            <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
-              API Key
-            </label>
-            <Input
-              type="text"
-              value={apiKey}
-              onChange={e => setApiKey(e.target.value)}
-              placeholder={isVercelProvider ? 'Vercel AI Gateway API Key' : 'sk-...'}
-            />
-          </div>
-          <div className="space-y-2">
-            <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
-              模型 / Provider
-            </label>
-            <Select
-              selectedKeys={[provider]}
-              onSelectionChange={(keys) => {
-                const p = Array.from(keys)[0] as LlmProvider
-                if (p) {
-                  setProvider(p)
-                  const config = LLM_PROVIDERS[p]
-                  if (config.models.length > 0)
-                    setModel(config.models[0].value)
-                  else if (p === 'custom')
-                    setModel('')
-                  else if (p === 'vercel')
-                    setModel('')
-                }
-              }}
-              placeholder="选择模型"
-              aria-label="选择模型"
-            >
-              {Object.entries(LLM_PROVIDERS).map(([key, config]) => (
-                <SelectItem key={key}>
-                  {config.label}
-                </SelectItem>
-              ))}
-            </Select>
-          </div>
           {isCustomProvider && (
             <div className="space-y-2">
               <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
@@ -90,46 +50,88 @@ export function StepLlmSetting() {
               />
             </div>
           )}
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
+                Provider
+              </label>
+              <Select
+                selectedKeys={[provider]}
+                onSelectionChange={(keys) => {
+                  const p = Array.from(keys)[0] as LlmProvider
+                  if (p) {
+                    setProvider(p)
+                    const config = LLM_PROVIDERS[p]
+                    if (config.models.length > 0)
+                      setModel(config.models[0].value)
+                    else if (p === 'custom')
+                      setModel('')
+                    else if (p === 'vercel')
+                      setModel('')
+                  }
+                }}
+                placeholder="选择 Provider"
+                aria-label="选择 Provider"
+              >
+                {Object.entries(LLM_PROVIDERS).map(([key, config]) => (
+                  <SelectItem key={key}>
+                    {config.label}
+                  </SelectItem>
+                ))}
+              </Select>
+            </div>
+            <div className="space-y-2">
+              <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
+                Model
+              </label>
+              {isVercelProvider
+                ? (
+                    <VercelModelSelect
+                      value={model}
+                      onChange={setModel}
+                      placeholder="搜索并选择模型（200+）"
+                      ariaLabel="选择具体模型"
+                    />
+                  )
+                : modelOptions.length > 0
+                  ? (
+                      <Select
+                        selectedKeys={[model]}
+                        onSelectionChange={(keys) => {
+                          const m = Array.from(keys)[0] as string
+                          if (m)
+                            setModel(m)
+                        }}
+                        placeholder="选择模型"
+                        aria-label="选择具体模型"
+                      >
+                        {modelOptions.map(opt => (
+                          <SelectItem key={opt.value}>
+                            {opt.label}
+                          </SelectItem>
+                        ))}
+                      </Select>
+                    )
+                  : (
+                      <Input
+                        type="text"
+                        value={model}
+                        onChange={e => setModel(e.target.value)}
+                        placeholder="如 gpt-4、claude-3"
+                      />
+                    )}
+            </div>
+          </div>
           <div className="space-y-2">
             <label className="text-gray-400 dark:text-white/40 text-xs uppercase tracking-widest font-semibold px-1">
-              Model
+              API Key
             </label>
-            {isVercelProvider
-              ? (
-                  <VercelModelSelect
-                    value={model}
-                    onChange={setModel}
-                    placeholder="搜索并选择模型（200+）"
-                    ariaLabel="选择具体模型"
-                  />
-                )
-              : modelOptions.length > 0
-                ? (
-                    <Select
-                      selectedKeys={[model]}
-                      onSelectionChange={(keys) => {
-                        const m = Array.from(keys)[0] as string
-                        if (m)
-                          setModel(m)
-                      }}
-                      placeholder="选择模型"
-                      aria-label="选择具体模型"
-                    >
-                      {modelOptions.map(opt => (
-                        <SelectItem key={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  )
-                : (
-                    <Input
-                      type="text"
-                      value={model}
-                      onChange={e => setModel(e.target.value)}
-                      placeholder="如 gpt-4、claude-3"
-                    />
-                  )}
+            <Input
+              type="text"
+              value={apiKey}
+              onChange={e => setApiKey(e.target.value)}
+              placeholder={isVercelProvider ? 'Vercel AI Gateway API Key' : 'sk-...'}
+            />
           </div>
           <div className="flex space-x-3">
             <Button

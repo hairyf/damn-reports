@@ -125,6 +125,9 @@ export class CronService {
 
   async remove(id: string): Promise<boolean> {
     await this.ensureLoaded()
+    const job = this.store!.jobs.find(j => j.id === id)
+    if (job?.system)
+      return false
     const before = this.store!.jobs.length
     this.store!.jobs = this.store!.jobs.filter(j => j.id !== id)
     if (this.store!.jobs.length === before)

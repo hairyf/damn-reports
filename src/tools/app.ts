@@ -15,7 +15,7 @@ export const generate_report = tool({
 })
 
 export const get_settings = tool({
-  description: '获取应用设置（LLM 模型、用户界面、通知、自动保存、日报生成时间）',
+  description: '获取应用设置（LLM 模型、用户界面、通知、自动保存）',
   inputSchema: z.object({}),
   execute: () => store.setting.$state,
 })

@@ -12,7 +12,6 @@ export const setting = defineStore(
       autoSave: true,
       notifications: true,
       autoCheckUpdate: true,
-      dailyReportTime: '18:00',
     }),
     persist: {
       key: 'setting',

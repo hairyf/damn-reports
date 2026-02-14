@@ -9,6 +9,7 @@ import {
 import { Icon } from '@iconify/react'
 import { useMutation } from '@tanstack/react-query'
 import dayjs from 'dayjs'
+import { Link } from 'react-router-dom'
 import { store } from '@/store'
 
 const PAYLOAD_LABELS: Record<string, string> = {
@@ -142,14 +143,22 @@ export function HookItem({ job }: { job: CronJob }) {
                   : undefined}
               </Button>
               <Button
+                as={Link}
+                to={`/tool/hook?id=${job.id}`}
+                isIconOnly
+                variant="light"
+                size="sm"
+              >
+                <Icon icon="lucide:edit" className="w-4 h-4" />
+              </Button>
+              <Button
                 isIconOnly
                 variant="light"
                 size="sm"
                 color="danger"
                 isLoading={removeMutation.isPending}
                 onPress={() => removeMutation.mutate(job.id)}
-                disabled
-                className="opacity-50"
+                isDisabled={job.system}
               >
                 {!removeMutation.isPending ? <Icon icon="lucide:trash-2" className="w-4 h-4" /> : undefined}
               </Button>
@@ -175,7 +184,7 @@ export function HookItem({ job }: { job: CronJob }) {
                 <DropdownItem key="run" startContent={<Icon icon="lucide:play" className="w-4 h-4" />}>
                   立即运行
                 </DropdownItem>
-                <DropdownItem key="edit" startContent={<Icon icon="lucide:pencil" className="w-4 h-4" />}>
+                <DropdownItem key="edit" startContent={<Icon icon="lucide:edit" className="w-4 h-4" />}>
                   编辑
                 </DropdownItem>
                 <DropdownItem key="remove" className="text-danger" color="danger" startContent={<Icon icon="lucide:trash-2" className="w-4 h-4" />}>

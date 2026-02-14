@@ -4,7 +4,7 @@ export type CronSchedule
   = | { kind: 'at', at: string }
     | { kind: 'every', everyMs: number, anchorMs?: number }
     | { kind: 'cron', expr: string, tz?: string }
-    | { kind: 'workday'; time: string; region?: string }
+    | { kind: 'workday', time: string, region?: string }
 
 // ── Payload ──
 
@@ -34,6 +34,10 @@ export interface CronJob {
   description?: string
   enabled: boolean
   deleteAfterRun?: boolean
+  /** 系统任务，不允许删除 */
+  system?: boolean
+  /** 是否在前端显示，false 则仅在内部使用 */
+  view?: boolean
   schedule: CronSchedule
   payload: CronPayload
   state: CronJobState
