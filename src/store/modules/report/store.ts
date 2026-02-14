@@ -23,8 +23,10 @@ async function collectAndSummarize(): Promise<string> {
   }
 
   const summary = await buildRecordSummaryPrompt(store.source.raw)
-  if (!summary?.trim() || summary === 'No record data available.')
+  if (!summary?.trim() || summary === 'No record data available.') {
+    addToast({ title: '无可用的记录数据', description: '启用中的数据源今日暂无记录' })
     throw new Error('没有可用的记录数据')
+  }
 
   return summary
 }
@@ -32,8 +34,10 @@ async function collectAndSummarize(): Promise<string> {
 /** 验证摘要数据可用性（不重新收集） */
 async function ensureSummary(): Promise<string> {
   const summary = await buildRecordSummaryPrompt(store.source.raw)
-  if (!summary?.trim() || summary === 'No record data available.')
+  if (!summary?.trim() || summary === 'No record data available.') {
+    addToast({ title: '无可用的记录数据', description: '启用中的数据源今日暂无记录' })
     throw new Error('没有可用的记录数据')
+  }
   return summary
 }
 

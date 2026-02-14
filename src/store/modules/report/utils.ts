@@ -6,6 +6,8 @@ export interface SourceItem {
   id: string
   name?: string
   tool?: string
+  /** 禁用时不参与日报生成 */
+  enable?: boolean
 }
 export function stringifyData(data: unknown): string | undefined {
   if (!data)
@@ -17,7 +19,14 @@ export function stringifyData(data: unknown): string | undefined {
 }
 
 export async function buildRecordSummaryPrompt(sources: SourceItem[]): Promise<string> {
-  const records = await db.record.findMany({ date: dayjs().toISOString() })
+  const enabledIds = sources.filter(s => s.enable !== false).map(s => s.id)
+  if (enabledIds.length === 0)
+    return 'No record data available.'
+
+  const records = await db.record.findMany({
+    date: dayjs().toISOString(),
+    sourceIds: enabledIds,
+  })
 
   const sourceMap = new Map(sources.map(s => [s.id, s]))
   const grouped = new Map<string, Array<{ summary: string, data: unknown }>>()
