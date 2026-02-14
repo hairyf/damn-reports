@@ -38,7 +38,7 @@ function useCarousel() {
   return context
 }
 
-function Carousel({ ref, orientation = 'horizontal', opts, setApi, plugins, className, children, ...props }: React.HTMLAttributes<HTMLDivElement> & CarouselProps & { ref?: React.RefObject<HTMLDivElement | null> }) {
+function Carousel({ ref, orientation = 'horizontal', opts, setApi, plugins, className, children, ...props }: React.HTMLAttributes<HTMLDivElement> & CarouselProps & { ref?: React.Ref<HTMLDivElement> }) {
   const [carouselRef, api] = useEmblaCarousel(
     {
       ...opts,
@@ -131,7 +131,7 @@ function Carousel({ ref, orientation = 'horizontal', opts, setApi, plugins, clas
 }
 Carousel.displayName = 'Carousel'
 
-function CarouselContent({ ref, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement | null> }) {
+function CarouselContent({ ref, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) {
   const { carouselRef, orientation } = useCarousel()
 
   return (
@@ -150,7 +150,7 @@ function CarouselContent({ ref, className, ...props }: React.HTMLAttributes<HTML
 }
 CarouselContent.displayName = 'CarouselContent'
 
-function CarouselItem({ ref, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.RefObject<HTMLDivElement | null> }) {
+function CarouselItem({ ref, className, ...props }: React.HTMLAttributes<HTMLDivElement> & { ref?: React.Ref<HTMLDivElement> }) {
   const { orientation } = useCarousel()
 
   return (

@@ -534,7 +534,6 @@ export function CodeBlockLanguageSelectorTrigger({
         'h-7 border-none bg-transparent px-2 text-xs shadow-none',
         className,
       )}
-      size="sm"
       {...props}
     />
   )

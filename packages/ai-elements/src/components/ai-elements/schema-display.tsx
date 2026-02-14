@@ -168,7 +168,7 @@ export function SchemaDisplayPath({
   const { path } = use(SchemaDisplayContext)
 
   // Highlight path parameters
-  const highlightedPath = path.replaceAll(
+  const highlightedPath = path.replace(
     /\{([^}]+)\}/g,
     '<span class="text-blue-600 dark:text-blue-400">{$1}</span>',
   )

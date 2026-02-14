@@ -31,10 +31,31 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
-      # 使用自动化工具生成 Changelog
+        with:
+          fetch-depth: 0
+      # 使用自动化工具生成 Changelog（COMMIT 模式：基于 Conventional Commits，不依赖 PR）
       - name: Generate Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v4
+        with:
+          commitMode: "true"
+          configurationJson: |
+            {
+              "template": "#{{CHANGELOG}}\n\n#{{UNCATEGORIZED}}",
+              "categories": [
+                {"title": "## ✨ Features", "labels": ["feat", "feature"]},
+                {"title": "## 🐛 Bug Fixes", "labels": ["fix", "bug"]},
+                {"title": "## 📦 Dependencies", "labels": ["chore", "build", "ci", "deps"]},
+                {"title": "## 📝 Other", "labels": ["docs", "style", "refactor", "perf", "test", "ui"]}
+              ],
+              "label_extractor": [
+                {
+                  "pattern": "^(feat|fix|chore|build|ci|docs|style|refactor|perf|test|ui)(\\([\\w\\-\\.]+\\))?(!)?: .*",
+                  "on_property": "title",
+                  "target": "$1"
+                }
+              ]
+            }
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -74,7 +95,7 @@ jobs:
           tagName: ${{ github.ref_name }}
           releaseName: 'Damn Reports ${{ github.ref_name }}'
           releaseBody: |
-            ${${{ steps.github_release.outputs.changelog }}}
+            ${{ steps.github_release.outputs.changelog }}
 
             ### 📦 Artifacts
             - **macOS (M1/M2/M3)**: download `aarch64.dmg`
