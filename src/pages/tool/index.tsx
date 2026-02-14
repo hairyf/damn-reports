@@ -5,7 +5,7 @@ import { PageTools } from '@/ui/page-tools'
 
 function Page() {
   return (
-    <Tabs classNames={{ tabList: 'overflow-hidden' }} variant="underlined">
+    <Tabs classNames={{ tabList: 'overflow-hidden', panel: 'px-0' }} variant="solid">
       <Tab
         key="tools"
         title={(

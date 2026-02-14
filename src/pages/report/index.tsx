@@ -59,7 +59,7 @@ function Page() {
       confirmText: '删除',
       cancelText: '取消',
     })
-    await db.report.delete(id)
+    await db.report.delete(id as unknown as Parameters<typeof db.report.delete>[0])
     refetch()
   }
 

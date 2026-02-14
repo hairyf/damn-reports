@@ -1048,7 +1048,7 @@ export function PromptInputButton({
     <Tooltip>
       <TooltipTrigger asChild>{button}</TooltipTrigger>
       <TooltipContent side={side}>
-        {tooltipContent}
+        {tooltipContent as never}
         {shortcut && (
           <span className="ml-2 text-muted-foreground">{shortcut}</span>
         )}

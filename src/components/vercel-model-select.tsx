@@ -72,7 +72,7 @@ export function VercelModelSelect(props: VercelModelSelectProps) {
       items={items}
       showScrollIndicators={false}
       scrollShadowProps={{ hideScrollBar: true }}
-      classNames={{ popoverContent: '!overflow-hidden' }}
+      classNames={{ popoverContent: '[&>div]:!overflow-hidden' }}
     >
       {item => (
         <AutocompleteItem key={item.value} textValue={item.label}>

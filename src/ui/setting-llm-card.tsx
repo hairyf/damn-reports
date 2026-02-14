@@ -4,6 +4,7 @@ import { Icon } from '@iconify/react'
 import { useState } from 'react'
 import { useStore } from 'valtio-define'
 import { VercelModelSelect } from '@/components/vercel-model-select'
+import { store } from '@/store'
 import { LLM_PROVIDERS } from '@/store/modules/llm'
 
 function snapshot(llm: { apiKey: string, baseUrl: string, provider: string, model: string }) {
@@ -96,7 +97,10 @@ export function SettingLlmCard() {
             </Select>
           </div>
           <div className="flex flex-col gap-2">
-            <label className="text-sm font-medium">Model</label>
+            <div className="flex items-center gap-2">
+              <Icon icon="lucide:sparkles" className="w-4 h-4 text-default-500" />
+              <label className="text-sm font-medium">Model</label>
+            </div>
             {llm.provider === 'vercel'
               ? (
                   <VercelModelSelect

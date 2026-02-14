@@ -43,6 +43,7 @@ export interface ButtonProps
 function Button({ ref, className, variant, size, asChild = false, ...props }: ButtonProps & { ref?: React.Ref<HTMLButtonElement> }) {
   const Comp = asChild ? Slot : 'button'
   return (
+    // @ts-expect-error React 18/19 ReactNode type compatibility
     <Comp
       className={cn(buttonVariants({ variant, size, className }))}
       ref={ref}

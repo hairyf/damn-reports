@@ -57,10 +57,11 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
       },
     },
   })
+  const reportIdNum = typeof reportId === 'string' ? Number.parseInt(reportId, 10) : reportId
   const { data: report } = useQuery({
     queryKey: ['report', reportId],
     queryFn: async () => {
-      const report = await db.report.findUnique(reportId)
+      const report = await db.report.findUnique(reportIdNum as unknown as Parameters<typeof db.report.findUnique>[0])
       return report ?? null
     },
     enabled: !!reportId,
@@ -92,7 +93,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
     mutationFn: async () => {
       if (!isUnsaved || !reportId)
         return
-      await db.report.update(reportId, {
+      await db.report.update(reportIdNum as unknown as Parameters<typeof db.report.update>[0], {
         content: text,
         updatedAt: dayjs().toISOString(),
       })
@@ -107,7 +108,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
     mutationFn: async () => {
       if (!reportId)
         return
-      await store.report.regenerate(reportId)
+      await store.report.regenerate(String(reportId))
       await Promise.all([
         queryClient.invalidateQueries({ queryKey: ['reports'] }),
         queryClient.invalidateQueries({ queryKey: ['report', reportId] }),
@@ -130,7 +131,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
         confirmText: '删除',
         cancelText: '取消',
       })
-      return await db.report.delete(reportId)
+      return await db.report.delete(reportIdNum as unknown as Parameters<typeof db.report.delete>[0])
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['reports'] })
@@ -266,7 +267,7 @@ export function ReportEditor({ reportId, ...props }: ReportEditorProps) {
                 </Button>
               </Tooltip>
               <OptimizeReportButton
-                reportId={reportId}
+                reportId={String(reportId)}
                 text={text}
                 isStreaming={isStreaming}
               />
