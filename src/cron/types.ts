@@ -5,12 +5,14 @@ export type CronSchedule
     | { kind: 'every', everyMs: number, anchorMs?: number }
     | { kind: 'cron', expr: string, tz?: string }
     | { kind: 'workday', time: string, region?: string }
+    | { kind: 'report-end', trigger: 'every' | 'scheduled', command: string }
 
 // ── Payload ──
 
 export type CronPayload
   = | { kind: 'collect' }
     | { kind: 'report' }
+    | { kind: 'reportEnd' }
     | { kind: 'agentTurn', message: string }
     | { kind: 'command', command: string }
 

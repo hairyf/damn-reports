@@ -37,7 +37,7 @@
 | `MEMORY.md` | 长期记忆 | 启动 |
 | `memory/YYYY-MM-DD.md` | 每日记录 | 启动（近两天） |
 | `BOOTSTRAP.md` | 首次引导 | 仅首次 |
-| `skills/` `tools/` `tools.json` `sources.json` `crons.json` `package.json` | 技能/工具/配置 | 按需 |
+| `skills/` `skills/README.md` `tools/` `tools.json` `sources.json` `crons.json` `package.json` | 技能/工具/配置 | 按需 |
 
 <skills_system priority="1">
 
@@ -52,7 +52,7 @@
 <skill name="report" location="skills/report">报告表操作：SQL 查询、generate_report 生成、修改。</skill>
 <skill name="skill-creator" location="skills/skill-creator">创建或更新技能的引导工具。</skill>
 <skill name="agent-browser" location="skills/agent-browser">浏览器自动化：导航、填表、点击、截图、数据提取、Web 测试。</skill>
-<skill name="cron" location="skills/cron">管理 crons.json 中的定时任务（Hooks）：增删改查。使用 read/write/edit 操作 crons.json。</skill>
+<skill name="cron" location="skills/cron">管理 crons.json 中的调度任务（Hooks）的增删改查。</skill>
 </available_skills>
 <!-- SKILLS_TABLE_END -->
 

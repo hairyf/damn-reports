@@ -1,5 +1,5 @@
-export { executeJob } from './executor'
-export type { ExecuteResult, ExecutorDeps } from './executor'
+export { executeJob, executeReportEndCommand } from './executor'
+export type { ExecuteResult, ExecutorDeps, ExecuteJobOptions } from './executor'
 export { computeNextRunAtMs } from './schedule'
 export { CronService } from './service'
 export type { CronServiceOptions } from './service'

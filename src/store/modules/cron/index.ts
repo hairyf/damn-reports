@@ -1,6 +1,7 @@
 /* eslint-disable no-console */
 import type { CronJob, CronJobPatch, CronStoreFile } from '@/cron/types'
 import { defineStore } from 'valtio-define'
+import { setReportEndHandler } from '@/cron/report-hook'
 import { CronService } from '@/cron/service'
 import { store } from '@/store'
 import { MAIN_SESSION_ID } from '@/store/modules/chat'
@@ -16,7 +17,7 @@ const DEFAULT_CRONS: CronStoreFile = {
       description: '在设定时间自动收集数据并生成日报',
       enabled: true,
       system: true,
-      schedule: { kind: 'workday', time: '18:00', region: 'CN' },
+      schedule: { kind: 'workday', time: '17:45', region: 'CN' },
       payload: { kind: 'report' },
       state: {},
       createdAtMs: Date.now(),
@@ -101,7 +102,8 @@ export const cron = defineStore({
         },
         deps: {
           collect: () => store.source.collect(),
-          generateReport: () => store.report.generate(),
+          generateReport: (fromScheduled?: boolean) =>
+            store.report.generate({ fromScheduled }),
           sendChatMessage: async (message: string) => {
             store.chat.activate(MAIN_SESSION_ID)
             await store.chat.send(message)
@@ -116,10 +118,14 @@ export const cron = defineStore({
 
       await service.start()
       this.running = true
+      setReportEndHandler((content, fromScheduled) => {
+        service?.triggerReportEndJobs(content, fromScheduled)
+      })
       await this.sync()
     },
 
     stop() {
+      setReportEndHandler(null)
       service?.stop()
       service = null
       this.running = false

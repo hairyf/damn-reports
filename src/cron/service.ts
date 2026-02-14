@@ -1,7 +1,7 @@
 /* eslint-disable no-console */
 import type { ExecuteResult, ExecutorDeps } from './executor'
 import type { CronEvent, CronJob, CronJobCreate, CronJobPatch, CronStoreFile } from './types'
-import { executeJob } from './executor'
+import { executeJob, executeReportEndCommand } from './executor'
 import { computeNextRunAtMs } from './schedule'
 
 const MAX_TIMER_DELAY_MS = 60_000
@@ -143,7 +143,33 @@ export class CronService {
     const job = this.store!.jobs.find(j => j.id === id)
     if (!job)
       return { status: 'error', error: 'job not found' }
-    return this.executeAndApply(job)
+    return this.executeAndApply(job, false)
+  }
+
+  /**
+   * 日报生成后触发 report-end 类型任务
+   * @param reportContent 报告内容
+   * @param fromScheduled 是否为定时任务触发（builtin_daily_report）
+   */
+  async triggerReportEndJobs(reportContent: string, fromScheduled: boolean): Promise<void> {
+    await this.ensureLoaded()
+    if (!this.store)
+      return
+
+    const jobs = this.store.jobs.filter((j) => {
+      if (!j.enabled || j.schedule.kind !== 'report-end')
+        return false
+      const trigger = j.schedule.trigger
+      if (trigger === 'scheduled' && !fromScheduled)
+        return false
+      if (!j.schedule.command?.trim())
+        return false
+      return true
+    })
+
+    for (const job of jobs) {
+      await this.executeAndApplyReportEnd(job, reportContent)
+    }
   }
 
   // ── Internal ──
@@ -210,7 +236,7 @@ export class CronService {
       const dueJobs = this.findDueJobs()
 
       for (const job of dueJobs) {
-        await this.executeAndApply(job)
+        await this.executeAndApply(job, true)
       }
 
       if (dueJobs.length === 0) {
@@ -244,7 +270,7 @@ export class CronService {
     })
   }
 
-  private async executeAndApply(job: CronJob): Promise<ExecuteResult> {
+  private async executeAndApply(job: CronJob, fromScheduled: boolean): Promise<ExecuteResult> {
     const startedAt = Date.now()
     job.state.runningAtMs = startedAt
     job.state.lastError = undefined
@@ -253,7 +279,7 @@ export class CronService {
     let result: ExecuteResult
     try {
       result = await Promise.race([
-        executeJob(job, this.opts.deps),
+        executeJob(job, this.opts.deps, { fromScheduled }),
         new Promise<never>((_, reject) => {
           setTimeout(() => reject(new Error('job execution timed out')), DEFAULT_JOB_TIMEOUT_MS)
         }),
@@ -276,6 +302,40 @@ export class CronService {
     })
 
     return result
+  }
+
+  private async executeAndApplyReportEnd(job: CronJob, reportContent: string): Promise<void> {
+    const startedAt = Date.now()
+    job.state.runningAtMs = startedAt
+    job.state.lastError = undefined
+    this.emit({ jobId: job.id, action: 'started' })
+
+    let result: ExecuteResult
+    try {
+      const command = (job.schedule as { kind: 'report-end', command: string }).command
+      await executeReportEndCommand(command, reportContent)
+      result = { status: 'ok' }
+      console.info(`[cron] job "${job.name}" report-end executed`)
+    }
+    catch (err) {
+      result = { status: 'error', error: String(err) }
+      console.error(`[cron] job "${job.name}" report-end failed:`, err)
+    }
+
+    const endedAt = Date.now()
+    job.state.runningAtMs = undefined
+    job.state.lastRunAtMs = startedAt
+    job.state.lastStatus = result.status
+    job.state.lastDurationMs = Math.max(0, endedAt - startedAt)
+    job.state.lastError = result.error
+    job.updatedAtMs = endedAt
+    if (result.status === 'error')
+      job.state.consecutiveErrors = (job.state.consecutiveErrors ?? 0) + 1
+    else
+      job.state.consecutiveErrors = 0
+
+    await this.opts.save(this.store!)
+    this.emit({ jobId: job.id, action: 'finished', status: result.status, error: result.error })
   }
 
   private async applyResult(job: CronJob, result: ExecuteResult, startedAt: number, endedAt: number) {

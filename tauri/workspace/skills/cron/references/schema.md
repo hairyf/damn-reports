@@ -50,7 +50,7 @@
   - 仅对 `at` 类型有效。为 `true` 时，一次性任务成功后自动删除。
 
 - `schedule`（object）
-  - 调度配置，四种类型之一：
+  - 调度配置，五种类型之一：
 
   **工作日（含调休补班）**：
   ```json
@@ -79,8 +79,16 @@
   ```
   - `at`：ISO 8601 时间字符串。
 
+  **日报生成后**（report-end，事件驱动）：
+  ```json
+  { "kind": "report-end", "trigger": "every", "command": "node tools/script.js" }
+  ```
+  - `trigger`：`every` = 每次日报生成后执行；`scheduled` = 仅定时任务触发时报生成后执行
+  - `command`：执行命令，最终以报告文件路径为参数调用：`{command} "<reportPath>"`
+  - 无 `nextRunAtMs`，由日报生成事件触发
+
 - `payload`（object）
-  - 执行动作，四种类型之一：
+  - 执行动作，五种类型之一：
 
   **收集数据**：
   ```json
@@ -101,6 +109,13 @@
   ```json
   { "kind": "command", "command": "node ./tools/my_script.js" }
   ```
+
+  **日报生成后执行**（配合 schedule.kind = report-end）：
+  ```json
+  { "kind": "reportEnd" }
+  ```
+  - 固定为 `reportEnd`，命令由 `schedule.command` 指定
+  - 执行时：报告写入临时文件，以文件路径为参数调用 `schedule.command`
 
 - `state`（object）
   - 运行时状态，由调度器自动管理。添加时设为 `{}`。
@@ -124,6 +139,15 @@
 | cron | `0 9,18 * * *` | 每天 9:00 和 18:00 |
 | cron | `0 0 * * 1` | 每周一零点 |
 | cron | `0 0 1 * *` | 每月 1 号零点 |
+
+## report-end 调度说明
+
+| trigger | 含义 |
+|---------|------|
+| `every` | 任意日报生成后执行（含手动、定时） |
+| `scheduled` | 仅 builtin_daily_report 定时触发时执行 |
+
+示例：`{"kind": "report-end", "trigger": "every", "command": "node tools/notify.js"}` → 日报生成后执行 `node tools/notify.js "<报告文件路径>"`，脚本可通过首个参数读取报告内容。
 
 ## 常用间隔参考
 

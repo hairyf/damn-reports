@@ -15,6 +15,7 @@ import { store } from '@/store'
 const PAYLOAD_LABELS: Record<string, string> = {
   collect: '数据',
   report: '报告',
+  reportEnd: '日报后',
   agentTurn: '对话',
   command: '命令',
 }
@@ -22,6 +23,7 @@ const PAYLOAD_LABELS: Record<string, string> = {
 const PAYLOAD_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'warning'> = {
   collect: 'primary',
   report: 'success',
+  reportEnd: 'success',
   agentTurn: 'secondary',
   command: 'warning',
 }
@@ -44,6 +46,10 @@ function formatSchedule(job: CronJob): string {
   }
   if (schedule.kind === 'at')
     return dayjs(schedule.at).format('YYYY-MM-DD HH:mm')
+  if (schedule.kind === 'report-end') {
+    const triggerLabel = schedule.trigger === 'scheduled' ? '仅定时' : '每次'
+    return `日报后 (${triggerLabel})`
+  }
   return '未知'
 }
 
@@ -54,6 +60,8 @@ function formatNextRun(job: CronJob): string {
     return '已禁用'
   if (job.state.runningAtMs)
     return '运行中...'
+  if (job.schedule.kind === 'report-end')
+    return '日报生成后'
   if (!job.state.nextRunAtMs)
     return '无计划'
   const d = dayjs(job.state.nextRunAtMs)
@@ -137,6 +145,8 @@ export function HookItem({ job }: { job: CronJob }) {
                 size="sm"
                 isLoading={runMutation.isPending}
                 onPress={() => runMutation.mutate(job.id)}
+                isDisabled={job.schedule.kind === 'report-end'}
+                title={job.schedule.kind === 'report-end' ? '由日报生成自动触发' : undefined}
               >
                 {!runMutation.isPending
                   ? <Icon icon="lucide:play" className="w-4 h-4" />

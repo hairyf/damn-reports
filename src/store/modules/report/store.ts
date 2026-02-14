@@ -3,6 +3,7 @@ import dayjs from 'dayjs'
 import { defineStore } from 'valtio-define'
 import { queryClient } from '@/config/client'
 import { dailyReportPrompt, optimizeReportPrompt } from '@/config/prompts'
+import { notifyReportGenerated } from '@/cron/report-hook'
 import { store } from '@/store'
 import { buildRecordSummaryPrompt } from './utils'
 import 'valtio-define/types'
@@ -71,7 +72,7 @@ export const report = defineStore({
     },
 
     /** 首次生成日报：收集数据摘要 → 流式生成 → 创建报告 */
-    async generate() {
+    async generate(options?: { fromScheduled?: boolean }) {
       try {
         const summary = await collectAndSummarize()
         const content = await streamGenerate(this, dailyReportPrompt(summary))
@@ -89,6 +90,7 @@ export const report = defineStore({
         ])
         this.resetStream()
 
+        notifyReportGenerated(content, options?.fromScheduled ?? false)
         return content
       }
       catch (error) {

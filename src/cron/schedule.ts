@@ -8,6 +8,10 @@ function resolveCronTimezone(tz?: string) {
 }
 
 export async function computeNextRunAtMs(schedule: CronSchedule, nowMs: number): Promise<number | undefined> {
+  // report-end 为事件驱动，无定时下次执行
+  if (schedule.kind === 'report-end')
+    return undefined
+
   if (schedule.kind === 'workday') {
     const time = (schedule.time ?? '18:00').trim()
     const region = (schedule.region ?? 'CN').trim()

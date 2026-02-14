@@ -51,12 +51,12 @@
    - `description`：简短描述（可选）
 
 2. **调度方式**（`schedule`）：
-   - 类型：工作日（workday，含补班）/ cron 表达式 / 固定间隔 / 一次性
-   - 对应参数：workday 用 `time`、`region`；cron 用 `expr`、`tz`；every 用 `everyMs`；at 用 `at`
+   - 类型：工作日（workday，含补班）/ cron 表达式 / 固定间隔 / 一次性 / 日报生成后（report-end）
+   - 对应参数：workday 用 `time`、`region`；cron 用 `expr`、`tz`；every 用 `everyMs`；at 用 `at`；report-end 用 `trigger`（every / scheduled）、`command`
 
 3. **执行动作**（`payload`）：
-   - 类型：收集数据 / 生成报告 / AI 对话 / 执行命令
-   - 对应参数（message / command）
+   - 类型：收集数据 / 生成报告 / 日报生成后执行 / AI 对话 / 执行命令
+   - 对应参数（message / command）；report-end 时 payload 固定为 `{ kind: "reportEnd" }`
 
 **推荐实现（读–改–写）**
 

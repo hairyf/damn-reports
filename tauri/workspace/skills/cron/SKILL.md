@@ -22,7 +22,7 @@ description: "管理 crons.json 中的定时任务（Hooks）：列出、添加�
 - `crons.json`：根结构为 **JSON 对象**，包含 `version` 和 `jobs` 数组。
   - 在仓库中位于 `./crons.json`。
   - 使用工具（read、write、edit）时，路径为 `path: "crons.json"`。
-- **单个任务格式**：见 `references/schema.md`。
+- **单个任务格式**：见 `references/schema.md`。支持五种 schedule 类型（workday / cron / every / at / report-end）及五种 payload 类型。
 - **高层操作**（get_all、add、get、set、remove）：见 `references/operations.md`。
 
 ## 使用的工具

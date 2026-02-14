@@ -22,13 +22,20 @@ const SCHEDULE_KINDS = [
   { key: 'cron', label: 'Cron 表达式' },
   { key: 'every', label: '固定间隔' },
   { key: 'at', label: '一次性' },
+  { key: 'report-end', label: '日报生成后' },
 ]
 
 const PAYLOAD_KINDS = [
   { key: 'collect', label: '收集数据' },
   { key: 'report', label: '生成报告' },
+  { key: 'reportEnd', label: '日报生成后执行' },
   { key: 'agentTurn', label: 'AI 对话' },
   { key: 'command', label: '执行命令' },
+]
+
+const REPORT_END_TRIGGERS = [
+  { key: 'every', label: '每一次' },
+  { key: 'scheduled', label: '仅定时触发' },
 ]
 
 const INTERVAL_PRESETS = [
@@ -48,6 +55,8 @@ interface HookFormValues {
   cronExpr: string
   everyMs: string
   atTime: string
+  reportEndTrigger: string
+  reportEndCommand: string
   payloadKind: string
   agentMessage: string
   command: string
@@ -68,17 +77,21 @@ function formatAtForInput(iso?: string): string {
 }
 
 function getDefaultValues(job?: { name: string, description?: string, schedule: CronSchedule, payload: CronPayload } | null): HookFormValues {
+  const sch = job?.schedule
+  const reportEndSch = sch?.kind === 'report-end' ? sch : null
   return {
     name: job?.name ?? '',
     description: job?.description ?? '',
-    scheduleKind: job?.schedule?.kind ?? 'workday',
-    workdayTime: job?.schedule?.kind === 'workday' ? job.schedule.time : '18:00',
-    cronExpr: job?.schedule?.kind === 'cron' ? job.schedule.expr : '0 18 * * 1-5',
-    everyMs: job?.schedule?.kind === 'every' ? String(job.schedule.everyMs) : '3600000',
-    atTime: job?.schedule?.kind === 'at' ? formatAtForInput(job.schedule.at) : '',
+    scheduleKind: sch?.kind ?? 'workday',
+    workdayTime: sch?.kind === 'workday' ? sch.time : '18:00',
+    cronExpr: sch?.kind === 'cron' ? sch.expr : '0 18 * * 1-5',
+    everyMs: sch?.kind === 'every' ? String(sch.everyMs) : '3600000',
+    atTime: sch?.kind === 'at' ? formatAtForInput(sch.at) : '',
+    reportEndTrigger: reportEndSch?.trigger ?? 'every',
+    reportEndCommand: reportEndSch?.command ?? '',
     payloadKind: job?.payload?.kind ?? 'collect',
-    agentMessage: job?.payload?.kind === 'agentTurn' ? job.payload.message : '',
-    command: job?.payload?.kind === 'command' ? job.payload.command : '',
+    agentMessage: job?.payload?.kind === 'agentTurn' ? (job.payload as { message: string }).message : '',
+    command: job?.payload?.kind === 'command' ? (job.payload as { command: string }).command : '',
   }
 }
 
@@ -107,6 +120,12 @@ function Page() {
         return { kind: 'every', everyMs: Number(values.everyMs) || 3600000 }
       case 'at':
         return { kind: 'at', at: values.atTime || new Date().toISOString() }
+      case 'report-end':
+        return {
+          kind: 'report-end',
+          trigger: (values.reportEndTrigger === 'scheduled' ? 'scheduled' : 'every') as 'every' | 'scheduled',
+          command: values.reportEndCommand?.trim() || '',
+        }
       case 'cron':
         return { kind: 'cron', expr: values.cronExpr, tz: 'Asia/Shanghai' }
       default:
@@ -115,9 +134,13 @@ function Page() {
   }
 
   function buildPayload(values: HookFormValues): CronPayload {
+    if (values.scheduleKind === 'report-end')
+      return { kind: 'reportEnd' }
     switch (values.payloadKind) {
       case 'report':
         return { kind: 'report' }
+      case 'reportEnd':
+        return { kind: 'reportEnd' }
       case 'agentTurn':
         return { kind: 'agentTurn', message: values.agentMessage }
       case 'command':
@@ -134,6 +157,10 @@ function Page() {
   const onSubmit = form.handleSubmit(async (values) => {
     if (!values.name.trim())
       return
+    if (values.scheduleKind === 'report-end' && !values.reportEndCommand?.trim()) {
+      addToast({ title: '错误', description: '请输入执行命令', color: 'danger' })
+      return
+    }
     if (!id) {
       addToast({ title: '错误', description: '缺少 Hook ID', color: 'danger' })
       return
@@ -310,7 +337,7 @@ function Page() {
                     control={form.control}
                     name="cronExpr"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormLabel>Cron 表达式</FormLabel>
                         <FormControl>
                           <Input
@@ -330,7 +357,7 @@ function Page() {
                     control={form.control}
                     name="everyMs"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormLabel>执行间隔</FormLabel>
                         <FormControl>
                           <Select
@@ -353,7 +380,7 @@ function Page() {
                     control={form.control}
                     name="atTime"
                     render={({ field }) => (
-                      <FormItem>
+                      <FormItem className="flex-1">
                         <FormLabel>执行时间</FormLabel>
                         <FormControl>
                           <Input
@@ -368,28 +395,77 @@ function Page() {
                     )}
                   />
                 )}
-              </div>
-              <FormField
-                control={form.control}
-                name="payloadKind"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>执行动作</FormLabel>
-                    <FormControl>
-                      <Select
-                        selectedKeys={field.value ? [field.value] : []}
-                        onSelectionChange={keys => field.onChange([...keys][0] as string)}
-                        labelPlacement="outside-top"
-                      >
-                        {PAYLOAD_KINDS.map(p => (
-                          <SelectItem key={p.key}>{p.label}</SelectItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
+                {scheduleKind === 'report-end' && (
+                  <>
+                    <FormField
+                      control={form.control}
+                      name="reportEndTrigger"
+                      render={({ field }) => (
+                        <FormItem className="flex-1">
+                          <FormLabel>执行时机</FormLabel>
+                          <FormControl>
+                            <Select
+                              selectedKeys={field.value ? [field.value] : []}
+                              onSelectionChange={keys => field.onChange([...keys][0] as string)}
+                              labelPlacement="outside-top"
+                            >
+                              {REPORT_END_TRIGGERS.map(t => (
+                                <SelectItem key={t.key}>{t.label}</SelectItem>
+                              ))}
+                            </Select>
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+
+                  </>
                 )}
-              />
+              </div>
+              {scheduleKind === 'report-end' && (
+                <FormField
+                  control={form.control}
+                  name="reportEndCommand"
+                  render={({ field }) => (
+                    <FormItem className="flex-1">
+                      <FormLabel>执行命令</FormLabel>
+                      <FormControl>
+                        <Input
+                          {...field}
+                          value={field.value ?? ''}
+                          placeholder="node tools/script.js"
+                          description="最终执行：命令 <reportContent>"
+                          labelPlacement="outside-top"
+                        />
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
+              {scheduleKind !== 'report-end' && (
+                <FormField
+                  control={form.control}
+                  name="payloadKind"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>执行动作</FormLabel>
+                      <FormControl>
+                        <Select
+                          selectedKeys={field.value ? [field.value] : []}
+                          onSelectionChange={keys => field.onChange([...keys][0] as string)}
+                          labelPlacement="outside-top"
+                        >
+                          {PAYLOAD_KINDS.map(p => (
+                            <SelectItem key={p.key}>{p.label}</SelectItem>
+                          ))}
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
               {payloadKind === 'agentTurn' && (
                 <FormField
                   control={form.control}
@@ -422,7 +498,6 @@ function Page() {
                           {...field}
                           value={field.value ?? ''}
                           placeholder="要执行的 shell 命令"
-                          labelPlacement="outside-top"
                         />
                       </FormControl>
                       <FormMessage />
