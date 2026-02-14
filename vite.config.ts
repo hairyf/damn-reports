@@ -23,7 +23,6 @@ export default defineConfig(async () => ({
       dirs: [
         'src/database',
         'src/config',
-        'src/tools',
         'src/components',
         'src/layouts/index.ts',
         'src/services',

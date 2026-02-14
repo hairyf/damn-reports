@@ -43,6 +43,30 @@ export async function readDir(path: string, options?: ReadDirOptions): Promise<D
   })
 }
 
+export async function remove(path: string) {
+  return invoke('fs_remove', { path })
+}
+
+export interface GrepOptions {
+  literal?: boolean
+  ignoreCase?: boolean
+  context?: number
+  limit?: number
+  glob?: string
+}
+
+export async function grep(
+  path: string,
+  pattern: string,
+  options?: GrepOptions,
+): Promise<string> {
+  return invoke<string>('fs_grep', {
+    path,
+    pattern,
+    options: options || undefined,
+  })
+}
+
 export async function readJson(path: string) {
   return JSON.parse(await readTextFile(path))
 }

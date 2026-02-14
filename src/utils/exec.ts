@@ -8,6 +8,13 @@ import mustache from 'mustache'
 // Without this, paths like "D:/projects" become "D:&#x2F;projects".
 mustache.escape = (text: string) => text
 
+/** Escape path for use inside single-quoted shell string */
+function escapeForShellQuoted(path: string, isWindows: boolean): string {
+  return isWindows
+    ? path.replace(/'/g, '\'\'') // PowerShell: '' = escaped '
+    : path.replace(/'/g, '\'\\\'\'') // sh: '\'' = embed single quote
+}
+
 export interface Collector {
   name: string
   description: string
@@ -52,20 +59,24 @@ async function renderTemplate(value: any, config: Record<string, any>): Promise<
 }
 
 export function executeCollector(collector: Collector, config: Record<string, any>) {
-  if (collector.type === 'exec') {
-    return executeCommandExpression(collector, config)
-  }
-  else if (collector.type === 'http') {
-    return executeHttpRequestExpression(collector, config)
+  switch (collector.type) {
+    case 'exec':
+      return executeCommandExpression(collector, config)
+    case 'http':
+      return executeHttpRequestExpression(collector, config)
+    default:
+      throw new Error(
+        `Unknown collector type "${collector.type}". Expected "exec" or "http".`,
+      )
   }
 }
 
 export async function executeCommandExpression(collector: Collector, config: Record<string, any>) {
   const { command, args = [] } = collector.executor
 
-  // Render command and args with mustache templates
-  const renderedCommand = mustache.render(command, config)
-  const renderedArgs = args.map((arg: string) => mustache.render(String(arg), config))
+  // Render command and args (supports mustache + jsonata, consistent with HTTP)
+  const renderedCommand = await renderTemplate(command, config) as string
+  const renderedArgs = (await Promise.all((args as string[]).map(arg => renderTemplate(arg, config)))) as string[]
 
   // Properly quote arguments that contain spaces or special characters
   const quotedArgs = renderedArgs.map((arg: string) => {
@@ -89,10 +100,12 @@ export async function executeCommandExpression(collector: Collector, config: Rec
       catch (transformError) {
         const errMsg = transformError instanceof Error ? transformError.message : String(transformError)
         throw new Error(
-          `Transformer failed for command "${renderedCommand}".\n`
-          + `Transformer expression: ${collector.transformer}\n`
-          + `Raw output (first 500 chars): ${String(result).slice(0, 500)}\n`
-          + `Error: ${errMsg}`,
+          [
+            `Transformer failed for command "${renderedCommand}".`,
+            `Transformer expression: ${collector.transformer}`,
+            `Raw output (first 500 chars): ${String(result).slice(0, 500)}`,
+            `Error: ${errMsg}`,
+          ].join('\n'),
         )
       }
     }
@@ -104,10 +117,7 @@ export async function executeCommandExpression(collector: Collector, config: Rec
     // Re-throw with enriched context if not already enriched
     if (errMsg.includes('Transformer failed'))
       throw error
-    throw new Error(
-      `exec_tool failed for command: ${fullCommand}\n`
-      + `Error: ${errMsg}`,
-    )
+    throw new Error(`exec_tool failed for command: ${fullCommand}\nError: ${errMsg}`)
   }
 }
 
@@ -122,19 +132,18 @@ export async function executeHttpRequestExpression(collector: Collector, config:
     url.searchParams.append(key, String(value))
   }
 
+  const requestHeaders: Record<string, string> = { ...headers }
+  if (body && !requestHeaders['Content-Type']) {
+    requestHeaders['Content-Type'] = 'application/json'
+  }
+
+  const options: RequestInit = {
+    method,
+    headers: requestHeaders,
+    ...(body ? { body: JSON.stringify(body) } : {}),
+  }
+
   try {
-    const options: RequestInit = {
-      method,
-      headers,
-    }
-
-    if (body) {
-      options.body = JSON.stringify(body)
-      if (!headers['Content-Type']) {
-        headers['Content-Type'] = 'application/json'
-      }
-    }
-
     const response = await fetch(url.toString(), options)
 
     if (!response.ok) {
@@ -143,7 +152,6 @@ export async function executeHttpRequestExpression(collector: Collector, config:
 
     const result = await response.json()
 
-    // Apply transformer if provided
     if (collector.transformer) {
       const expression = jsonata(collector.transformer)
       return await expression.evaluate(result)
@@ -152,57 +160,45 @@ export async function executeHttpRequestExpression(collector: Collector, config:
     return result
   }
   catch (error) {
-    console.error('HTTP request error:', error)
-    throw error
+    const msg = error instanceof Error ? error.message : String(error)
+    throw new Error(`HTTP request failed: ${msg}`)
   }
 }
 
 export async function executeCommand(command: string) {
-  try {
-    // Get app data directory as working directory
-    const cwd = await resolveResource('workspace')
-
-    // Detect platform and use appropriate shell
-    const isWindows = navigator.userAgent.toLowerCase().includes('windows')
-
-    let cmd: any
-    if (isWindows) {
-      // Use PowerShell on Windows with comprehensive UTF-8 support
-      // - $OutputEncoding: affects encoding for piped output to native commands
-      // - [Console]::OutputEncoding: affects how PowerShell reads native command stdout
-      // - chcp 65001: sets the console code page to UTF-8 for child processes
-      const psCommand = [
+  const cwd = await resolveResource('workspace')
+  const isWindows = navigator.userAgent.toLowerCase().includes('windows')
+  const safeCwd = escapeForShellQuoted(cwd, isWindows)
+  const shellCommand = isWindows
+    ? [
         'chcp 65001 | Out-Null',
         '$OutputEncoding = [System.Text.Encoding]::UTF8',
         '[Console]::OutputEncoding = [System.Text.Encoding]::UTF8',
         '[Console]::InputEncoding = [System.Text.Encoding]::UTF8',
-        `Set-Location '${cwd}'`,
+        `Set-Location '${safeCwd}'`,
         command,
       ].join('; ')
-      cmd = Command.create('powershell', ['-Command', psCommand])
-    }
-    else {
-      // Use sh on Unix-like systems with cd to working directory
-      cmd = Command.create('sh', ['-c', `cd '${cwd}' && ${command}`])
-    }
+    : `cd '${safeCwd}' && ${command}`
 
-    const output = await cmd.execute()
+  const cmd = isWindows
+    ? Command.create('powershell', ['-Command', shellCommand])
+    : Command.create('sh', ['-c', shellCommand])
 
-    if (output.code !== 0) {
-      throw new Error(
-        `Command failed (exit code ${output.code})\n`
-        + `Command: ${command}\n`
-        + `Working directory: ${cwd}\n${
-          output.stderr ? `stderr: ${output.stderr}\n` : ''
-        }${output.stdout ? `stdout: ${output.stdout}` : ''}`,
-      )
-    }
+  const output = await cmd.execute()
 
-    return output.stdout
+  if (output.code !== 0) {
+    const stderrPart = output.stderr ? `stderr: ${output.stderr}\n` : ''
+    const stdoutPart = output.stdout ? `stdout: ${output.stdout}` : ''
+    throw new Error(
+      [
+        `Command failed (exit code ${output.code})`,
+        `Command: ${command}`,
+        `Working directory: ${cwd}`,
+        stderrPart,
+        stdoutPart,
+      ].filter(Boolean).join('\n'),
+    )
   }
-  catch (error) {
-    console.error(error)
-    const errorMessage = error instanceof Error ? error.message : String(error)
-    throw new Error(`Command execution error: ${errorMessage}`)
-  }
+
+  return output.stdout
 }

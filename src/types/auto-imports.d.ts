@@ -8,6 +8,8 @@ export {}
 declare global {
   const Activity: typeof import('react').Activity
   const AlimailIcon: typeof import('../components/icons').AlimailIcon
+  const ApplyPatchResult: typeof import('../utils/apply-patch.js').ApplyPatchResult
+  const ApplyPatchSummary: typeof import('../utils/apply-patch.js').ApplyPatchSummary
   const BaseDirectory: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').BaseDirectory
   const ClickupIcon: typeof import('../components/icons').ClickupIcon
   const CornerActions: typeof import('../components/corner-actions').CornerActions
@@ -60,9 +62,14 @@ declare global {
   const Suspense: typeof import('react').Suspense
   const ThemeSwitch: typeof import('../components/theme-switch').ThemeSwitch
   const ToolIcon: typeof import('../components/tool-icon').ToolIcon
+  const ToolInputError: typeof import('../tools/exec').ToolInputError
   const TrendCard: typeof import('../components/trend-card').TrendCard
   const UpdateStatus: typeof import('../components/update-status').UpdateStatus
   const VercelModelSelect: typeof import('../components/vercel-model-select').VercelModelSelect
+  const agentTools: typeof import('../tools/index').agentTools
+  const applyPatch: typeof import('../utils/apply-patch').applyPatch
+  const applyUpdateHunk: typeof import('../utils/apply-patch-update').applyUpdateHunk
+  const apply_patch: typeof import('../tools/file').apply_patch
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
   const clickup: typeof import('../config/collectors').clickup
@@ -96,7 +103,8 @@ declare global {
   const get_current_time: typeof import('../config/collectors').get_current_time
   const get_settings: typeof import('../tools/app').get_settings
   const git_directory: typeof import('../config/collectors').git_directory
-  const grep: typeof import('../tools/file').grep
+  const grep: typeof import('../utils/fs-extra').grep
+  const grep_tool: typeof import('../tools/file').grep_tool
   const http: typeof import('../tools/http').http
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
@@ -114,7 +122,7 @@ declare global {
   const readJson: typeof import('../utils/fs-extra').readJson
   const readTextFile: typeof import('../utils/fs-extra').readTextFile
   const readTextFileLines: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readTextFileLines
-  const remove: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').remove
+  const remove: typeof import('../utils/fs-extra').remove
   const rename: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').rename
   const retry: typeof import('../utils/utility').retry
   const set_settings: typeof import('../tools/app').set_settings
@@ -224,10 +232,16 @@ declare global {
   export type { VercelModelSelectProps } from '../components/vercel-model-select'
   import('../components/vercel-model-select')
   // @ts-ignore
+  export type { UpdateFileChunk } from '../utils/apply-patch-update'
+  import('../utils/apply-patch-update')
+  // @ts-ignore
+  export type { ApplyPatchSummary, ApplyPatchResult } from '../utils/apply-patch'
+  import('../utils/apply-patch')
+  // @ts-ignore
   export type { Collector } from '../utils/exec'
   import('../utils/exec')
   // @ts-ignore
-  export type { DirEntry, ReadDirOptions } from '../utils/fs-extra'
+  export type { DirEntry, ReadDirOptions, GrepOptions } from '../utils/fs-extra'
   import('../utils/fs-extra')
   // @ts-ignore
   export type { Skill } from '../utils/skills'

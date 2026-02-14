@@ -98,6 +98,8 @@ fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
         bridge::fs::fs_read_text_file,
         bridge::fs::fs_write_text_file,
         bridge::fs::fs_read_dir,
+        bridge::fs::fs_remove,
+        bridge::fs::fs_grep,
     ]
 }
 
