@@ -39,7 +39,7 @@ export class CronService {
 
   async start() {
     this.store = await this.opts.load()
-    this.recomputeNextRuns()
+    await this.recomputeNextRuns()
     await this.opts.save(this.store)
     this.armTimer()
     console.info('[cron] service started', { jobs: this.store.jobs.length })
@@ -57,7 +57,7 @@ export class CronService {
 
   async reload() {
     this.store = await this.opts.load()
-    this.recomputeNextRuns()
+    await this.recomputeNextRuns()
     await this.opts.save(this.store)
     this.armTimer()
   }
@@ -78,7 +78,7 @@ export class CronService {
       updatedAtMs: now,
     }
     if (job.enabled) {
-      job.state.nextRunAtMs = computeNextRunAtMs(job.schedule, now)
+      job.state.nextRunAtMs = await computeNextRunAtMs(job.schedule, now)
     }
     this.store!.jobs.push(job)
     await this.opts.save(this.store!)
@@ -111,7 +111,7 @@ export class CronService {
     job.updatedAtMs = now
 
     if (job.enabled) {
-      job.state.nextRunAtMs = computeNextRunAtMs(job.schedule, now)
+      job.state.nextRunAtMs = await computeNextRunAtMs(job.schedule, now)
     }
     else {
       job.state.nextRunAtMs = undefined
@@ -151,7 +151,7 @@ export class CronService {
     }
   }
 
-  private recomputeNextRuns() {
+  private async recomputeNextRuns() {
     if (!this.store)
       return
     const now = Date.now()
@@ -159,7 +159,7 @@ export class CronService {
       if (!job.state)
         job.state = {}
       if (job.enabled && typeof job.state.runningAtMs !== 'number') {
-        job.state.nextRunAtMs = computeNextRunAtMs(job.schedule, now)
+        job.state.nextRunAtMs = await computeNextRunAtMs(job.schedule, now)
       }
       else if (!job.enabled) {
         job.state.nextRunAtMs = undefined
@@ -212,7 +212,7 @@ export class CronService {
 
       if (dueJobs.length === 0) {
         // Maintenance recompute
-        this.recomputeNextRuns()
+        await this.recomputeNextRuns()
         await this.opts.save(this.store!)
       }
     }
@@ -261,7 +261,7 @@ export class CronService {
     }
 
     const endedAt = Date.now()
-    this.applyResult(job, result, startedAt, endedAt)
+    await this.applyResult(job, result, startedAt, endedAt)
     await this.opts.save(this.store!)
 
     this.emit({
@@ -275,7 +275,7 @@ export class CronService {
     return result
   }
 
-  private applyResult(job: CronJob, result: ExecuteResult, startedAt: number, endedAt: number) {
+  private async applyResult(job: CronJob, result: ExecuteResult, startedAt: number, endedAt: number) {
     job.state.runningAtMs = undefined
     job.state.lastRunAtMs = startedAt
     job.state.lastStatus = result.status
@@ -304,14 +304,13 @@ export class CronService {
       job.state.nextRunAtMs = undefined
     }
     else if (result.status === 'error' && job.enabled) {
-      // Exponential backoff
       const backoff = errorBackoffMs(job.state.consecutiveErrors ?? 1)
-      const normalNext = computeNextRunAtMs(job.schedule, endedAt)
+      const normalNext = await computeNextRunAtMs(job.schedule, endedAt)
       const backoffNext = endedAt + backoff
       job.state.nextRunAtMs = normalNext !== undefined ? Math.max(normalNext, backoffNext) : backoffNext
     }
     else if (job.enabled) {
-      job.state.nextRunAtMs = computeNextRunAtMs(job.schedule, endedAt)
+      job.state.nextRunAtMs = await computeNextRunAtMs(job.schedule, endedAt)
     }
     else {
       job.state.nextRunAtMs = undefined

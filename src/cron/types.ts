@@ -1,17 +1,18 @@
 // ── Schedule ──
 
-export type CronSchedule =
-  | { kind: 'at'; at: string }
-  | { kind: 'every'; everyMs: number; anchorMs?: number }
-  | { kind: 'cron'; expr: string; tz?: string }
+export type CronSchedule
+  = | { kind: 'at', at: string }
+    | { kind: 'every', everyMs: number, anchorMs?: number }
+    | { kind: 'cron', expr: string, tz?: string }
+    | { kind: 'workday'; time: string; region?: string }
 
 // ── Payload ──
 
-export type CronPayload =
-  | { kind: 'collect' }
-  | { kind: 'report' }
-  | { kind: 'agentTurn'; message: string }
-  | { kind: 'command'; command: string }
+export type CronPayload
+  = | { kind: 'collect' }
+    | { kind: 'report' }
+    | { kind: 'agentTurn', message: string }
+    | { kind: 'command', command: string }
 
 // ── Job State ──
 

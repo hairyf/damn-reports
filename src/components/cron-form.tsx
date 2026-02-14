@@ -69,7 +69,7 @@ export function CronForm({ isOpen, onClose, onSubmit, initial }: CronFormProps) 
       case 'at':
         return { kind: 'at', at: atTime || new Date().toISOString() }
       default:
-        return { kind: 'cron', expr: cronExpr }
+        return { kind: 'cron', expr: cronExpr, tz: 'Asia/Shanghai' }
     }
   }
 

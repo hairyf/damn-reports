@@ -1,5 +1,5 @@
 /* eslint-disable no-console */
-import type { CronJob, CronJobCreate, CronJobPatch, CronStoreFile } from '@/cron/types'
+import type { CronJob, CronStoreFile } from '@/cron/types'
 import { defineStore } from 'valtio-define'
 import { CronService } from '@/cron/service'
 import { store } from '@/store'
@@ -15,7 +15,7 @@ const DEFAULT_CRONS: CronStoreFile = {
       name: '每日报告生成',
       description: '在设定时间自动收集数据并生成日报',
       enabled: true,
-      schedule: { kind: 'cron', expr: '0 18 * * 1-5' },
+      schedule: { kind: 'workday', time: '18:00', region: 'CN' },
       payload: { kind: 'report' },
       state: {},
       createdAtMs: Date.now(),
@@ -52,7 +52,24 @@ export const cron = defineStore({
       service = new CronService({
         load: async () => {
           try {
-            return await readJson('crons.json')
+            const data = await readJson('crons.json') as CronStoreFile
+            // 迁移：为未指定时区的 cron 补充国内时区；将工作日 cron/cnWorkday 转为 workday（支持补班）
+            let migrated = false
+            for (const job of data.jobs) {
+              if (job.schedule.kind === 'cron' && !job.schedule.tz) {
+                job.schedule.tz = 'Asia/Shanghai'
+                migrated = true
+              }
+              const sch = job.schedule as { kind: string, expr?: string }
+              const isLegacyWorkday = (sch.kind === 'cron' && sch.expr === '0 18 * * 1-5') || sch.kind === 'cnWorkday'
+              if (job.id === 'builtin_daily_report' && isLegacyWorkday) {
+                job.schedule = { kind: 'workday', time: '18:00', region: 'CN' }
+                migrated = true
+              }
+            }
+            if (migrated)
+              await writeJson('crons.json', data)
+            return data
           }
           catch {
             // First run: create default crons
@@ -95,22 +112,6 @@ export const cron = defineStore({
       if (!service)
         return
       this.jobs = await service.list()
-    },
-
-    async add(input: CronJobCreate): Promise<CronJob> {
-      if (!service)
-        throw new Error('cron service not started')
-      const job = await service.add(input)
-      await this.sync()
-      return job
-    },
-
-    async update(id: string, patch: CronJobPatch): Promise<CronJob | null> {
-      if (!service)
-        throw new Error('cron service not started')
-      const job = await service.update(id, patch)
-      await this.sync()
-      return job
     },
 
     async remove(id: string): Promise<boolean> {

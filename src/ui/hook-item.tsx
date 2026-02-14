@@ -12,10 +12,10 @@ import dayjs from 'dayjs'
 import { store } from '@/store'
 
 const PAYLOAD_LABELS: Record<string, string> = {
-  collect: '收集数据',
-  report: '生成报告',
-  agentTurn: 'AI 对话',
-  command: '执行命令',
+  collect: '数据',
+  report: '报告',
+  agentTurn: '对话',
+  command: '命令',
 }
 
 const PAYLOAD_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'warning'> = {
@@ -24,8 +24,11 @@ const PAYLOAD_COLORS: Record<string, 'primary' | 'secondary' | 'success' | 'warn
   agentTurn: 'secondary',
   command: 'warning',
 }
+
 function formatSchedule(job: CronJob): string {
   const { schedule } = job
+  if (schedule.kind === 'workday')
+    return `工作日 ${schedule.time}`
   if (schedule.kind === 'cron')
     return schedule.expr
   if (schedule.kind === 'every') {
@@ -43,6 +46,8 @@ function formatSchedule(job: CronJob): string {
   return '未知'
 }
 
+const WEEKDAY_ZH = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+
 function formatNextRun(job: CronJob): string {
   if (!job.enabled)
     return '已禁用'
@@ -50,7 +55,9 @@ function formatNextRun(job: CronJob): string {
     return '运行中...'
   if (!job.state.nextRunAtMs)
     return '无计划'
-  return dayjs(job.state.nextRunAtMs).format('MM-DD HH:mm')
+  const d = dayjs(job.state.nextRunAtMs)
+  const weekday = WEEKDAY_ZH[d.day()]
+  return `下次 ${d.format('MM-DD HH:mm')} (${weekday})`
 }
 
 export function HookItem({ job }: { job: CronJob }) {
@@ -78,14 +85,14 @@ export function HookItem({ job }: { job: CronJob }) {
                 size="sm"
                 variant="flat"
                 color={PAYLOAD_COLORS[job.payload.kind] ?? 'default'}
-                className="text-xs"
+                className="text-xs h-5"
               >
                 {PAYLOAD_LABELS[job.payload.kind] ?? job.payload.kind}
               </Chip>
-              <Chip size="sm" variant="flat" color="default" className="text-xs font-mono">
+              <Chip size="sm" variant="flat" color="default" className="text-xs font-mono h-5">
                 {formatSchedule(job)}
               </Chip>
-              <Chip size="sm" variant="flat" color="default" className="text-xs font-mono">
+              <Chip size="sm" variant="flat" color="default" className="text-xs font-mono h-5">
                 {formatNextRun(job)}
               </Chip>
             </div>

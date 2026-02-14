@@ -1,12 +1,18 @@
 import type { CronSchedule } from './types'
 import { Cron } from 'croner'
+import { computeNextWorkdayRunAtMs } from './workday'
 
 function resolveCronTimezone(tz?: string) {
   const trimmed = typeof tz === 'string' ? tz.trim() : ''
   return trimmed || Intl.DateTimeFormat().resolvedOptions().timeZone
 }
 
-export function computeNextRunAtMs(schedule: CronSchedule, nowMs: number): number | undefined {
+export async function computeNextRunAtMs(schedule: CronSchedule, nowMs: number): Promise<number | undefined> {
+  if (schedule.kind === 'workday') {
+    const time = (schedule.time ?? '18:00').trim()
+    const region = (schedule.region ?? 'CN').trim()
+    return computeNextWorkdayRunAtMs(region || 'CN', time || '18:00', nowMs)
+  }
   if (schedule.kind === 'at') {
     const atMs = new Date(schedule.at).getTime()
     if (!Number.isFinite(atMs))
