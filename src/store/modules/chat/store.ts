@@ -229,9 +229,6 @@ export const chat = defineStore(
           isExistsBootstrap
           && `「Read BOOTSTRAP.md」\n${await readTextFile('BOOTSTRAP.md')}`,
         ].filter(Boolean).join('\n\n')
-
-        // eslint-disable-next-line no-console
-        console.log(systemPrompt)
         try {
           await store.llm.streamChat({
             messagesForModel,
