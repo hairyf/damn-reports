@@ -1,7 +1,6 @@
 export * from './app'
 export * from './date'
 export * from './exec'
-export * from './exec-tool'
 export * from './file'
 export * from './http'
 export * from './skill'

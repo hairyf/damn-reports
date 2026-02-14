@@ -63,8 +63,6 @@ declare global {
   const TrendCard: typeof import('../components/trend-card').TrendCard
   const UpdateStatus: typeof import('../components/update-status').UpdateStatus
   const VercelModelSelect: typeof import('../components/vercel-model-select').VercelModelSelect
-  const add_source: typeof import('../config/tools').add_source
-  const add_tool: typeof import('../config/tools').add_tool
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
   const clickup: typeof import('../config/collectors').clickup
@@ -74,22 +72,19 @@ declare global {
   const create: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').create
   const createContext: typeof import('react').createContext
   const createRef: typeof import('react').createRef
-  const cron_tool: typeof import('../config/tools').cron_tool
   const current_time: typeof import('../config/collectors').current_time
   const dailyReportPrompt: typeof import('../config/prompts').dailyReportPrompt
   const date: typeof import('../tools/date').date
   const db: typeof import('../database/index').db
   const edit: typeof import('../tools/file').edit
-  const exe_tool: typeof import('../config/tools').exe_tool
   const exec: typeof import('../tools/exec').exec
   const exec_sql: typeof import('../tools/sql').exec_sql
-  const exec_tool: typeof import('../tools/exec-tool').exec_tool
+  const exec_tool: typeof import('../tools/exec').exec_tool
   const executeCollector: typeof import('../utils/exec').executeCollector
   const executeCommand: typeof import('../utils/exec').executeCommand
   const executeCommandExpression: typeof import('../utils/exec').executeCommandExpression
   const executeHttpRequestExpression: typeof import('../utils/exec').executeHttpRequestExpression
   const exists: typeof import('../utils/fs-extra').exists
-  const fetch_http: typeof import('../config/tools').fetch_http
   const find: typeof import('../tools/file').find
   const forwardRef: typeof import('react').forwardRef
   const generateTitlePrompt: typeof import('../config/prompts').generateTitlePrompt
@@ -99,12 +94,7 @@ declare global {
   const getTools: typeof import('../utils/tool').getTools
   const getWorkspaceSkills: typeof import('../utils/skills').getWorkspaceSkills
   const get_current_time: typeof import('../config/collectors').get_current_time
-  const get_records: typeof import('../config/tools').get_records
-  const get_records_by_source: typeof import('../config/tools').get_records_by_source
   const get_settings: typeof import('../tools/app').get_settings
-  const get_sources: typeof import('../config/tools').get_sources
-  const get_tool: typeof import('../config/tools').get_tool
-  const get_tools: typeof import('../config/tools').get_tools
   const git_directory: typeof import('../config/collectors').git_directory
   const grep: typeof import('../tools/file').grep
   const http: typeof import('../tools/http').http
@@ -124,13 +114,10 @@ declare global {
   const readJson: typeof import('../utils/fs-extra').readJson
   const readTextFile: typeof import('../utils/fs-extra').readTextFile
   const readTextFileLines: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readTextFileLines
-  const records_sync: typeof import('../config/tools').records_sync
   const remove: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').remove
   const rename: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').rename
   const retry: typeof import('../utils/utility').retry
   const set_settings: typeof import('../tools/app').set_settings
-  const set_source: typeof import('../config/tools').set_source
-  const set_tool: typeof import('../config/tools').set_tool
   const siteConfig: typeof import('../config/site').siteConfig
   const size: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').size
   const skill: typeof import('../tools/skill').skill
@@ -240,7 +227,7 @@ declare global {
   export type { Collector } from '../utils/exec'
   import('../utils/exec')
   // @ts-ignore
-  export type { ReadDirOptions } from '../utils/fs-extra'
+  export type { DirEntry, ReadDirOptions } from '../utils/fs-extra'
   import('../utils/fs-extra')
   // @ts-ignore
   export type { Skill } from '../utils/skills'

@@ -92,6 +92,12 @@ fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
         bridge::cmd::database_loaded,
+        bridge::fs::fs_exists,
+        bridge::fs::fs_read_file,
+        bridge::fs::fs_write_file,
+        bridge::fs::fs_read_text_file,
+        bridge::fs::fs_write_text_file,
+        bridge::fs::fs_read_dir,
     ]
 }
 
@@ -163,8 +169,6 @@ fn builder() -> tauri::Builder<tauri::Wry> {
         .plugin(tauri_plugin_opener::init())
         // Dialog plugin
         .plugin(tauri_plugin_dialog::init())
-        // FS plugin
-        .plugin(tauri_plugin_fs::init())
         // Process plugin
         .plugin(tauri_plugin_process::init())
 }

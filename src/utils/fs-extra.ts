@@ -1,33 +1,35 @@
-import type { DirEntry } from '@tauri-apps/plugin-fs'
-import {
-  BaseDirectory,
-  exists as existsFs,
-  readDir as readDirFs,
-  readFile as readFileFs,
-  readTextFile as readTextFileFs,
-  writeFile as writeFileFs,
-  writeTextFile as writeTextFileFs,
-} from '@tauri-apps/plugin-fs'
-import pathe from 'pathe'
+import { invoke } from '@tauri-apps/api/core'
 
-export async function exists(path: string) {
-  return existsFs(pathe.join('workspace', path), { baseDir: BaseDirectory.Resource })
+export interface DirEntry {
+  name: string
+  isDirectory: boolean
+  isFile: boolean
+  isSymlink: boolean
 }
+
+/** path 由 Rust 层处理：相对路径基于 workspace，绝对路径直接使用 */
+export async function exists(path: string) {
+  return invoke<boolean>('fs_exists', { path })
+}
+
 export async function readFile(path: string) {
-  return readFileFs(pathe.join('workspace', path), { baseDir: BaseDirectory.Resource })
+  return invoke<number[]>('fs_read_file', { path }).then(bytes => Uint8Array.from(bytes))
 }
 
 export async function writeFile(path: string, data: Uint8Array | ReadableStream<Uint8Array>) {
-  return writeFileFs(pathe.join('workspace', path), data, { baseDir: BaseDirectory.Resource })
+  const bytes
+    = data instanceof Uint8Array
+      ? Array.from(data)
+      : Array.from(new Uint8Array(await new Response(data).arrayBuffer()))
+  return invoke('fs_write_file', { path, data: bytes })
 }
 
 export async function readTextFile(path: string) {
-  const filePath = pathe.join('workspace', path)
-  return readTextFileFs(filePath, { baseDir: BaseDirectory.Resource })
+  return invoke<string>('fs_read_text_file', { path })
 }
 
 export async function writeTextFile(path: string, data: string) {
-  return writeTextFileFs(pathe.join('workspace', path), data, { baseDir: BaseDirectory.Resource })
+  return invoke('fs_write_text_file', { path, data })
 }
 
 export interface ReadDirOptions {
@@ -35,20 +37,10 @@ export interface ReadDirOptions {
 }
 
 export async function readDir(path: string, options?: ReadDirOptions): Promise<DirEntry[]> {
-  const fullPath = pathe.join('workspace', path)
-  if (options?.recursive) {
-    const result: DirEntry[] = []
-    const entries = await readDirFs(fullPath, { baseDir: BaseDirectory.Resource })
-    for (const e of entries) {
-      const childPath = path ? `${path}/${e.name}` : e.name
-      result.push({ name: childPath, isDirectory: e.isDirectory, isFile: e.isFile, isSymlink: e.isSymlink })
-      if (e.isDirectory) {
-        result.push(...(await readDir(childPath, { recursive: true })))
-      }
-    }
-    return result
-  }
-  return readDirFs(fullPath, { baseDir: BaseDirectory.Resource })
+  return invoke<DirEntry[]>('fs_read_dir', {
+    path,
+    recursive: options?.recursive ?? false,
+  })
 }
 
 export async function readJson(path: string) {
