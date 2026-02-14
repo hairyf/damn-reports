@@ -120,6 +120,8 @@
 - 要快速定位 tool id 在文件中的原始文本，使用 `grep`：
   - 输入：`{"path": "tools.json", "pattern": "\"<toolid>\""}`
 
+- 可选参数：`literal`（pattern 含正则特殊字符时按字面量匹配）、`context`（显示匹配行前后行数）、`limit`、`glob`（path 为目录时过滤文件如 `*.json`）。
+
 - 这对编辑前了解上下文有帮助，但权威值仍应从解析后的 JSON 获取。
 
 ## /tool set

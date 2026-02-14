@@ -23,32 +23,10 @@ description: "Manage App Workspace collector tools defined in tools.json: read a
 - **单个工具格式**：见 `references/schema.md`。
 - **高层操作**（`/tool get_all`、`/tool add`、`/tool get`、`/tool set`、`/tool exec`）：见 `references/operations.md`。
 
-## 使用的工具
+## 使用的工具和技能
 
-- `read`
-  - 读取工作区下的文本文件。
-  - 使用 `{"path": "tools.json"}` 读取当前采集器列表。
-
-- `write`
-  - 创建或覆盖工作区下的文件。
-  - 使用 `{"path": "tools.json", "content": "<更新后的 JSON>"}` 持久化更改。
-
-- `edit`
-  - 对文件进行简单文本替换。
-  - 当你已知确切的旧/新片段时，适用于较小、精确的更新。
-
-- `grep`
-  - 在文件中搜索字符串模式。
-  - 路径约定与 `read`/`write`/`edit` 相同：使用 `path: "tools.json"`。
-
-- `exec_tool`
-  - 按 id 执行存储在 `tools.json` 中的工具定义。
-  - 会读取 `tools.json`、查找请求的工具、调用底层执行器（`exec` 或 `http`），
-    然后应用 JSONata `transformer` 规范化输出。
-
-- `jsonata` 技能
-  - 在设计、校验或调试 `tools.json` 中工具的 `transformer` 表达式时，
-    使用 `jsonata` 技能（`./skills/jsonata`）。
+- 工具：`read` `write` `edit` `grep` `exec_tool`
+- 技能：`jsonata` 设计/调试 transformer 时使用（`./skills/jsonata`）。
 
 ## 使用方式
 

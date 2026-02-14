@@ -21,13 +21,7 @@ description: "Query, generate, and update reports in the Report table. Use when 
 
 ## 使用的工具
 
-- `exec_sql`
-  - 在应用内置 SQLite（main.db）上执行 SQL。
-  - 输入: `{"sql": "<SQL 语句>"}`
-
-- `generate_report`
-  - 同步记录并生成、保存当天的日报。
-  - 无需参数: `{}`
+- `exec_sql` `generate_report`
 
 ## 使用方式
 

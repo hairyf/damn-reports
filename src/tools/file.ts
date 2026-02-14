@@ -70,18 +70,35 @@ export const edit = tool({
 })
 
 export const apply_patch = tool({
-  description: [
-    '按 apply_patch 格式应用多文件补丁。输入须包含 *** Begin Patch 和 *** End Patch 标记。',
-    '',
-    '支持的 hunk：',
-    '- *** Add File: path - 新建文件',
-    '- *** Delete File: path - 删除文件',
-    '- *** Update File: path - 更新文件（可选 *** Move to: newPath 重命名）',
-    '',
-    'Update 行内格式：空格=上下文，-=删除行，+=新增行。可用 @@ 或空行开始首个 chunk。*** End of File 表示在文件末尾插入。',
-  ].join('\n'),
+  description: '使用 apply_patch 格式对一或多个文件应用补丁（增删改查）操作',
   inputSchema: z.object({
-    input: z.string().describe('补丁内容（*** Begin Patch ... *** End Patch 格式）'),
+    input: z.string().describe([
+      '必须：首行 *** Begin Patch，末行 *** End Patch；',
+      '必须：内部 *** Update File: path / *** Add File: path / *** Delete File: path。',
+      '',
+      '【行前缀规则：Update 和 Add File 均适用】',
+      '每行行首必须带前缀：空格=上下文保留，-=删除，+=新增。',
+      'Add File 可看作“全为 + 行”的特例，新建文件的每行也须以 + 开头。',
+      '',
+      'chunk 以 @@ 或空行开始，勿用 @@ -1,3 +1,4 @@。',
+      '',
+      'Update 示例：',
+      '*** Begin Patch',
+      '*** Update File: a.txt',
+      '@@',
+      ' 第一行（空格=上下文）',
+      '-第二行',
+      '+新第二行',
+      '*** End Patch',
+      '',
+      'Add File 示例（每行必须 + 开头）：',
+      '*** Begin Patch',
+      '*** Add File: b.txt',
+      '@@',
+      '+第一行',
+      '+第二行',
+      '*** End Patch',
+    ].join('\n')),
   }),
   execute: async ({ input }) => {
     if (!input?.trim())

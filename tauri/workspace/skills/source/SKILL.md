@@ -26,23 +26,7 @@ description: "Manage App Workspace data sources defined in sources.json: list al
 
 ## 使用的工具
 
-- `read`
-  - 读取工作区下的文本文件。
-  - 内部会将给定路径与 `workspace` 目录拼接。
-  - 使用 `{"path": "sources.json"}` 读取当前数据源列表。
-
-- `write`
-  - 创建或覆盖工作区下的文件。
-  - 同样会与 `workspace` 拼接。
-  - 使用 `{"path": "sources.json", "content": "<更新后的 JSON>"}` 持久化更改。
-
-- `edit`
-  - 对文件进行简单文本替换。
-  - 适用于较小、精确的更新。
-
-- `grep`
-  - 在文件中搜索字符串模式。
-  - 路径约定与 `read`/`write`/`edit` 相同：使用 `path: "sources.json"`。
+- `read` `write` `edit` `grep`
 
 ## 使用方式
 

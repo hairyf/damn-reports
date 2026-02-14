@@ -21,13 +21,7 @@ description: "Query, sync, and insert records in the Record table. Use when you 
 
 ## 使用的工具
 
-- `exec_sql`  
-  - 在应用内置 SQLite（main.db）上执行 SQL。  
-  - 输入: `{"sql": "<SQL 语句>"}`
-
-- `sync_records`  
-  - 同步采集数据，返回采集到的数量。  
-  - 无需参数: `{}`
+- `exec_sql` `sync_records`
 
 ## 使用方式
 

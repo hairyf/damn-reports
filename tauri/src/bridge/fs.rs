@@ -1,14 +1,12 @@
 use std::cell::RefCell;
 use std::fs;
 use std::path::{Component, Path, PathBuf};
-use std::sync::atomic::{AtomicU32, Ordering};
-use std::sync::Arc;
 
 use grep_regex::RegexMatcherBuilder;
 use grep_searcher::sinks::UTF8;
 use grep_searcher::SearcherBuilder;
 use ignore::overrides::OverrideBuilder;
-use ignore::{WalkBuilder, WalkState};
+use ignore::{WalkBuilder};
 use serde::Serialize;
 use tauri::{AppHandle, Manager};
 

@@ -27,22 +27,7 @@ description: "管理 crons.json 中的定时任务（Hooks）：列出、添加�
 
 ## 使用的工具
 
-- `read`
-  - 读取工作区下的文本文件。
-  - 使用 `{"path": "crons.json"}` 读取当前任务列表。
-
-- `write`
-  - 创建或覆盖工作区下的文件。
-  - 使用 `{"path": "crons.json", "content": "<更新后的 JSON>"}` 持久化更改。
-  - **写入后应用会自动重新加载 cron 调度器**。
-
-- `edit`
-  - 对文件进行简单文本替换。
-  - 适用于较小、精确的更新（如修改单个字段）。
-
-- `grep`
-  - 在文件中搜索字符串模式。
-  - 路径约定与 `read`/`write`/`edit` 相同。
+- `read` `write` `edit` `grep`
 
 ## 使用方式
 
