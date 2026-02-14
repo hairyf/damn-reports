@@ -41,6 +41,7 @@ export function optimizeReportPrompt(currentContent: string, userInstruction?: s
 ${userInstruction?.trim()
   ? `请根据以下要求对日报内容进行优化：${userInstruction.trim()}`
   : '请对以下日报内容进行优化，使其更加简洁、专业、易读。'}
+不要输出任何引导语、客套话或装饰性分隔（如「根据提供的...我为您生成以下日报」「---」等），输出必须是日报正文。
 
 # 当前日报内容
 ${currentContent}`

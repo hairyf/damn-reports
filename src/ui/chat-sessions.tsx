@@ -1,4 +1,4 @@
-import { Button, Card, CardBody, ScrollShadow } from '@heroui/react'
+import { Button, Card, CardBody, ScrollShadow, Tooltip } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useOverlay } from '@overlastic/react'
 import clsx from 'clsx'
@@ -51,49 +51,55 @@ export function ChatSessions() {
             {sessions.map((item) => {
               const isActive = activeSession?.id === item.id
               return (
-                <Button
+                <Tooltip
                   key={item.id}
-                  variant="light"
-                  className={clsx(
-                    'text-left pr-2',
-                    isActive
-                      ? 'bg-primary/10 text-primary'
-                      : 'hover:bg-default-100 text-default-400',
-                  )}
-                  onPress={() => store.chat.activate(item.id)}
+                  content={item.title}
+                  placement="right"
                 >
-                  <div className="flex-1 min-w-0">
-                    <div className="truncate font-medium text-foreground">
-                      {item.title || '未命名会话'}
+                  <Button
+                    key={item.id}
+                    variant="light"
+                    className={clsx(
+                      'text-left pr-2',
+                      isActive
+                        ? 'bg-primary/10 text-primary'
+                        : 'hover:bg-default-100 text-default-400',
+                    )}
+                    onPress={() => store.chat.activate(item.id)}
+                  >
+                    <div className="flex-1 min-w-0">
+                      <div className="truncate font-medium text-foreground">
+                        {item.title || '未命名会话'}
+                      </div>
                     </div>
-                  </div>
-                  {item.id === MAIN_SESSION_ID
-                    ? (
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          as="span"
-                          variant="light"
-                          className="hover:!bg-white/50"
-                          title="清空主会话"
-                          onPress={handleClearMainSession}
-                        >
-                          <Icon icon="lucide:eraser" className="w-3 h-3" />
-                        </Button>
-                      )
-                    : (
-                        <Button
-                          isIconOnly
-                          size="sm"
-                          as="span"
-                          variant="light"
-                          className="hover:!bg-white/50"
-                          onPress={() => handleDeleteSession(item.id)}
-                        >
-                          <Icon icon="lucide:trash-2" className="w-3 h-3" />
-                        </Button>
-                      )}
-                </Button>
+                    {item.id === MAIN_SESSION_ID
+                      ? (
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            as="span"
+                            variant="light"
+                            className="hover:!bg-white/50"
+                            title="清空主会话"
+                            onPress={handleClearMainSession}
+                          >
+                            <Icon icon="lucide:eraser" className="w-3 h-3" />
+                          </Button>
+                        )
+                      : (
+                          <Button
+                            isIconOnly
+                            size="sm"
+                            as="span"
+                            variant="light"
+                            className="hover:!bg-white/50"
+                            onPress={() => handleDeleteSession(item.id)}
+                          >
+                            <Icon icon="lucide:trash-2" className="w-3 h-3" />
+                          </Button>
+                        )}
+                  </Button>
+                </Tooltip>
               )
             })}
           </div>
