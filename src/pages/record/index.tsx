@@ -138,7 +138,7 @@ function Page() {
                     <span>{record.tool}</span>
                   </div>
                 </TableCell>
-                <TableCell>{dayjs(typeof record.createdAt === 'number' ? record.createdAt * 1000 : record.createdAt).format('YYYY-MM-DD')}</TableCell>
+                <TableCell>{dayjs(typeof record.updatedAt === 'number' ? record.updatedAt * 1000 : record.updatedAt).format('YYYY-MM-DD')}</TableCell>
                 <TableCell>
                   <div className="w-full relative h-5">
                     <div className="absolute inset-0">

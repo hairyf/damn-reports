@@ -18,20 +18,26 @@ export function stringifyData(data: unknown): string | undefined {
   return json
 }
 
-export async function buildRecordSummaryPrompt(sources: SourceItem[]): Promise<string> {
+export interface RecordForSummary { source: string, summary: string, data: unknown }
+
+export async function buildRecordSummaryPrompt(
+  sources: SourceItem[],
+  records?: RecordForSummary[],
+): Promise<string> {
   const enabledIds = sources.filter(s => s.enable !== false).map(s => s.id)
   if (enabledIds.length === 0)
     return 'No record data available.'
 
-  const records = await db.record.findMany({
-    date: dayjs().toISOString(),
+  const fetchedRecords = records ?? await db.record.findMany({
+    date: dayjs().startOf('day').toISOString(),
     sourceIds: enabledIds,
   })
+  const filtered = records ? fetchedRecords.filter(r => enabledIds.includes(r.source)) : fetchedRecords
 
   const sourceMap = new Map(sources.map(s => [s.id, s]))
   const grouped = new Map<string, Array<{ summary: string, data: unknown }>>()
 
-  for (const rec of records) {
+  for (const rec of filtered) {
     const key = rec.source
     if (!grouped.has(key))
       grouped.set(key, [])

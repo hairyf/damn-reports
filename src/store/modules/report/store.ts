@@ -9,6 +9,14 @@ import { writeTextFile } from '@/utils/fs-extra'
 import { buildRecordSummaryPrompt } from './utils'
 import 'valtio-define/types'
 
+function validateSummary(summary: string): string {
+  if (!summary?.trim() || summary === 'No record data available.') {
+    addToast({ title: '无可用的记录数据', description: '启用中的数据源今日暂无记录' })
+    throw new Error('没有可用的记录数据')
+  }
+  return summary
+}
+
 /** 收集并验证记录数据，返回摘要 prompt */
 async function collectAndSummarize(): Promise<string> {
   await store.source.collect()
@@ -22,23 +30,14 @@ async function collectAndSummarize(): Promise<string> {
     throw new Error('未收集到任何数据')
   }
 
-  const summary = await buildRecordSummaryPrompt(store.source.raw)
-  if (!summary?.trim() || summary === 'No record data available.') {
-    addToast({ title: '无可用的记录数据', description: '启用中的数据源今日暂无记录' })
-    throw new Error('没有可用的记录数据')
-  }
-
-  return summary
+  const summary = await buildRecordSummaryPrompt(store.source.raw, records)
+  return validateSummary(summary)
 }
 
 /** 验证摘要数据可用性（不重新收集） */
 async function ensureSummary(): Promise<string> {
   const summary = await buildRecordSummaryPrompt(store.source.raw)
-  if (!summary?.trim() || summary === 'No record data available.') {
-    addToast({ title: '无可用的记录数据', description: '启用中的数据源今日暂无记录' })
-    throw new Error('没有可用的记录数据')
-  }
-  return summary
+  return validateSummary(summary)
 }
 
 /** 将报告内容写入 memory/reports/YYYY-MM-DD.md */

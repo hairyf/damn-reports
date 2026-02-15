@@ -96,11 +96,11 @@ export class Record extends Model<DB, 'record'> {
       const startStr = dayjs(date).startOf('day').toISOString()
       const endStr = dayjs(date).endOf('day').toISOString()
       query = query
-        .where('record.createdAt', '>=', startStr)
-        .where('record.createdAt', '<', endStr)
+        .where('record.updatedAt', '>=', startStr)
+        .where('record.updatedAt', '<', endStr)
     }
 
-    query = query.orderBy('record.createdAt', 'desc')
+    query = query.orderBy('record.updatedAt', 'desc')
 
     return query
   }
