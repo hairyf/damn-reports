@@ -12,6 +12,8 @@ const host = process.env.TAURI_DEV_HOST
 
 // https://vite.dev/config/
 export default defineConfig(async () => ({
+  // 明确从项目根加载 .env，避免从子目录执行 tauri build 时读不到
+  envDir: path.resolve(__dirname),
   plugins: [
     react(),
     autoImport({

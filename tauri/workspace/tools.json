@@ -37,7 +37,7 @@
         "assignees[]": "{{user}}"
       }
     },
-    "transformer": "tasks.{\"id\": id, \"summary\": name, \"createdAt\": $number(date_created), \"data\": $}"
+    "transformer": "tasks.{\"id\": id & \"-\" & $string(date_updated), \"summary\": name, \"createdAt\": $number(date_updated), \"data\": $}"
   },
   "test_nodejs": {
     "name": "Test Node.js",
