@@ -1,6 +1,6 @@
 [package]
 name = "damn-daily-reports"
-version = "0.2.9"
+version = "0.2.10"
 description = "A Tauri App"
 authors = [ "Hairy" ]
 edition = "2021"
