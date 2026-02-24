@@ -22,9 +22,9 @@
 
 ## 预览
 
-![今日报告](static/screenshots/home.png)
+![今日报告](static/home.png)
 
-![对话](static/screenshots/chat.png)
+![对话](static/chat.png)
 
 ## 开发指南
 
