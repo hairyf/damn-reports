@@ -22,7 +22,7 @@
 
 ## 预览
 
-![今日报告（空状态）](static/screenshots/report-empty.png)
+![今日报告](static/screenshots/home.png)
 
 ![对话](static/screenshots/chat.png)
 
