@@ -1,0 +1,29 @@
+# damn-daily-reports Development Guidelines
+
+Auto-generated from all feature plans. Last updated: 2026-02-15
+
+## Active Technologies
+
+- TypeScript 5.8, Rust (Tauri 2), Node.js ≥20.19 + React 19, Vite 7, HeroUI v2, Tailwind CSS 4, Framer Motion, AI SDK (DeepSeek/OpenAI), Tauri 2, Kysely, Prisma (main)
+
+## Project Structure
+
+```text
+src/
+tests/
+```
+
+## Commands
+
+cargo test; cargo clippy
+
+## Code Style
+
+TypeScript 5.8, Rust (Tauri 2), Node.js ≥20.19: Follow standard conventions
+
+## Recent Changes
+
+- main: Added TypeScript 5.8, Rust (Tauri 2), Node.js ≥20.19 + React 19, Vite 7, HeroUI v2, Tailwind CSS 4, Framer Motion, AI SDK (DeepSeek/OpenAI), Tauri 2, Kysely, Prisma
+
+<!-- MANUAL ADDITIONS START -->
+<!-- MANUAL ADDITIONS END -->
