@@ -19,7 +19,7 @@ export function PageTools() {
   const { raw } = useStore(store.tool)
 
   const tools = useMemo(() => {
-    const entries = Object.entries(raw).map(([id, def]) => ({ id, ...def }))
+    const entries = Object.entries(raw).map(([id, { id: _ignored, ...def }]) => ({ id, ...def }))
     if (!debouncedSearch)
       return entries.filter(t => t.enable !== false)
     const q = debouncedSearch.toLowerCase()
