@@ -1,10 +1,10 @@
-# crons.json 与单个任务格式
+# cron.json 与单个任务格式
 
-本文描述 `crons.json` 的顶层结构及单个定时任务条目的预期格式。
+本文描述 `cron.json` 的顶层结构及单个定时任务条目的预期格式。
 
-## crons.json 顶层结构
+## cron.json 顶层结构
 
-- 文件 `crons.json` 为 **JSON 对象**，包含两个字段：
+- 文件 `cron.json` 为 **JSON 对象**，包含两个字段：
   - `version`（number）：固定为 `1`。
   - `jobs`（array）：定时任务数组。
 

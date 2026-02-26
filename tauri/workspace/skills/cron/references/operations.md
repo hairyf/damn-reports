@@ -11,9 +11,9 @@
 
 ## 路径与工具
 
-- `crons.json` 逻辑路径：
-  - 仓库位置：`./crons.json`。
-  - 对 `read`、`write`、`edit`、`grep`：使用 `path: "crons.json"`。
+- `cron.json` 逻辑路径：
+  - 仓库位置：`./cron.json`。
+  - 对 `read`、`write`、`edit`、`grep`：使用 `path: "cron.json"`。
 
 - 工具：
   - `read` – 加载当前 JSON 文本。
@@ -21,18 +21,18 @@
   - `edit` – 受控的小范围文本替换。
   - `grep` – 定位模式（如特定 `id`）在文件中的位置。
 
-**避免重复读取**：读-改-写流程中，同一操作只需读取一次；若上一步已解析 `crons.json`，下一步直接复用解析结果，勿再次 `read`。
+**避免重复读取**：读-改-写流程中，同一操作只需读取一次；若上一步已解析 `cron.json`，下一步直接复用解析结果，勿再次 `read`。
 
 ## get_all
 
 **目的**
 
-返回完整的 `crons.json`（所有定时任务）。
+返回完整的 `cron.json`（所有定时任务）。
 
 **实现**
 
 1. 调用 `read`：
-   - 输入：`{"path": "crons.json"}`
+   - 输入：`{"path": "cron.json"}`
 2. 将返回字符串解析为 JSON。
 3. 返回 `jobs` 数组。
 
@@ -40,7 +40,7 @@
 
 **目的**
 
-向 `crons.json` 的 `jobs` 数组添加新定时任务。
+向 `cron.json` 的 `jobs` 数组添加新定时任务。
 
 **交互式添加时的必问项**
 
@@ -60,7 +60,7 @@
 
 **推荐实现（读–改–写）**
 
-1. 调用 `read`：`{"path": "crons.json"}`
+1. 调用 `read`：`{"path": "cron.json"}`
 2. 将文本解析为对象 `store`。
 3. 检查 `store.jobs` 中是否存在相同 `id`：
    - 若存在，返回错误。
@@ -68,7 +68,7 @@
 5. 补全 `createdAtMs`、`updatedAtMs`（当前时间戳）、`state: {}`。
 6. 追加：`store.jobs.push(newJob)`。
 7. 调用 `write` 持久化：
-   - 输入：`{"path": "crons.json", "content": "<序列化后的 store>"}`
+   - 输入：`{"path": "cron.json", "content": "<序列化后的 store>"}`
 
 ## get
 
@@ -78,7 +78,7 @@
 
 **实现**
 
-1. 调用 `read`：`{"path": "crons.json"}`
+1. 调用 `read`：`{"path": "cron.json"}`
 2. 解析为对象，在 `jobs` 数组中查找 `item.id === id`。
 3. 返回找到的任务或"未找到"。
 
@@ -108,11 +108,11 @@
 
 **目的**
 
-从 `crons.json` 中移除指定 `id` 的任务。
+从 `cron.json` 中移除指定 `id` 的任务。
 
 **实现**
 
-1. 调用 `read`：`{"path": "crons.json"}`，解析为对象 `store`。
+1. 调用 `read`：`{"path": "cron.json"}`，解析为对象 `store`。
 2. 过滤：`store.jobs = store.jobs.filter(item => item.id !== id)`。
 3. 调用 `write` 持久化。
 
