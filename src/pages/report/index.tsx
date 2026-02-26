@@ -1,5 +1,5 @@
 /* eslint-disable react-dom/no-dangerously-set-innerhtml */
-import { useDebounce, useOffsetPagination, useWatch } from '@hairy/react-lib'
+import { useDebounce, useWatch } from '@hairy/react-lib'
 import {
   addToast,
   Button,
@@ -24,6 +24,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import removeMd from 'remove-markdown'
 import snarkdown from 'snarkdown'
+import { useOffsetPagination } from '@/hooks/use-offset-pagination'
 
 function Page() {
   const navigate = useNavigate()
@@ -32,7 +33,7 @@ function Page() {
   const [type, setType] = useState<string>('')
   const openDialog = useOverlay(Dialog)
   const pagination = useOffsetPagination({
-    pageSize: 7,
+    pageSize: 8,
   })
 
   const typeOptions = [
@@ -42,15 +43,19 @@ function Page() {
     { label: '年', value: 'yearly' },
   ]
 
-  const { data: reports = [], isLoading, refetch } = useQuery({
+  const { data: { data: reports = [], total } = {}, isLoading, refetch } = useQuery({
     queryKey: ['reports', debouncedSearch, type, pagination.page, pagination.pageSize],
-    queryFn: async () => db.report.findMany({
-      search: debouncedSearch,
-      type,
-      page: pagination.page,
-      pageSize: pagination.pageSize,
-    }),
+    queryFn: async () => {
+      const { data, total } = await db.report.findManyPage({
+        search: debouncedSearch,
+        type,
+        page: pagination.page,
+        pageSize: pagination.pageSize,
+      })
+      return { data, total }
+    },
   })
+  useWatch(total, () => pagination.pageTotalChange(total || 0), { immediate: true })
 
   async function onDelete(id: number) {
     await openDialog({
@@ -182,11 +187,11 @@ function Page() {
         </TableBody>
       </Table>
 
-      {pagination.total > 1 && (
+      {pagination.pageCount > 1 && (
         <div className="flex justify-end pt-4">
           <Pagination
-            className="pb-0"
-            total={pagination.total}
+            className="overflow-hidden"
+            total={pagination.pageCount}
             page={pagination.page}
             onChange={pagination.pageChange}
             showControls

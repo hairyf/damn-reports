@@ -161,6 +161,7 @@ declare global {
   const useMemo: typeof import('react').useMemo
   const useNavigate: typeof import('react-router-dom').useNavigate
   const useNavigationType: typeof import('react-router-dom').useNavigationType
+  const useOffsetPagination: typeof import('../hooks/use-offset-pagination').useOffsetPagination
   const useOptimistic: typeof import('react').useOptimistic
   const useOutlet: typeof import('react-router-dom').useOutlet
   const useOutletContext: typeof import('react-router-dom').useOutletContext
@@ -249,4 +250,7 @@ declare global {
   // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
+  // @ts-ignore
+  export type { UseOffsetPaginationOptions, Pagination } from '../hooks/use-offset-pagination'
+  import('../hooks/use-offset-pagination')
 }

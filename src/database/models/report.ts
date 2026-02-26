@@ -51,6 +51,38 @@ export class Report extends Model<DB, 'report'> {
     return query.execute()
   }
 
+  /** 分页查询并返回总条数 */
+  async findManyPage(input: ReportFindManyInput): Promise<{ data: Awaited<ReturnType<Report['findMany']>>, total: number }> {
+    const { search, type, page = 1, pageSize = 10 } = input
+    let baseQuery = this.db.selectFrom('report').selectAll()
+
+    if (search) {
+      const searchPattern = `%${search}%`
+      baseQuery = baseQuery.where(eb =>
+        eb.or([
+          eb('name', 'like', searchPattern),
+          eb('content', 'like', searchPattern),
+        ]),
+      )
+    }
+    if (type) {
+      baseQuery = baseQuery.where('type', '=', type)
+    }
+    baseQuery = baseQuery.orderBy('createdAt', 'desc')
+
+    const countQuery = baseQuery
+      .clearSelect()
+      .select(this.db.fn.count('report.id').as('count'))
+    const offset = page > 0 ? (page - 1) * pageSize : 0
+    const dataQuery = baseQuery.limit(pageSize).offset(offset)
+
+    const [totalResult, data] = await Promise.all([
+      countQuery.executeTakeFirst().then(rs => Number(rs?.count ?? 0)),
+      dataQuery.execute(),
+    ])
+    return { data, total: totalResult }
+  }
+
   async findFirstByType(input: ReportFindByTypeInput) {
     const { type } = input
     // 根据类型计算时间范围

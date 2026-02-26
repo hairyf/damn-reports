@@ -1,4 +1,4 @@
-import { useDebounce, useOffsetPagination, useWatch } from '@hairy/react-lib'
+import { useDebounce, useWatch } from '@hairy/react-lib'
 import {
   addToast,
   Button,
@@ -18,6 +18,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { useState } from 'react'
 import { useStore } from 'valtio-define'
+import { useOffsetPagination } from '@/hooks/use-offset-pagination'
 import { store } from '@/store'
 
 function Page() {
@@ -25,7 +26,7 @@ function Page() {
   const [sourceFilter, setSourceFilter] = useState<string>('')
   const queryClient = useQueryClient()
   const pagination = useOffsetPagination({
-    pageSize: 20,
+    pageSize: 8,
   })
   // 防抖搜索词和筛选条件
   const debouncedSearch = useDebounce(search, 300)
@@ -33,7 +34,7 @@ function Page() {
 
   const { raw: sources, map: sourceMap } = useStore(store.source)
 
-  const { data: records = [], isLoading } = useQuery({
+  const { data: { data: records = [], total } = {}, isLoading } = useQuery({
     queryKey: ['records', debouncedSearch, debouncedSourceFilter, pagination.page, pagination.pageSize, sources.length],
     queryFn: async () => {
       const { data, total } = await db.record.findManyPageWithSources(
@@ -45,10 +46,10 @@ function Page() {
         },
         sourceMap,
       )
-      pagination.pageSizeChange(total)
-      return data
+      return { data, total }
     },
   })
+  useWatch(total, () => pagination.pageTotalChange(total || 0), { immediate: true })
 
   const syncMutation = useMutation({
     mutationFn: async () => {
@@ -164,11 +165,11 @@ function Page() {
         </TableBody>
       </Table>
 
-      {pagination.total > 1 && (
+      {pagination.pageCount > 1 && (
         <div className="flex justify-end pt-4">
           <Pagination
-            className="pb-0"
-            total={pagination.total}
+            className="overflow-hidden"
+            total={pagination.pageCount}
             page={pagination.page}
             onChange={pagination.pageChange}
             showControls
