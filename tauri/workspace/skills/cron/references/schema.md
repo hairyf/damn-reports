@@ -128,7 +128,8 @@
 - `updatedAtMs`（number）
   - 最后更新时间戳（毫秒）。
 
-## 常用调度参考
+- `files`（可选，字符串数组）
+  - 导出/导入时携带的附件路径（相对工作区），如 report-end 的 `schedule.command` 所引用的脚本。与 tools.json 中工具的 `files` 含义一致。
 
 | 类型 | 示例 | 含义 |
 |------|------|------|

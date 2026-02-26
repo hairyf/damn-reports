@@ -40,6 +40,8 @@ export interface CronJob {
   system?: boolean
   /** 是否在前端显示，false 则仅在内部使用 */
   view?: boolean
+  /** 导出/导入时携带的附件路径（相对工作区），如 report-end 的脚本 */
+  files?: string[]
   schedule: CronSchedule
   payload: CronPayload
   state: CronJobState

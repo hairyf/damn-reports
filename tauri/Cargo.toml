@@ -48,6 +48,7 @@ grep-regex = "0.1"
 grep-searcher = "0.1"
 ignore = "0.4"
 pathdiff = "0.2"
+zip = "0.6"
 [dependencies.tauri-plugin-sql]
 features = [ "sqlite" ] # or "postgres", or "mysql"
 version = "2"

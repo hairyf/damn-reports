@@ -1,5 +1,6 @@
 import { Else, If, Then, useDebounce } from '@hairy/react-lib'
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -9,6 +10,7 @@ import { Icon } from '@iconify/react'
 import { useMemo } from 'react'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
+import { exportCron, importCron } from '@/tools/workspace-archive'
 import { HookItem } from './hook-item'
 
 const PAYLOAD_LABELS: Record<string, string> = {
@@ -44,6 +46,31 @@ export function PageHooks() {
     navigate('/chat?intent=search-hook')
   }
 
+  async function onExport(jobId: string) {
+    try {
+      const ok = await exportCron(jobId)
+      if (ok)
+        addToast({ title: '导出成功', description: '该 Hook 已保存为 .cron 文件', color: 'success' })
+    }
+    catch (e) {
+      addToast({ title: '导出失败', description: String(e), color: 'danger' })
+    }
+  }
+
+  async function onImport() {
+    try {
+      const ok = await importCron()
+      if (ok) {
+        store.cron.stop()
+        await store.cron.start()
+        addToast({ title: '导入成功', description: '已合并定时任务并刷新', color: 'success' })
+      }
+    }
+    catch (e) {
+      addToast({ title: '导入失败', description: String(e), color: 'danger' })
+    }
+  }
+
   return (
     <>
       <Card className="mb-4 flex-shrink-0" shadow="none">
@@ -70,6 +97,13 @@ export function PageHooks() {
             >
               刷新
             </Button>
+            <Button
+              variant="flat"
+              onPress={onImport}
+              startContent={<Icon icon="lucide:download" className="w-4 h-4" />}
+            >
+              从 .cron 导入
+            </Button>
           </div>
         </CardBody>
       </Card>
@@ -81,6 +115,7 @@ export function PageHooks() {
               <HookItem
                 key={job.id}
                 job={job}
+                onExport={onExport}
               />
             ))}
           </Then>

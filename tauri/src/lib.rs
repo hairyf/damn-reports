@@ -91,6 +91,10 @@ fn tray<R: Runtime>(app: &tauri::AppHandle<R>) -> tauri::Result<()> {
 // configure invoke handler
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
+        bridge::archive::workspace_export_tools,
+        bridge::archive::workspace_import_tools,
+        bridge::archive::workspace_export_cron,
+        bridge::archive::workspace_import_cron,
         bridge::cmd::database_loaded,
         bridge::fs::fs_exists,
         bridge::fs::fs_read_file,

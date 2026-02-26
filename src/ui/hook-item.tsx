@@ -69,7 +69,7 @@ function formatNextRun(job: CronJob): string {
   return `下次 ${d.format('MM-DD HH:mm')} (${weekday})`
 }
 
-export function HookItem({ job }: { job: CronJob }) {
+export function HookItem({ job, onExport }: { job: CronJob, onExport: (jobId: string) => void }) {
   async function handleToggle(id: string) {
     await store.cron.toggle(id)
   }
@@ -139,6 +139,15 @@ export function HookItem({ job }: { job: CronJob }) {
               aria-label="启用/禁用"
             />
             <div className="flex items-center gap-1">
+              <Button
+                isIconOnly
+                variant="light"
+                size="sm"
+                onPress={() => onExport(job.id)}
+                title="导出为 .cron"
+              >
+                <Icon icon="lucide:upload" className="w-4 h-4" />
+              </Button>
               <Button
                 isIconOnly
                 variant="light"
