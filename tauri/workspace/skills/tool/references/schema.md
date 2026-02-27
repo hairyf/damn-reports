@@ -1,10 +1,10 @@
-# tools.json 与单个工具格式
+# tool.json 与单个工具格式
 
-本文描述 `tools.json` 的结构及单个工具定义的预期格式。
+本文描述 `tool.json` 的结构及单个工具定义的预期格式。
 
-## tools.json 顶层结构
+## tool.json 顶层结构
 
-- 文件 `tools.json` 为 **单个 JSON 对象**。
+- 文件 `tool.json` 为 **单个 JSON 对象**。
 - 每个属性键为 **tool id**（string）。
 - 每个属性值为 **工具定义对象**。
 

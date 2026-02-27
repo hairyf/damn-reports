@@ -147,7 +147,7 @@ export class CronService {
   }
 
   /**
-   * 日报生成后触发 report-end 类型任务
+   * 日报生成后触发 reportend 类型任务
    * @param reportContent 报告内容
    * @param fromScheduled 是否为定时任务触发（builtin_daily_report）
    */
@@ -157,12 +157,12 @@ export class CronService {
       return
 
     const jobs = this.store.jobs.filter((j) => {
-      if (!j.enabled || j.schedule.kind !== 'report-end')
+      if (!j.enabled || j.schedule.kind !== 'reportend')
         return false
       const trigger = j.schedule.trigger
       if (trigger === 'scheduled' && !fromScheduled)
         return false
-      if (!j.schedule.command?.trim())
+      if (j.payload.kind !== 'command' || !j.payload.command?.trim())
         return false
       return true
     })
@@ -312,14 +312,14 @@ export class CronService {
 
     let result: ExecuteResult
     try {
-      const command = (job.schedule as { kind: 'report-end', command: string }).command
-      await executeReportEndCommand(command, reportContent)
+      const cmd = (job.payload as { kind: 'command', command: string }).command
+      await executeReportEndCommand(cmd, reportContent)
       result = { status: 'ok' }
-      console.info(`[cron] job "${job.name}" report-end executed`)
+      console.info(`[cron] job "${job.name}" reportend executed`)
     }
     catch (err) {
       result = { status: 'error', error: String(err) }
-      console.error(`[cron] job "${job.name}" report-end failed:`, err)
+      console.error(`[cron] job "${job.name}" reportend failed:`, err)
     }
 
     const endedAt = Date.now()

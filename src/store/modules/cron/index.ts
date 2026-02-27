@@ -31,7 +31,7 @@ const DEFAULT_CRONS: CronStoreFile = {
       system: true,
       view: false,
       schedule: { kind: 'cron', expr: '0 0 * * *' },
-      payload: { kind: 'agentTurn', message: '储存今天的记忆' },
+      payload: { kind: 'mainagent', message: '储存今天的记忆' },
       state: {},
       createdAtMs: Date.now(),
       updatedAtMs: Date.now(),

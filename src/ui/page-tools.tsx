@@ -1,5 +1,6 @@
 import { Else, If, Then, useDebounce } from '@hairy/react-lib'
 import {
+  addToast,
   Button,
   Card,
   CardBody,
@@ -10,6 +11,10 @@ import { Icon } from '@iconify/react'
 import { useMemo } from 'react'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
+import { exportTools, importTools } from '@/tools/workspace-archive'
+
+/** 默认内置工具，不允许导出 */
+const BUILTIN_TOOL_IDS = ['git_directory', 'clickup']
 
 export function PageTools() {
   const navigate = useNavigate()
@@ -33,6 +38,30 @@ export function PageTools() {
 
   async function onRefresh() {
     await store.tool.sync()
+  }
+
+  async function onExport(toolId: string) {
+    try {
+      const ok = await exportTools(toolId)
+      if (ok)
+        addToast({ title: '导出成功', description: '该工具已保存为 .tool 文件', color: 'success' })
+    }
+    catch (e) {
+      addToast({ title: '导出失败', description: String(e), color: 'danger' })
+    }
+  }
+
+  async function onImport() {
+    try {
+      const ok = await importTools()
+      if (ok) {
+        await store.tool.sync()
+        addToast({ title: '导入成功', description: '已合并工具配置并刷新', color: 'success' })
+      }
+    }
+    catch (e) {
+      addToast({ title: '导入失败', description: String(e), color: 'danger' })
+    }
   }
 
   return (
@@ -63,6 +92,13 @@ export function PageTools() {
               startContent={<Icon icon="lucide:refresh-cw" className="w-4 h-4" />}
             >
               刷新
+            </Button>
+            <Button
+              variant="flat"
+              onPress={onImport}
+              startContent={<Icon icon="lucide:download" className="w-4 h-4" />}
+            >
+              从 .tool 导入
             </Button>
           </div>
         </CardBody>
@@ -96,6 +132,17 @@ export function PageTools() {
                         {tool.description}
                       </p>
                     </div>
+                    {!BUILTIN_TOOL_IDS.includes(tool.id) && (
+                      <Button
+                        isIconOnly
+                        variant="light"
+                        size="sm"
+                        onPress={() => onExport(tool.id)}
+                        title="导出为 .tool"
+                      >
+                        <Icon icon="lucide:upload" className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                 </CardBody>
               </Card>

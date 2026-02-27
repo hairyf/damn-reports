@@ -30,7 +30,7 @@ export const source = defineStore({
   },
   actions: {
     async sync() {
-      const data = await readJson('sources.json').catch(() => [])
+      const data = await readJson('source.json').catch(() => [])
       const arr = Array.isArray(data) ? data : []
       const now = new Date().toISOString()
       this.raw = arr.map((item: any) => {
@@ -45,7 +45,7 @@ export const source = defineStore({
     },
 
     async save() {
-      await writeJson('sources.json', this.raw)
+      await writeJson('source.json', this.raw)
     },
 
     find(id: string): Source | undefined {
@@ -111,7 +111,7 @@ export const source = defineStore({
 
         const toolDef = tools[src.tool]
         if (!toolDef) {
-          console.warn(`Tool "${src.tool}" not found in tools.json, skipping source "${src.name}"`)
+          console.warn(`Tool "${src.tool}" not found in tool.json, skipping source "${src.name}"`)
           continue
         }
 
