@@ -38,13 +38,13 @@ fn write_workspace_json(app: &AppHandle, path: &str, value: &Value) -> Result<()
 #[tauri::command]
 pub async fn workspace_export_tools(app: AppHandle, save_path: String, tool_id: String) -> Result<(), String> {
     let root = workspace_root(&app)?;
-    let tools_path = root.join("tools.json");
+    let tools_path = root.join("tool.json");
     let tools: Value = serde_json::from_str(
-        &fs::read_to_string(&tools_path).map_err(|e| format!("Read tools.json: {}", e))?,
+        &fs::read_to_string(&tools_path).map_err(|e| format!("Read tool.json: {}", e))?,
     )
-    .map_err(|e| format!("Parse tools.json: {}", e))?;
+    .map_err(|e| format!("Parse tool.json: {}", e))?;
 
-    let obj = tools.as_object().ok_or("tools.json is not an object")?;
+    let obj = tools.as_object().ok_or("tool.json is not an object")?;
     if BUILTIN_TOOL_IDS.contains(&tool_id.as_str()) {
         return Err(format!("Built-in tool '{}' cannot be exported", tool_id));
     }
@@ -85,7 +85,7 @@ pub async fn workspace_export_tools(app: AppHandle, save_path: String, tool_id: 
     Ok(())
 }
 
-/// 导入 .tool：解压并合并到 tools.json，写入附带 files，刷新由前端负责
+/// 导入 .tool：解压并合并到 tool.json，写入附带 files，刷新由前端负责
 #[tauri::command]
 pub async fn workspace_import_tools(app: AppHandle, zip_path: String) -> Result<(), String> {
     let root = workspace_root(&app)?;
@@ -115,12 +115,12 @@ pub async fn workspace_import_tools(app: AppHandle, zip_path: String) -> Result<
     }
 
     let index_obj = index.as_object().ok_or("index.json is not an object")?;
-    let current: Value = read_workspace_json(&app, "tools.json").unwrap_or(Value::Object(serde_json::Map::new()));
+    let current: Value = read_workspace_json(&app, "tool.json").unwrap_or(Value::Object(serde_json::Map::new()));
     let mut current_obj = current.as_object().cloned().unwrap_or_default();
     for (k, v) in index_obj.iter() {
         current_obj.insert(k.clone(), v.clone());
     }
-    write_workspace_json(&app, "tools.json", &Value::Object(current_obj))?;
+    write_workspace_json(&app, "tool.json", &Value::Object(current_obj))?;
     Ok(())
 }
 

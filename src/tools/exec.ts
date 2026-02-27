@@ -60,7 +60,7 @@ export const exec = tool({
 })
 
 export const exec_tool = tool({
-  description: '执行指定 tools.json 中的工具',
+  description: '执行指定 tool.json 中的工具',
   inputSchema: z.object({
     toolid: z.string().describe('要执行的工具 ID(key)'),
     params: z.record(z.string(), z.any()).describe('工具参数').optional(),
@@ -71,7 +71,7 @@ export const exec_tool = tool({
     if (!tool) {
       const available = Object.keys(store.tool.$state.raw).join(', ')
       throw new Error(
-        `Tool "${toolid}" not found in tools.json. Available tools: ${available}`,
+        `Tool "${toolid}" not found in tool.json. Available tools: ${available}`,
       )
     }
 

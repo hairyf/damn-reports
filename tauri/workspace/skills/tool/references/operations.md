@@ -12,11 +12,11 @@
 
 ## 路径与工具
 
-**避免重复读取**：读-改-写流程中，同一操作只需读取一次；若上一步已解析 `tools.json`，下一步直接复用解析结果，勿再次 `read`。执行 `exec_tool` 时，若本回合已读取过 `tools.json`，可直接调用，无需预校验。
+**避免重复读取**：读-改-写流程中，同一操作只需读取一次；若上一步已解析 `tool.json`，下一步直接复用解析结果，勿再次 `read`。执行 `exec_tool` 时，若本回合已读取过 `tool.json`，可直接调用，无需预校验。
 
-- `tools.json` 逻辑路径：
-  - 仓库位置：`./tools.json`。
-  - 对 `read`、`write`、`edit`、`grep`：使用 `path: "tools.json"`（这些工具内部会加 `workspace` 前缀；见 `src/utils/fs-extra.ts`）。
+- `tool.json` 逻辑路径：
+  - 仓库位置：`./tool.json`。
+  - 对 `read`、`write`、`edit`、`grep`：使用 `path: "tool.json"`（这些工具内部会加 `workspace` 前缀；见 `src/utils/fs-extra.ts`）。
 
 - 辅助工具：
   - `read` – 以文本形式加载当前 JSON 内容。
@@ -29,12 +29,12 @@
 
 **目的**
 
-返回完整的 `tools.json` 对象（所有采集器）。
+返回完整的 `tool.json` 对象（所有采集器）。
 
 **实现**
 
 1. 调用 `read`：
-   - 输入：`{"path": "tools.json"}`
+   - 输入：`{"path": "tool.json"}`
 
 2. 将返回字符串解析为 JSON。
 
@@ -66,7 +66,7 @@
 **推荐实现（读–改–写）**
 
 1. 调用 `/tool get_all`（或直接 `read`）加载当前 JSON：
-   - `read` 输入：`{"path": "tools.json"}`
+   - `read` 输入：`{"path": "tool.json"}`
 
 2. 将文本解析为 JSON 对象 `tools`。
 
@@ -76,7 +76,7 @@
 4. 将 `tools` 序列化回 JSON 字符串（如可能，格式化输出）。
 
 5. 调用 `write` 持久化：
-   - 输入：`{"path": "tools.json", "content": "<序列化后的 tools>"}`
+   - 输入：`{"path": "tool.json", "content": "<序列化后的 tools>"}`
 
 6. 验证：通常无需再次 `read`；写入后即可认为成功。
 
@@ -84,11 +84,11 @@
 
 当希望最小化 diff 时，可做小幅修改：
 
-1. 使用 `read` 获取 `tools.json` 的**确切**当前文本。
+1. 使用 `read` 获取 `tool.json` 的**确切**当前文本。
 2. 构建要替换的稳定子串 `oldContent`（如 closing `}` 或已知尾部条目）。
 3. 构建 `newContent`，将新工具定义插入对象。
 4. 调用 `edit`：
-   - 输入：`{"path": "tools.json", "oldContent": "<旧>", "newContent": "<新>"}`
+   - 输入：`{"path": "tool.json", "oldContent": "<旧>", "newContent": "<新>"}`
 
 5. 验证：通常无需再次 `read`；仅在异常或用户要求确认时再读取。
 
@@ -107,7 +107,7 @@
 **实现**
 
 1. 调用 `read`：
-   - 输入：`{"path": "tools.json"}`
+   - 输入：`{"path": "tool.json"}`
 
 2. 将文本解析为 JSON 对象 `tools`。
 
@@ -118,7 +118,7 @@
 **使用 grep 快速检查（可选）**
 
 - 要快速定位 tool id 在文件中的原始文本，使用 `grep`：
-  - 输入：`{"path": "tools.json", "pattern": "\"<toolid>\""}`
+  - 输入：`{"path": "tool.json", "pattern": "\"<toolid>\""}`
 
 - 可选参数：`literal`（pattern 含正则特殊字符时按字面量匹配）、`context`（显示匹配行前后行数）、`limit`、`glob`（path 为目录时过滤文件如 `*.json`）。
 
@@ -146,7 +146,7 @@
 
 5. 将 `tools` 序列化回 JSON 字符串。
 6. 调用 `write`：
-   - 输入：`{"path": "tools.json", "content": "<序列化后的 tools>"}`
+   - 输入：`{"path": "tool.json", "content": "<序列化后的 tools>"}`
 
 7. 验证：通常无需再次 `read`；写入后即可认为成功。
 
@@ -157,7 +157,7 @@
 1. 使用 `read` 和/或 `grep` 定位确切旧片段。
 2. 构建包含要替换的精确文本的 `oldContent` 和 `newContent`（含引号等）。
 3. 调用 `edit`：
-   - 输入：`{"path": "tools.json", "oldContent": "<旧>", "newContent": "<新>"}`
+   - 输入：`{"path": "tool.json", "oldContent": "<旧>", "newContent": "<新>"}`
 
 4. 验证：通常无需再次 `read`；仅在异常或用户要求确认时再读取。
 
@@ -165,7 +165,7 @@
 
 **目的**
 
-使用运行时 `exec_tool` 桥接执行 `tools.json` 中定义的工具。
+使用运行时 `exec_tool` 桥接执行 `tool.json` 中定义的工具。
 
 **输入（概念）**
 
@@ -175,7 +175,7 @@
 **实现**
 
 1. 校验工具存在（可选；通常可省略）：
-   - 若本回合**已读取过** `tools.json`，直接复用该结果，无需再次 `read`。
+   - 若本回合**已读取过** `tool.json`，直接复用该结果，无需再次 `read`。
    - 若未读取过且需预校验，可调用 `/tool get`；若已确认 `toolid` 存在（如来自刚添加的 source），**跳过此步**，直接调用 `exec_tool`。
    - `exec_tool` 失败时会返回详细错误（含可用 tool id 列表），足以诊断问题。
 
@@ -183,7 +183,7 @@
    - 输入：`{"toolid": "<toolid>", "params": { /* 参数值 */ }}`
 
 3. `exec_tool` 会：
-   - 读取 `tools.json`。
+   - 读取 `tool.json`。
    - 按 `toolid` 定位工具。
    - 执行底层 `executor`：
      - `"exec"` 类型：执行命令。
@@ -210,7 +210,7 @@
   - 底层错误信息（命令失败、transformer 失败等）
 - 对 `exec` 类型：命令失败时错误会包含退出码、stderr、stdout。
 - transformer 失败时，错误会包含原始输出预览和失败的 JSONata 表达式。
-- 若在 `tools.json` 中未找到工具，错误会列出所有可用 tool id。
+- 若在 `tool.json` 中未找到工具，错误会列出所有可用 tool id。
 - 若缺少必需参数，错误会列出缺失参数及其描述。
 
 **常见问题排查**

@@ -26,11 +26,11 @@ export const tool = defineStore({
   },
   actions: {
     async sync() {
-      this.raw = await readJson('tools.json').catch(() => ({}))
+      this.raw = await readJson('tool.json').catch(() => ({}))
     },
     async set(value: Record<string, Tool>) {
       this.raw = value
-      await writeJson('tools.json', value)
+      await writeJson('tool.json', value)
     },
   },
 })

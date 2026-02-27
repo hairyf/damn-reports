@@ -105,7 +105,7 @@ export class Record extends Model<DB, 'record'> {
     return query
   }
 
-  /** Fetch records and merge with source info from sources.json. Use findManyPageWithSources for UI. */
+  /** Fetch records and merge with source info from source.json. Use findManyPageWithSources for UI. */
   async findManyPageWithSources(
     input: RecordFindManyPageInput,
     sourceMap: Map<string, { name: string, tool: string }>,

@@ -1,10 +1,10 @@
-# sources.json 与单个数据源格式
+# source.json 与单个数据源格式
 
-本文描述 `sources.json` 的顶层结构及单个数据源条目的预期格式。
+本文描述 `source.json` 的顶层结构及单个数据源条目的预期格式。
 
-## sources.json 顶层结构
+## source.json 顶层结构
 
-- 文件 `sources.json` 为 **JSON 数组**。
+- 文件 `source.json` 为 **JSON 数组**。
 - 每个元素为 **数据源定义对象**。
 - 每个数据源由其 `id` 字段唯一标识。
 
@@ -42,7 +42,7 @@
   - 数据源的简短描述。
 
 - `tool`（string）
-  - 关联的采集器类型（`tools.json` 中的 tool id）。
+  - 关联的采集器类型（`tool.json` 中的 tool id）。
 
 - `enable`（boolean，可选）
   - 是否启用此数据源。省略时默认为 `true`。
@@ -58,7 +58,7 @@
 - `updatedAt`（string）
   - ISO 8601 时间戳，最后更新时间。
 
-## 与 tools.json 的关系
+## 与 tool.json 的关系
 
-- `source.tool` 引用 `tools.json` 中的 tool id。
+- `source.tool` 引用 `tool.json` 中的 tool id。
 - `source.params` 的字段应与该工具的 `definition` 参数对应，执行时用于填充 `executor` 中的 `{{...}}` 占位符。

@@ -60,7 +60,7 @@
   - 仅对 `at` 类型有效。为 `true` 时，一次性任务成功后自动删除。
 
 - `files`（可选，字符串数组）
-  - 导出/导入时携带的附件路径（相对工作区），如 reportend 的 `payload.command` 所引用的脚本。与 tools.json 中工具的 `files` 含义一致。
+  - 导出/导入时携带的附件路径（相对工作区），如 reportend 的 `payload.command` 所引用的脚本。与 tool.json 中工具的 `files` 含义一致。
 
 - `schedule`（object）
   - 调度配置，五种类型之一：

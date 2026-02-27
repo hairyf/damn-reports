@@ -4,8 +4,8 @@
 
 | Action | Input | Output | Description |
 |--------|-------|--------|-------------|
-| `sync` | - | `Promise<void>` | 从 sources.json 加载配置到内存 |
-| `save` | - | `Promise<void>` | 持久化 raw 到 sources.json |
+| `sync` | - | `Promise<void>` | 从 source.json 加载配置到内存 |
+| `save` | - | `Promise<void>` | 持久化 raw 到 source.json |
 | `find` | `id` | `Source \| undefined` | 按 ID 查找 |
 | `create` | `Omit<Source, 'id' \| 'createdAt' \| 'updatedAt'>` | `Promise<Source>` | 创建数据源 |
 | `update` | `id`, `partial` | `Promise<void>` | 更新数据源 |
@@ -28,4 +28,4 @@ interface Source {
 
 ## Persistence
 
-- `sources.json`：数据源配置（路径由 storage driver 决定，通常为 app 数据目录）
+- `source.json`：数据源配置（路径由 storage driver 决定，通常为 app 数据目录）

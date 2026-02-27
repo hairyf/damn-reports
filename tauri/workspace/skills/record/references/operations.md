@@ -38,7 +38,7 @@
 
 **目的**
 
-调用 `sync_records` 同步采集数据（执行 tools.json 中配置的采集流程）。
+调用 `sync_records` 同步采集数据（执行 tool.json 中配置的采集流程）。
 
 **实现**
 
