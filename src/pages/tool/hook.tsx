@@ -22,14 +22,13 @@ const SCHEDULE_KINDS = [
   { key: 'cron', label: 'Cron 表达式' },
   { key: 'every', label: '固定间隔' },
   { key: 'at', label: '一次性' },
-  { key: 'report-end', label: '日报生成后' },
+  { key: 'reportend', label: '日报生成后' },
 ]
 
 const PAYLOAD_KINDS = [
   { key: 'collect', label: '收集数据' },
   { key: 'report', label: '生成报告' },
-  { key: 'reportEnd', label: '日报生成后执行' },
-  { key: 'agentTurn', label: 'AI 对话' },
+  { key: 'mainagent', label: 'AI 对话' },
   { key: 'command', label: '执行命令' },
 ]
 
@@ -78,7 +77,7 @@ function formatAtForInput(iso?: string): string {
 
 function getDefaultValues(job?: { name: string, description?: string, schedule: CronSchedule, payload: CronPayload } | null): HookFormValues {
   const sch = job?.schedule
-  const reportEndSch = sch?.kind === 'report-end' ? sch : null
+  const reportEndSch = sch?.kind === 'reportend' ? sch : null
   return {
     name: job?.name ?? '',
     description: job?.description ?? '',
@@ -88,9 +87,9 @@ function getDefaultValues(job?: { name: string, description?: string, schedule: 
     everyMs: sch?.kind === 'every' ? String(sch.everyMs) : '3600000',
     atTime: sch?.kind === 'at' ? formatAtForInput(sch.at) : '',
     reportEndTrigger: reportEndSch?.trigger ?? 'every',
-    reportEndCommand: reportEndSch?.command ?? '',
+    reportEndCommand: job?.payload?.kind === 'command' && sch?.kind === 'reportend' ? job.payload.command : '',
     payloadKind: job?.payload?.kind ?? 'collect',
-    agentMessage: job?.payload?.kind === 'agentTurn' ? (job.payload as { message: string }).message : '',
+    agentMessage: job?.payload?.kind === 'mainagent' ? (job.payload as { message: string }).message : '',
     command: job?.payload?.kind === 'command' ? (job.payload as { command: string }).command : '',
   }
 }
@@ -120,11 +119,10 @@ function Page() {
         return { kind: 'every', everyMs: Number(values.everyMs) || 3600000 }
       case 'at':
         return { kind: 'at', at: values.atTime || new Date().toISOString() }
-      case 'report-end':
+      case 'reportend':
         return {
-          kind: 'report-end',
+          kind: 'reportend',
           trigger: (values.reportEndTrigger === 'scheduled' ? 'scheduled' : 'every') as 'every' | 'scheduled',
-          command: values.reportEndCommand?.trim() || '',
         }
       case 'cron':
         return { kind: 'cron', expr: values.cronExpr, tz: 'Asia/Shanghai' }
@@ -134,15 +132,13 @@ function Page() {
   }
 
   function buildPayload(values: HookFormValues): CronPayload {
-    if (values.scheduleKind === 'report-end')
-      return { kind: 'reportEnd' }
+    if (values.scheduleKind === 'reportend')
+      return { kind: 'command', command: values.reportEndCommand?.trim() || '' }
     switch (values.payloadKind) {
       case 'report':
         return { kind: 'report' }
-      case 'reportEnd':
-        return { kind: 'reportEnd' }
-      case 'agentTurn':
-        return { kind: 'agentTurn', message: values.agentMessage }
+      case 'mainagent':
+        return { kind: 'mainagent', message: values.agentMessage }
       case 'command':
         return { kind: 'command', command: values.command }
       default:
@@ -157,7 +153,7 @@ function Page() {
   const onSubmit = form.handleSubmit(async (values) => {
     if (!values.name.trim())
       return
-    if (values.scheduleKind === 'report-end' && !values.reportEndCommand?.trim()) {
+    if (values.scheduleKind === 'reportend' && !values.reportEndCommand?.trim()) {
       addToast({ title: '错误', description: '请输入执行命令', color: 'danger' })
       return
     }
@@ -395,7 +391,7 @@ function Page() {
                     )}
                   />
                 )}
-                {scheduleKind === 'report-end' && (
+                {scheduleKind === 'reportend' && (
                   <>
                     <FormField
                       control={form.control}
@@ -422,7 +418,7 @@ function Page() {
                   </>
                 )}
               </div>
-              {scheduleKind === 'report-end' && (
+              {scheduleKind === 'reportend' && (
                 <FormField
                   control={form.control}
                   name="reportEndCommand"
@@ -443,7 +439,7 @@ function Page() {
                   )}
                 />
               )}
-              {scheduleKind !== 'report-end' && (
+              {scheduleKind !== 'reportend' && (
                 <FormField
                   control={form.control}
                   name="payloadKind"
@@ -466,7 +462,7 @@ function Page() {
                   )}
                 />
               )}
-              {payloadKind === 'agentTurn' && (
+              {payloadKind === 'mainagent' && (
                 <FormField
                   control={form.control}
                   name="agentMessage"

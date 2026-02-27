@@ -12,14 +12,14 @@ export interface ExecutorDeps {
 }
 
 /**
- * 执行 report-end 命令：将报告写入临时文件，以文件路径为参数调用命令
+ * 执行 reportend 命令：将报告写入临时文件，以文件路径为参数调用命令
  * 最终执行：{command} "<reportPath>"
  * 脚本可通过首个参数读取报告文件路径
  */
 export async function executeReportEndCommand(command: string, reportContent: string): Promise<string> {
   const workspace = await resolveResource('workspace')
   // 使用正斜杠，Node 在 Windows 上兼容
-  const reportPath = `${workspace}/.report-end-${Date.now()}.md`.replace(/\\/g, '/')
+  const reportPath = `${workspace}/.reportend-${Date.now()}.md`.replace(/\\/g, '/')
   try {
     await writeTextFile(reportPath, reportContent)
     const fullCommand = `${command.trim()} "${reportPath.replace(/"/g, '\\"')}"`
@@ -39,7 +39,7 @@ export interface ExecuteResult {
 }
 
 export interface ExecuteJobOptions {
-  /** 是否为定时器触发（用于 report-end 的 trigger: scheduled 判断） */
+  /** 是否为定时器触发（用于 reportend 的 trigger: scheduled 判断） */
   fromScheduled?: boolean
 }
 
@@ -62,7 +62,7 @@ export async function executeJob(
         console.info(`[cron] job "${job.name}" generated report`)
         return { status: 'ok' }
       }
-      case 'agentTurn': {
+      case 'mainagent': {
         await deps.sendChatMessage(payload.message)
         console.info(`[cron] job "${job.name}" sent agent message`)
         return { status: 'ok' }
@@ -72,9 +72,6 @@ export async function executeJob(
         console.info(`[cron] job "${job.name}" command output:`, output)
         return { status: 'ok' }
       }
-      case 'reportEnd':
-        // report-end 由 triggerReportEndJobs 触发，不在此分支执行
-        return { status: 'skipped', error: 'report-end triggered by report generation' }
       default:
         return { status: 'skipped', error: `unknown payload kind` }
     }

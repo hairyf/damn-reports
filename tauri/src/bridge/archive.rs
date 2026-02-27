@@ -14,6 +14,9 @@ fn workspace_root(app: &AppHandle) -> Result<PathBuf, String> {
     Ok(resource_dir.join("workspace"))
 }
 
+/// 默认内置工具 ID，不允许导出
+const BUILTIN_TOOL_IDS: &[&str] = &["git_directory", "clickup"];
+
 fn read_workspace_json(app: &AppHandle, path: &str) -> Result<Value, String> {
     let root = workspace_root(app)?;
     let full = root.join(path);
@@ -42,6 +45,9 @@ pub async fn workspace_export_tools(app: AppHandle, save_path: String, tool_id: 
     .map_err(|e| format!("Parse tools.json: {}", e))?;
 
     let obj = tools.as_object().ok_or("tools.json is not an object")?;
+    if BUILTIN_TOOL_IDS.contains(&tool_id.as_str()) {
+        return Err(format!("Built-in tool '{}' cannot be exported", tool_id));
+    }
     let tool = obj.get(&tool_id).ok_or_else(|| format!("Tool '{}' not found", tool_id))?;
     let mut index_obj = Map::new();
     index_obj.insert(tool_id.clone(), tool.clone());
@@ -128,6 +134,9 @@ pub async fn workspace_export_cron(app: AppHandle, save_path: String, job_id: St
         .iter()
         .find(|j| j.get("id").and_then(Value::as_str) == Some(&job_id))
         .ok_or_else(|| format!("Job '{}' not found", job_id))?;
+    if job.get("system").and_then(Value::as_bool).unwrap_or(false) {
+        return Err(format!("System job '{}' cannot be exported", job_id));
+    }
 
     let mut files_to_add: Vec<String> = Vec::new();
     if let Some(arr) = job.get("files").and_then(Value::as_array) {

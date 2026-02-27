@@ -13,6 +13,9 @@ import { useStore } from 'valtio-define'
 import { store } from '@/store'
 import { exportTools, importTools } from '@/tools/workspace-archive'
 
+/** 默认内置工具，不允许导出 */
+const BUILTIN_TOOL_IDS = ['git_directory', 'clickup']
+
 export function PageTools() {
   const navigate = useNavigate()
   const [search, setSearch] = useState('')
@@ -129,15 +132,17 @@ export function PageTools() {
                         {tool.description}
                       </p>
                     </div>
-                    <Button
-                      isIconOnly
-                      variant="light"
-                      size="sm"
-                      onPress={() => onExport(tool.id)}
-                      title="导出为 .tool"
-                    >
-                      <Icon icon="lucide:upload" className="w-4 h-4" />
-                    </Button>
+                    {!BUILTIN_TOOL_IDS.includes(tool.id) && (
+                      <Button
+                        isIconOnly
+                        variant="light"
+                        size="sm"
+                        onPress={() => onExport(tool.id)}
+                        title="导出为 .tool"
+                      >
+                        <Icon icon="lucide:upload" className="w-4 h-4" />
+                      </Button>
+                    )}
                   </div>
                 </CardBody>
               </Card>

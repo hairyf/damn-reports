@@ -16,8 +16,7 @@ import { HookItem } from './hook-item'
 const PAYLOAD_LABELS: Record<string, string> = {
   collect: '收集数据',
   report: '生成报告',
-  reportEnd: '日报生成后',
-  agentTurn: 'AI 对话',
+  mainagent: 'AI 对话',
   command: '执行命令',
 }
 
