@@ -1,5 +1,4 @@
 import type { StoreOptions } from '@tauri-apps/plugin-store'
-import { proxy } from '@hairy/utils'
 import { Store } from '@tauri-apps/plugin-store'
 import { defineDriver } from 'unstorage'
 
@@ -9,41 +8,30 @@ export interface TauriStorageDriverOptions {
 }
 
 export const tauriStorageDriver = defineDriver<TauriStorageDriverOptions | undefined, never>((options) => {
-  const store = proxy<Store>()
-  const path = options?.path ?? '.store.dat'
-  const promise = Store.load(path, options?.options).then(store.proxy.update)
-
+  const promise = Store.load(options?.path ?? '.store.dat', options?.options)
   return {
     name: 'tauri-storage',
     options,
     async hasItem(key) {
-      await promise
-      return store.has(key)
+      return promise.then(store => store.has(key))
     },
     async getItem(key) {
-      await promise
-      const value = await store.get(key)
-      return value || '{}'
+      return promise.then(store => store.get(key))
     },
     async setItem(key, value) {
-      await promise
-      await store.set(key, value)
+      return promise.then(store => store.set(key, value))
     },
     async removeItem(key) {
-      await promise
-      await store.delete(key)
+      await promise.then(store => store.delete(key))
     },
     async getKeys() {
-      await promise
-      return store.keys()
+      return promise.then(store => store.keys())
     },
     async clear() {
-      await promise
-      await store.clear()
-      await store.save()
+      return promise.then(store => store.clear())
     },
     async watch(callback) {
-      return store.onChange(key => callback('update', key))
-    },
+      return promise.then(store => store.onChange(key => callback('update', key)))
+    }
   }
 })
