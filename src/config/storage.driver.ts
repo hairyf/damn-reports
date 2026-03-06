@@ -31,7 +31,7 @@ export const tauriStorageDriver = defineDriver<TauriStorageDriverOptions | undef
       return promise.then(store => store.clear())
     },
     async watch(callback) {
-      return promise.then(store => store.onChange(key => callback('update', key)))
-    }
+      return promise.then(store => store.onChange((key, value) => callback(value === null ? 'remove' : 'update', key)))
+    },
   }
 })
