@@ -30,7 +30,7 @@ const DEFAULT_CRONS: CronStoreFile = {
       enabled: true,
       system: true,
       schedule: { kind: 'cron', expr: '0 0 * * *' },
-      payload: { kind: 'mainagent', message: '储存今天的记忆' },
+      payload: { kind: 'mainagent', message: '储存今天的记忆后，清空主会话消息。' },
       state: {},
       createdAtMs: Date.now(),
       updatedAtMs: Date.now(),
