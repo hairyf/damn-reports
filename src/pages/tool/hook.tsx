@@ -472,6 +472,7 @@ function Page() {
                       <FormControl>
                         <Textarea
                           {...field}
+                          classNames={{ innerWrapper: 'py-2' }}
                           value={field.value ?? ''}
                           placeholder="发送给 AI 的消息内容"
                           labelPlacement="outside-top"

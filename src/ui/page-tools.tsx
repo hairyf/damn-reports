@@ -4,14 +4,14 @@ import {
   Button,
   Card,
   CardBody,
-  Chip,
   Input,
 } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useMemo } from 'react'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
-import { exportTools, importTools } from '@/tools/workspace-archive'
+import { exportTools, handleImportAndInstall, importTools } from '@/utils/workspace-archive'
+import { ToolItem } from './tool-item'
 
 /** 默认内置工具，不允许导出 */
 const BUILTIN_TOOL_IDS = ['git_directory', 'clickup']
@@ -52,16 +52,17 @@ export function PageTools() {
   }
 
   async function onImport() {
-    try {
-      const ok = await importTools()
-      if (ok) {
-        await store.tool.sync()
-        addToast({ title: '导入成功', description: '已合并工具配置并刷新', color: 'success' })
-      }
-    }
-    catch (e) {
-      addToast({ title: '导入失败', description: String(e), color: 'danger' })
-    }
+    await handleImportAndInstall({
+      importFn: importTools,
+      refreshFn: () => store.tool.sync(),
+      rollbackFn: async (ids) => {
+        const next = { ...store.tool.raw }
+        for (const id of ids)
+          delete next[id]
+        await store.tool.set(next)
+      },
+      successMsg: '已合并工具配置',
+    })
   }
 
   return (
@@ -98,7 +99,7 @@ export function PageTools() {
               onPress={onImport}
               startContent={<Icon icon="lucide:download" className="w-4 h-4" />}
             >
-              从 .tool 导入
+              导入
             </Button>
           </div>
         </CardBody>
@@ -107,45 +108,12 @@ export function PageTools() {
         <If cond={tools.length > 0}>
           <Then>
             {tools.map(tool => (
-              <Card key={tool.id} shadow="none">
-                <CardBody>
-                  <div className="flex items-center gap-4">
-                    <div className="flex-shrink-0">
-                      <ToolIcon type={tool.id} size={24} />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-center gap-2">
-                        <span className="font-medium">{tool.name}</span>
-                        <Chip size="sm" variant="flat" color="default" className="text-xs">
-                          {tool.id}
-                        </Chip>
-                        <Chip
-                          size="sm"
-                          variant="flat"
-                          color={tool.type === 'exec' ? 'secondary' : 'primary'}
-                          className="text-xs"
-                        >
-                          {tool.type}
-                        </Chip>
-                      </div>
-                      <p className="text-sm text-default-500 mt-1 truncate">
-                        {tool.description}
-                      </p>
-                    </div>
-                    {!BUILTIN_TOOL_IDS.includes(tool.id) && (
-                      <Button
-                        isIconOnly
-                        variant="light"
-                        size="sm"
-                        onPress={() => onExport(tool.id)}
-                        title="导出为 .tool"
-                      >
-                        <Icon icon="lucide:upload" className="w-4 h-4" />
-                      </Button>
-                    )}
-                  </div>
-                </CardBody>
-              </Card>
+              <ToolItem
+                key={tool.id}
+                tool={tool}
+                onExport={onExport}
+                canExport={!BUILTIN_TOOL_IDS.includes(tool.id)}
+              />
             ))}
           </Then>
           <Else>

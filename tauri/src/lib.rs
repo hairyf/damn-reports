@@ -95,6 +95,7 @@ fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
         bridge::archive::workspace_import_tools,
         bridge::archive::workspace_export_cron,
         bridge::archive::workspace_import_cron,
+        bridge::archive::workspace_install_dependencies,
         bridge::cmd::database_loaded,
         bridge::fs::fs_exists,
         bridge::fs::fs_read_file,

@@ -10,7 +10,7 @@ import { Icon } from '@iconify/react'
 import { useMemo } from 'react'
 import { useStore } from 'valtio-define'
 import { store } from '@/store'
-import { exportCron, importCron } from '@/tools/workspace-archive'
+import { exportCron, handleImportAndInstall, importCron } from '@/utils/workspace-archive'
 import { HookItem } from './hook-item'
 
 const PAYLOAD_LABELS: Record<string, string> = {
@@ -57,17 +57,18 @@ export function PageHooks() {
   }
 
   async function onImport() {
-    try {
-      const ok = await importCron()
-      if (ok) {
+    await handleImportAndInstall({
+      importFn: importCron,
+      refreshFn: async () => {
         store.cron.stop()
         await store.cron.start()
-        addToast({ title: '导入成功', description: '已合并定时任务并刷新', color: 'success' })
-      }
-    }
-    catch (e) {
-      addToast({ title: '导入失败', description: String(e), color: 'danger' })
-    }
+      },
+      rollbackFn: async (ids) => {
+        for (const id of ids)
+          await store.cron.remove(id)
+      },
+      successMsg: '已合并定时任务',
+    })
   }
 
   return (
@@ -101,7 +102,7 @@ export function PageHooks() {
               onPress={onImport}
               startContent={<Icon icon="lucide:download" className="w-4 h-4" />}
             >
-              从 .cron 导入
+              导入
             </Button>
           </div>
         </CardBody>

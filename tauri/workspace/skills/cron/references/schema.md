@@ -62,6 +62,9 @@
 - `files`（可选，字符串数组）
   - 导出/导入时携带的附件路径（相对工作区），如 reportend 的 `payload.command` 所引用的脚本。与 tool.json 中工具的 `files` 含义一致。
 
+- `dependencies`（可选，对象）
+  - npm 依赖，与 workspace 根目录 `package.json` 的 `dependencies` 格式一致，键为包名，值为版本（如 `"^1.0.0"`）。导入 .cron 后若存在此字段，会在工作区自动执行 `pnpm install` 或 `npm install` 安装这些依赖。
+
 - `schedule`（object）
   - 调度配置，五种类型之一：
 

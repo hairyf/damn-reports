@@ -29,7 +29,6 @@ const DEFAULT_CRONS: CronStoreFile = {
       description: '每日零点存储主会话记忆并清空',
       enabled: true,
       system: true,
-      view: false,
       schedule: { kind: 'cron', expr: '0 0 * * *' },
       payload: { kind: 'mainagent', message: '储存今天的记忆' },
       state: {},
