@@ -41,6 +41,8 @@ export interface CronJob {
   view?: boolean
   /** 导出/导入时携带的附件路径（相对工作区），如 reportend 的脚本 */
   files?: readonly string[]
+  /** npm 依赖，与 package.json dependencies 格式一致，导入后会在工作区自动安装 */
+  dependencies?: Record<string, string>
   schedule: CronSchedule
   payload: CronPayload
   state: CronJobState

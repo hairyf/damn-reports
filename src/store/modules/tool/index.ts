@@ -10,6 +10,8 @@ export interface Tool {
   executor?: Record<string, any>
   transformer?: string
   files?: string[]
+  /** npm 依赖，与 package.json dependencies 格式一致，导入后会在工作区自动安装 */
+  dependencies?: Record<string, string>
 }
 
 export const tool = defineStore({

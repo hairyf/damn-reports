@@ -32,7 +32,10 @@ export function ChatSessions() {
     store.chat.clearMessages(MAIN_SESSION_ID)
   }
 
-  useMount(store.chat.ensureMain)
+  useMount(() => {
+    store.chat.ensureMain()
+    store.chat.clearStaleStreamingState()
+  })
 
   return (
     <Card className="w-56 flex-shrink-0 h-full" shadow="none">

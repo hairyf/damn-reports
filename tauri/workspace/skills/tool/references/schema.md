@@ -60,6 +60,9 @@
   - 路径相对于工作区资源根目录。
   - **复杂执行器**：优先在 `tools/` 下添加 Node 脚本并在此列出；使用 `executor.command: "node"` 和 `executor.args: ["./tools/script.js", ...]`。
 
+- `dependencies`（可选，对象）
+  - npm 依赖，与 workspace 根目录 `package.json` 的 `dependencies` 格式一致，键为包名，值为版本（如 `"^1.0.0"`）。导入 .tool 后若存在此字段，会在工作区自动执行 `pnpm install` 或 `npm install` 安装这些依赖。
+
 - `executor`（object）
   - 如何调用底层系统或 HTTP 层。
   - 结构随 `type` 不同：
