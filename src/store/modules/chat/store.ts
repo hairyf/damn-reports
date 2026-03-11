@@ -10,8 +10,8 @@ import { MAIN_SESSION_ID, NEW_SESSION_ID } from './types'
 import { createId, createMainSession, updateTimestamp } from './utils'
 import 'valtio-define/types'
 
-// 不放在 state 里，避免被持久化
-let abortController: AbortController | null = null
+// 不放在 state 里，避免被持久化；按 sessionId 存储，支持多会话并发
+const abortControllers = new Map<string, AbortController>()
 
 /** 流式更新 assistant 消息内容（模块内部使用） */
 function applyStreamDelta(
@@ -84,7 +84,8 @@ export const chat = defineStore(
     state: () => ({
       sessions: [] as ChatSession[],
       activeSessionId: null as string | null,
-      streaming: false,
+      /** 正在流式输出的会话 id 列表，用于多会话并发 */
+      streamingSessionIds: [] as string[],
     }),
     persist: {
       key: 'chat',
@@ -97,6 +98,12 @@ export const chat = defineStore(
         if (!this.activeSessionId)
           return this.sessions[0] ?? null
         return this.sessions.find(s => s.id === this.activeSessionId) ?? null
+      },
+      /** 当前选中的会话是否正在流式输出（用于输入区禁用/停止按钮） */
+      streaming(): boolean {
+        if (!this.activeSessionId || this.activeSessionId === NEW_SESSION_ID)
+          return false
+        return this.streamingSessionIds.includes(this.activeSessionId)
       },
     },
     actions: {
@@ -155,6 +162,12 @@ export const chat = defineStore(
           target.lastClearedAt = now
       },
 
+      /** 清空已失效的流式状态（应用启动时调用；无活跃请求时才清空，避免误清正在进行的流） */
+      clearStaleStreamingState() {
+        if (abortControllers.size === 0)
+          this.streamingSessionIds = []
+      },
+
       /** 确保主会话存在且置顶 */
       ensureMain() {
         let main = this.sessions.find(s => s.id === MAIN_SESSION_ID)
@@ -176,17 +189,16 @@ export const chat = defineStore(
         const content = userContent.trim()
         if (!content && files.length === 0)
           return
-        if (this.streaming)
-          throw new Error('当前正在生成回复，请稍后再试')
-        if (!store.llm.resolvedApiKey?.trim())
-          throw new Error('请先在设置中配置 LLM API Key')
-
         let current = this.activeSession
         if (!current)
           current = this.create()
+        const sessionId = current.id
+        if (this.streamingSessionIds.includes(sessionId))
+          throw new Error('当前会话正在生成回复，请稍后再试')
+        if (!store.llm.resolvedApiKey?.trim())
+          throw new Error('请先在设置中配置 LLM API Key')
 
         const isFirstRound = current.messages.length === 0
-        const sessionId = current.id
         const now = new Date().toISOString()
         const userMessageId = createId()
         const assistantMessageId = createId()
@@ -211,8 +223,9 @@ export const chat = defineStore(
         const messagesForModel = buildMessagesForModel(current.messages, content, files)
 
         const controller = new AbortController()
-        abortController = controller
-        this.streaming = true
+        abortControllers.set(sessionId, controller)
+        if (!this.streamingSessionIds.includes(sessionId))
+          this.streamingSessionIds = [...this.streamingSessionIds, sessionId]
         const isMainSession = sessionId === MAIN_SESSION_ID
         const isExistsYesterdayMemory = await fs.exists(`memory/${dayjs().format('YYYY-MM-DD')}.md`)
         const isExistsBootstrap = await fs.exists('BOOTSTRAP.md')
@@ -251,18 +264,22 @@ export const chat = defineStore(
           throw error
         }
         finally {
-          this.streaming = false
-          abortController = null
+          abortControllers.delete(sessionId)
+          this.streamingSessionIds = this.streamingSessionIds.filter(id => id !== sessionId)
         }
       },
 
-      /** 中止当前流式生成 */
-      abort() {
-        if (abortController) {
-          abortController.abort()
-          abortController = null
+      /** 中止指定会话的流式生成（不传则中止当前选中的会话） */
+      abort(sessionId?: string) {
+        const id = sessionId ?? this.activeSessionId
+        if (!id)
+          return
+        const controller = abortControllers.get(id)
+        if (controller) {
+          controller.abort()
+          abortControllers.delete(id)
+          this.streamingSessionIds = this.streamingSessionIds.filter(sid => sid !== id)
         }
-        this.streaming = false
       },
     },
   },
