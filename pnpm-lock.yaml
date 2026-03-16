@@ -146,6 +146,9 @@ importers:
       kysely-dialect-tauri:
         specifier: ^1.2.1
         version: 1.2.1(@tauri-apps/plugin-sql@2.3.1)(kysely@0.28.10)
+      kysely-model:
+        specifier: ^0.1.0
+        version: 0.1.0(kysely@0.28.10)
       kysely-orm:
         specifier: ^0.9.7
         version: 0.9.7(kysely@0.28.10)
@@ -4970,6 +4973,11 @@ packages:
     resolution: {integrity: sha512-/Bs3/Uktn04nQ9g/4oSphLMEtSHkS5+j5hbKjK5gMqXQfqr/v3V3FKtoN4pLTmo2W35hNdrIpQnBukGL1zZc6g==}
     peerDependencies:
       kysely: '>=0.26'
+
+  kysely-model@0.1.0:
+    resolution: {integrity: sha512-oL0N5vT2DF/7KuUdWdJcGU7Wy/+9FT4j4oWCo6mGmWIQ8wBAkiyvvfpVJktiBgZIeFmEoYGJWOV5tzS6uZw1Qg==}
+    peerDependencies:
+      kysely: '>=0.28'
 
   kysely-orm@0.9.7:
     resolution: {integrity: sha512-NEeilkpGqwJ3dXjibYiSXJONWOhouEG7D+X98k+ZYjt1iccZctikUnYfDXYQzF95jTny20+G3Ng2snx49vqYwg==}
@@ -12361,6 +12369,10 @@ snapshots:
       kysely-generic-sqlite: 1.2.1(kysely@0.28.10)
 
   kysely-generic-sqlite@1.2.1(kysely@0.28.10):
+    dependencies:
+      kysely: 0.28.10
+
+  kysely-model@0.1.0(kysely@0.28.10):
     dependencies:
       kysely: 0.28.10
 

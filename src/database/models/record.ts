@@ -1,6 +1,6 @@
 import type { Kysely } from 'kysely'
 import dayjs from 'dayjs'
-import { Model } from '../model'
+import { Model } from 'kysely-model'
 
 export interface RecordFindManyInput {
   search?: string

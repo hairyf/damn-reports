@@ -66,6 +66,7 @@
     "jsonata": "^2.1.0",
     "kysely": "^0.28.10",
     "kysely-dialect-tauri": "^1.2.1",
+    "kysely-model": "^0.1.0",
     "kysely-orm": "^0.9.7",
     "mitt": "^3.0.1",
     "mustache": "^4.2.0",

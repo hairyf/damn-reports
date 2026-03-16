@@ -92,6 +92,8 @@ declare global {
   const executeCommandExpression: typeof import('../utils/exec').executeCommandExpression
   const executeHttpRequestExpression: typeof import('../utils/exec').executeHttpRequestExpression
   const exists: typeof import('../utils/fs-extra').exists
+  const exportCron: typeof import('../utils/workspace-archive').exportCron
+  const exportTools: typeof import('../utils/workspace-archive').exportTools
   const find: typeof import('../tools/file').find
   const forwardRef: typeof import('react').forwardRef
   const generateTitlePrompt: typeof import('../config/prompts').generateTitlePrompt
@@ -105,7 +107,11 @@ declare global {
   const git_directory: typeof import('../config/collectors').git_directory
   const grep: typeof import('../utils/fs-extra').grep
   const grep_tool: typeof import('../tools/file').grep_tool
+  const handleImportAndInstall: typeof import('../utils/workspace-archive').handleImportAndInstall
   const http: typeof import('../tools/http').http
+  const importCron: typeof import('../utils/workspace-archive').importCron
+  const importTools: typeof import('../utils/workspace-archive').importTools
+  const installWorkspaceDependencies: typeof import('../utils/workspace-archive').installWorkspaceDependencies
   const layouts: typeof import('../layouts/index').layouts
   const lazy: typeof import('react').lazy
   const ls: typeof import('../tools/file').ls
@@ -250,6 +256,9 @@ declare global {
   // @ts-ignore
   export type { RetryOptions } from '../utils/utility'
   import('../utils/utility')
+  // @ts-ignore
+  export type { ImportResult } from '../utils/workspace-archive'
+  import('../utils/workspace-archive')
   // @ts-ignore
   export type { UseOffsetPaginationOptions, Pagination } from '../hooks/use-offset-pagination'
   import('../hooks/use-offset-pagination')
