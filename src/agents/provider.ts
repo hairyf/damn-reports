@@ -1,4 +1,4 @@
-export const PROVIDERS = {
+export const presetProviders = {
   deepseek: {
     label: 'DeepSeek',
     protocol: 'openai',

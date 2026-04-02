@@ -3,8 +3,8 @@ import { addToast, Button, Card, CardBody, CardHeader, Input, Select, SelectItem
 import { Icon } from '@iconify/react'
 import { useState } from 'react'
 import { useStore } from 'valtio-define'
+import { presetProviders } from '@/agents/provider'
 import { store } from '@/store'
-import { PROVIDERS } from '@/store/modules/agent/config'
 
 const PRESET_PROVIDERS = ['deepseek', 'openai', 'anthropic', 'google'] as const satisfies readonly Provider[]
 
@@ -33,7 +33,6 @@ function parseSnapshot(s: string): {
 
 export function SettingLlmCard() {
   const agent = useStore(store.agent)
-  const isEnvConfigured = !!(import.meta.env.VITE_LLM_API_KEY as string | undefined)?.trim()
   const [savedSnapshot, setSavedSnapshot] = useState(() => snapshot(agent))
   const hasUnsavedChanges = snapshot(agent) !== savedSnapshot
 
@@ -51,7 +50,7 @@ export function SettingLlmCard() {
     store.agent.cutsom.url = restored.cutsom.url
   }
 
-  const presetModels = agent.provider !== 'custom' ? PROVIDERS[agent.provider]!.models : []
+  const presetModels = agent.provider !== 'custom' ? presetProviders[agent.provider]!.models : []
 
   return (
     <Card shadow="none">
@@ -102,7 +101,7 @@ export function SettingLlmCard() {
                   return
                 store.agent.provider = provider
                 if (provider !== 'custom') {
-                  const cfg = PROVIDERS[provider]!
+                  const cfg = presetProviders[provider]!
                   if (cfg.models.length > 0)
                     store.agent.model = cfg.models[0].value
                 }
@@ -112,7 +111,7 @@ export function SettingLlmCard() {
             >
               <>
                 {PRESET_PROVIDERS.map((key) => {
-                  const cfg = PROVIDERS[key]!
+                  const cfg = presetProviders[key]!
                   return (
                     <SelectItem key={key}>
                       {cfg.label}
@@ -196,18 +195,13 @@ export function SettingLlmCard() {
             <Icon icon="lucide:key" className="w-4 h-4 text-default-500" />
             <label className="text-sm font-medium">
               API Key
-              {isEnvConfigured && <span className="text-xs text-primary ml-2">(已由环境变量配置)</span>}
             </label>
           </div>
           <Input
-            value={isEnvConfigured ? '••••••••' : agent.apiKey}
+            value={agent.apiKey}
             onChange={e => (store.agent.apiKey = e.target.value)}
             type="password"
             placeholder="sk-..."
-            isDisabled={isEnvConfigured}
-            endContent={
-              isEnvConfigured ? <Icon icon="lucide:lock" className="text-default-400" /> : null
-            }
           />
         </div>
       </CardBody>

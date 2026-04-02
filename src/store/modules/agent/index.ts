@@ -11,7 +11,7 @@ import {
 } from 'ai'
 import { defineStore } from 'valtio-define'
 import { createReportAgent } from '@/agents'
-import { PROVIDERS } from './config'
+import { presetProviders } from '@/agents/provider'
 
 export type Provider = 'deepseek' | 'openai' | 'anthropic' | 'google' | 'custom'
 export type Protocol = 'openai' | 'anthropic' | 'google'
@@ -47,7 +47,7 @@ export const agent = defineStore({
       const isCustom = this.provider === 'custom'
       const protocol = isCustom
         ? this.cutsom.type
-        : PROVIDERS[this.provider]?.protocol
+        : presetProviders[this.provider]?.protocol
 
       const handler = handlers[this.provider as keyof typeof handlers]
 

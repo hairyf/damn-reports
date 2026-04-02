@@ -3,8 +3,8 @@ import { Button, Card, CardBody, Input, Select, SelectItem } from '@heroui/react
 import { Icon } from '@iconify/react'
 import { useState } from 'react'
 import { useStore } from 'valtio-define'
+import { presetProviders } from '@/agents/provider'
 import { store } from '@/store'
-import { PROVIDERS } from '@/store/modules/agent/config'
 
 const PRESET_PROVIDERS = ['deepseek', 'openai', 'anthropic', 'google'] as const satisfies readonly Provider[]
 
@@ -16,7 +16,7 @@ export function StepLlmSetting() {
   const [baseUrl, setBaseUrl] = useState(persisted.cutsom.url)
   const [protocol, setProtocol] = useState<Protocol>(persisted.cutsom.type)
 
-  const presetModels = provider !== 'custom' ? PROVIDERS[provider]!.models : []
+  const presetModels = provider !== 'custom' ? presetProviders[provider]!.models : []
   const isCustom = provider === 'custom'
 
   function onConfirm() {
@@ -54,7 +54,7 @@ export function StepLlmSetting() {
                     return
                   setProvider(p)
                   if (p !== 'custom') {
-                    const cfg = PROVIDERS[p]!
+                    const cfg = presetProviders[p]!
                     if (cfg.models.length > 0)
                       setModel(cfg.models[0].value)
                   }
@@ -67,7 +67,7 @@ export function StepLlmSetting() {
               >
                 <>
                   {PRESET_PROVIDERS.map((key) => {
-                    const cfg = PROVIDERS[key]!
+                    const cfg = presetProviders[key]!
                     return (
                       <SelectItem key={key}>
                         {cfg.label}

@@ -1,9 +1,9 @@
 import clsx from 'clsx'
 import { AnimatePresence, motion } from 'framer-motion'
 import { useStore } from 'valtio-define'
-import { store } from '@/store'
 import { Navbar } from '@/layouts/components/navbar'
 import { Sidebar } from '@/layouts/components/sidebar'
+import { store } from '@/store'
 import { Initiator } from './components/initiator'
 import { Main } from './components/main'
 
@@ -17,9 +17,8 @@ export interface DefaultLayoutProps {
 }
 
 export function DefaultLayout(props: DefaultLayoutProps) {
-  const envKey = (import.meta.env.VITE_LLM_API_KEY as string | undefined)?.trim()
-  const apiKey = useStore(store.agent).apiKey?.trim()
-  const isConfigured = !!envKey || !!apiKey
+  const agent = useStore(store.agent)
+  const isConfigured = agent.provider !== 'custom' && !!agent.apiKey?.trim()
 
   const isNeedInitiator = !isConfigured
 
