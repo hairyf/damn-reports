@@ -41,7 +41,7 @@ export function PageHooks() {
   }, [visibleJobs, debouncedSearch])
 
   function goSearchHook() {
-    store.chat.prepareNew()
+    store.session.prepare()
     navigate('/chat?intent=search-hook')
   }
 

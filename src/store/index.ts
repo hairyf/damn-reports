@@ -1,7 +1,7 @@
-import { chat } from './modules/chat'
+import { agent } from './modules/agent'
 import { cron } from './modules/cron'
-import { llm } from './modules/llm'
 import { report } from './modules/report'
+import { session } from './modules/session'
 import { setting } from './modules/setting'
 import { source } from './modules/source'
 import { tool } from './modules/tool'
@@ -10,10 +10,10 @@ import { updater } from './modules/updater'
 export const store = {
   source,
   tool,
-  chat,
+  session,
   cron,
   setting,
-  llm,
+  agent,
   updater,
   report,
 }

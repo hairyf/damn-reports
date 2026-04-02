@@ -80,7 +80,7 @@ export function PageTools() {
             <Button
               color="primary"
               onPress={() => {
-                store.chat.prepareNew()
+                store.session.prepare()
                 navigate('/chat?intent=add-tool')
               }}
               startContent={<Icon icon="lucide:bot-message-square" className="w-4 h-4" />}

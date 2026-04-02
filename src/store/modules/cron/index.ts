@@ -1,10 +1,10 @@
 /* eslint-disable no-console */
 import type { CronJob, CronJobPatch, CronStoreFile } from '@/cron/types'
 import { defineStore } from 'valtio-define'
+import { MAIN_SESSION_ID } from '@/config/constants'
 import { offReportGenerated, onReportGenerated } from '@/cron/report'
 import { CronService } from '@/cron/service'
 import { store } from '@/store'
-import { MAIN_SESSION_ID } from '@/store/modules/chat'
 
 // ── Default jobs (migrate from Rust scheduler) ──
 
@@ -55,8 +55,8 @@ export const cron = defineStore({
 
       service = new CronService({
         load: async () => {
-          const cron = await readJson('cron.json')
-          if (!cron.jobs.length) {
+          const cron = await readJson('cron.json').catch(() => null)
+          if (!cron?.jobs?.length) {
             await writeJson('cron.json', DEFAULT_CRONS)
             return DEFAULT_CRONS
           }
@@ -72,8 +72,8 @@ export const cron = defineStore({
           generateReport: (fromScheduled?: boolean) =>
             store.report.generate({ fromScheduled }),
           sendChatMessage: async (message: string) => {
-            store.chat.activate(MAIN_SESSION_ID)
-            await store.chat.send(message)
+            store.session.activate(MAIN_SESSION_ID)
+            await store.session.send(message)
           },
         },
         onEvent: (evt) => {

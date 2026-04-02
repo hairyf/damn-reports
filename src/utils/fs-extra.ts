@@ -28,6 +28,21 @@ export async function readTextFile(path: string) {
   return invoke<string>('fs_read_text_file', { path })
 }
 
+/** 文件不存在或读取失败时返回占位文案，不抛错（用于系统提示等可选上下文） */
+export async function readTextFileOptional(
+  path: string,
+  whenMissing = '（文件不存在或暂不可读）',
+): Promise<string> {
+  try {
+    if (!(await exists(path)))
+      return whenMissing
+    return await readTextFile(path)
+  }
+  catch {
+    return whenMissing
+  }
+}
+
 export async function writeTextFile(path: string, data: string) {
   return invoke('fs_write_text_file', { path, data })
 }

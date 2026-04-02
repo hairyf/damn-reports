@@ -23,6 +23,9 @@
     "prepare": "skills-manifest install"
   },
   "dependencies": {
+    "@ai-sdk/anthropic": "^3.0.64",
+    "@ai-sdk/deepseek": "^2.0.26",
+    "@ai-sdk/google": "^3.0.55",
     "@ai-sdk/openai": "^3.0.26",
     "@hairy/react-lib": "^1.47.0",
     "@hairy/utils": "^1.47.0",

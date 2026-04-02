@@ -1,3 +1,4 @@
+import type { Session } from '@/store/modules/session'
 import { Button, Card, CardBody, ScrollShadow, Tooltip } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useOverlay } from '@overlastic/react'
@@ -5,19 +6,19 @@ import clsx from 'clsx'
 import { useMount } from 'react-use'
 import { useStore } from 'valtio-define'
 import { Dialog } from '@/components/dialog'
+import { MAIN_SESSION_ID } from '@/config/constants'
 import { store } from '@/store'
-import { MAIN_SESSION_ID } from '@/store/modules/chat'
 
 export function ChatSessions() {
-  const { sessions, activeSession } = useStore(store.chat)
+  const { sessions, session: activeSession } = useStore(store.session)
   const openDialog = useOverlay(Dialog)
 
   function handleNewSession() {
-    store.chat.prepareNew()
+    store.session.prepare()
   }
 
   function handleDeleteSession(id: string) {
-    store.chat.remove(id)
+    store.session.remove(id)
   }
 
   async function handleClearMainSession() {
@@ -29,12 +30,11 @@ export function ChatSessions() {
     })
     if (!confirmed)
       return
-    store.chat.clearMessages(MAIN_SESSION_ID)
+    store.session.clear(MAIN_SESSION_ID)
   }
 
   useMount(() => {
-    store.chat.ensureMain()
-    store.chat.clearStaleStreamingState()
+    store.session.clearStaleStreaming()
   })
 
   return (
@@ -51,7 +51,7 @@ export function ChatSessions() {
             >
               开启新对话
             </Button>
-            {sessions.map((item) => {
+            {(sessions as Session[]).map((item) => {
               const isActive = activeSession?.id === item.id
               return (
                 <Tooltip
@@ -68,7 +68,7 @@ export function ChatSessions() {
                         ? 'bg-primary/10 text-primary'
                         : 'hover:bg-default-100 text-default-400',
                     )}
-                    onPress={() => store.chat.activate(item.id)}
+                    onPress={() => store.session.activate(item.id)}
                   >
                     <div className="flex-1 min-w-0">
                       <div className="truncate font-medium text-foreground">

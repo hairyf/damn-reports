@@ -1,39 +1,57 @@
-import type { LlmProvider } from '@/store/modules/llm'
+import type { Protocol, Provider } from '@/store/modules/agent'
 import { addToast, Button, Card, CardBody, CardHeader, Input, Select, SelectItem, Tooltip } from '@heroui/react'
 import { Icon } from '@iconify/react'
 import { useState } from 'react'
 import { useStore } from 'valtio-define'
-import { VercelModelSelect } from '@/components/vercel-model-select'
 import { store } from '@/store'
-import { LLM_PROVIDERS } from '@/store/modules/llm'
+import { PROVIDERS } from '@/store/modules/agent/config'
 
-function snapshot(llm: { apiKey: string, baseUrl: string, provider: string, model: string }) {
-  return JSON.stringify({ apiKey: llm.apiKey, baseUrl: llm.baseUrl, provider: llm.provider, model: llm.model })
+const PRESET_PROVIDERS = ['deepseek', 'openai', 'anthropic', 'google'] as const satisfies readonly Provider[]
+
+function snapshot(agent: {
+  apiKey: string
+  provider: Provider
+  model: string
+  cutsom: { type: Protocol, url: string }
+}) {
+  return JSON.stringify({
+    apiKey: agent.apiKey,
+    provider: agent.provider,
+    model: agent.model,
+    cutsom: { ...agent.cutsom },
+  })
 }
 
-function parseSnapshot(s: string): { apiKey: string, baseUrl: string, provider: LlmProvider, model: string } {
-  const { apiKey, baseUrl, provider, model } = JSON.parse(s)
-  return { apiKey, baseUrl, provider, model }
+function parseSnapshot(s: string): {
+  apiKey: string
+  provider: Provider
+  model: string
+  cutsom: { type: Protocol, url: string }
+} {
+  return JSON.parse(s)
 }
 
 export function SettingLlmCard() {
-  const llm = useStore(store.llm)
-  const isEnvConfigured = store.llm.envConfigured
-  const [savedSnapshot, setSavedSnapshot] = useState(() => snapshot(llm))
-  const hasUnsavedChanges = snapshot(llm) !== savedSnapshot
+  const agent = useStore(store.agent)
+  const isEnvConfigured = !!(import.meta.env.VITE_LLM_API_KEY as string | undefined)?.trim()
+  const [savedSnapshot, setSavedSnapshot] = useState(() => snapshot(agent))
+  const hasUnsavedChanges = snapshot(agent) !== savedSnapshot
 
   function handleSave() {
-    setSavedSnapshot(snapshot(llm))
+    setSavedSnapshot(snapshot(agent))
     addToast({ title: '已保存', description: '模型设置已保存' })
   }
 
   function handleUndo() {
     const restored = parseSnapshot(savedSnapshot)
-    store.llm.apiKey = restored.apiKey
-    store.llm.baseUrl = restored.baseUrl
-    store.llm.provider = restored.provider
-    store.llm.model = restored.model
+    store.agent.apiKey = restored.apiKey
+    store.agent.provider = restored.provider
+    store.agent.model = restored.model
+    store.agent.cutsom.type = restored.cutsom.type
+    store.agent.cutsom.url = restored.cutsom.url
   }
+
+  const presetModels = agent.provider !== 'custom' ? PROVIDERS[agent.provider]!.models : []
 
   return (
     <Card shadow="none">
@@ -77,23 +95,34 @@ export function SettingLlmCard() {
               <label className="text-sm font-medium">Provider</label>
             </div>
             <Select
-              selectedKeys={[llm.provider]}
+              selectedKeys={[agent.provider]}
               onSelectionChange={(keys) => {
-                const provider = Array.from(keys)[0] as LlmProvider
-                if (provider) {
-                  store.llm.provider = provider
-                  const config = LLM_PROVIDERS[provider]
-                  store.llm.model = config.models.length > 0 ? config.models[0].value : ''
+                const provider = Array.from(keys)[0] as Provider
+                if (!provider)
+                  return
+                store.agent.provider = provider
+                if (provider !== 'custom') {
+                  const cfg = PROVIDERS[provider]!
+                  if (cfg.models.length > 0)
+                    store.agent.model = cfg.models[0].value
                 }
               }}
               placeholder="选择 Provider"
               aria-label="选择 Provider"
             >
-              {Object.entries(LLM_PROVIDERS).map(([key, config]) => (
-                <SelectItem key={key}>
-                  {config.label}
+              <>
+                {PRESET_PROVIDERS.map((key) => {
+                  const cfg = PROVIDERS[key]!
+                  return (
+                    <SelectItem key={key}>
+                      {cfg.label}
+                    </SelectItem>
+                  )
+                })}
+                <SelectItem key="custom">
+                  自定义 (Custom)
                 </SelectItem>
-              ))}
+              </>
             </Select>
           </div>
           <div className="flex flex-col gap-2">
@@ -101,56 +130,66 @@ export function SettingLlmCard() {
               <Icon icon="lucide:sparkles" className="w-4 h-4 text-default-500" />
               <label className="text-sm font-medium">Model</label>
             </div>
-            {llm.provider === 'vercel'
+            {presetModels.length > 0
               ? (
-                  <VercelModelSelect
-                    value={llm.model}
-                    onChange={v => (store.llm.model = v)}
-                    placeholder="搜索并选择模型"
-                    ariaLabel="选择具体模型"
-                    isDisabled={isEnvConfigured}
-                  />
+                  <Select
+                    selectedKeys={[agent.model]}
+                    onSelectionChange={(keys) => {
+                      const model = Array.from(keys)[0] as string
+                      if (model)
+                        store.agent.model = model
+                    }}
+                    placeholder="选择具体模型"
+                    aria-label="选择具体模型"
+                  >
+                    {presetModels.map(opt => (
+                      <SelectItem key={opt.value}>
+                        {opt.label}
+                      </SelectItem>
+                    ))}
+                  </Select>
                 )
-              : llm.providerModels.length > 0
-                ? (
-                    <Select
-                      selectedKeys={[llm.model]}
-                      onSelectionChange={(keys) => {
-                        const model = Array.from(keys)[0] as string
-                        if (model)
-                          store.llm.model = model
-                      }}
-                      placeholder="选择具体模型"
-                      aria-label="选择具体模型"
-                    >
-                      {llm.providerModels.map(opt => (
-                        <SelectItem key={opt.value}>
-                          {opt.label}
-                        </SelectItem>
-                      ))}
-                    </Select>
-                  )
-                : (
-                    <Input
-                      value={llm.model}
-                      onChange={e => (store.llm.model = e.target.value)}
-                      placeholder="如 gpt-4、claude-3"
-                    />
-                  )}
+              : (
+                  <Input
+                    value={agent.model}
+                    onChange={e => (store.agent.model = e.target.value)}
+                    placeholder="模型 ID"
+                  />
+                )}
           </div>
         </div>
-        {llm.customProvider && (
-          <div className="flex flex-col gap-2">
-            <div className="flex items-center gap-2">
-              <Icon icon="lucide:link" className="w-4 h-4 text-default-500" />
-              <label className="text-sm font-medium">Base URL</label>
+        {agent.provider === 'custom' && (
+          <>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Icon icon="lucide:network" className="w-4 h-4 text-default-500" />
+                <label className="text-sm font-medium">协议</label>
+              </div>
+              <Select
+                selectedKeys={[agent.cutsom.type]}
+                onSelectionChange={(keys) => {
+                  const p = Array.from(keys)[0] as Protocol
+                  if (p)
+                    store.agent.cutsom.type = p
+                }}
+                aria-label="自定义接口协议"
+              >
+                <SelectItem key="openai">OpenAI Compatible</SelectItem>
+                <SelectItem key="anthropic">Anthropic Messages</SelectItem>
+              </Select>
             </div>
-            <Input
-              value={llm.baseUrl}
-              onChange={e => (store.llm.baseUrl = e.target.value)}
-              placeholder="https://api.openai.com/v1"
-            />
-          </div>
+            <div className="flex flex-col gap-2">
+              <div className="flex items-center gap-2">
+                <Icon icon="lucide:link" className="w-4 h-4 text-default-500" />
+                <label className="text-sm font-medium">Base URL</label>
+              </div>
+              <Input
+                value={agent.cutsom.url}
+                onChange={e => (store.agent.cutsom.url = e.target.value)}
+                placeholder="https://api.openai.com/v1"
+              />
+            </div>
+          </>
         )}
         <div className="flex flex-col gap-2">
           <div className="flex items-center gap-2">
@@ -161,10 +200,10 @@ export function SettingLlmCard() {
             </label>
           </div>
           <Input
-            value={isEnvConfigured ? '••••••••' : llm.apiKey}
-            onChange={e => (store.llm.apiKey = e.target.value)}
+            value={isEnvConfigured ? '••••••••' : agent.apiKey}
+            onChange={e => (store.agent.apiKey = e.target.value)}
             type="password"
-            placeholder={llm.provider === 'vercel' ? 'Vercel AI Gateway API Key' : 'sk-...'}
+            placeholder="sk-..."
             isDisabled={isEnvConfigured}
             endContent={
               isEnvConfigured ? <Icon icon="lucide:lock" className="text-default-400" /> : null

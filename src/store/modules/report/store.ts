@@ -1,4 +1,5 @@
 import { addToast } from '@heroui/react'
+import { streamText } from 'ai'
 import dayjs from 'dayjs'
 import { defineStore } from 'valtio-define'
 import { queryClient } from '@/config/client'
@@ -8,6 +9,20 @@ import { store } from '@/store'
 import { writeTextFile } from '@/utils/fs-extra'
 import { buildRecordSummaryPrompt } from './utils'
 import 'valtio-define/types'
+
+/** 与旧 llm.streamGenerate 一致：从 fullStream 取 text-delta，遇 error/abort 抛出 */
+async function* pipeFullStreamToText(
+  stream: AsyncIterable<{ type: string, text?: string, error?: unknown }>,
+): AsyncIterable<string> {
+  for await (const part of stream) {
+    if (part.type === 'text-delta' && part.text)
+      yield part.text
+    else if (part.type === 'error')
+      throw part.error
+    else if (part.type === 'abort')
+      throw new Error('Stream aborted')
+  }
+}
 
 function validateSummary(summary: string): string {
   if (!summary?.trim() || summary === 'No record data available.') {
@@ -74,10 +89,12 @@ export const report = defineStore({
         console.warn('[report] streamGenerate start')
 
       try {
-        const textStream = store.llm.streamGenerate({
+        const result = streamText({
+          model: store.agent.getLanguageModel(),
           system: systemPrompt,
           prompt: userPrompt,
         })
+        const textStream = pipeFullStreamToText(result.fullStream)
         let chunkCount = 0
         for await (const delta of textStream) {
           chunkCount++

@@ -32,6 +32,9 @@ declare global {
   const Label: typeof import('../components/label').Label
   const Link: typeof import('react-router-dom').Link
   const Logo: typeof import('../components/icons').Logo
+  const MAIN_SESSION_ID: typeof import('../config/constants').MAIN_SESSION_ID
+  const MessageParts: typeof import('../components/message-parts').MessageParts
+  const MessageTool: typeof import('../components/message-tool').MessageTool
   const Modal: typeof import('../components/modal').Modal
   const Model: typeof import('../database/model').Model
   const MoonFilledIcon: typeof import('../components/icons').MoonFilledIcon
@@ -40,6 +43,7 @@ declare global {
   const N8N_LOGIN_DATA: typeof import('../config/constants').N8N_LOGIN_DATA
   const N8N_REGISTER_DATA: typeof import('../config/constants').N8N_REGISTER_DATA
   const N8N_WEBHOOK_ID: typeof import('../config/constants').N8N_WEBHOOK_ID
+  const NEW_SESSION_ID: typeof import('../config/constants').NEW_SESSION_ID
   const NavLink: typeof import('react-router-dom').NavLink
   const Navigate: typeof import('react-router-dom').Navigate
   const OptimizeReportButton: typeof import('../components/optimize-report-button').OptimizeReportButton
@@ -65,7 +69,7 @@ declare global {
   const ToolInputError: typeof import('../tools/exec').ToolInputError
   const TrendCard: typeof import('../components/trend-card').TrendCard
   const UpdateStatus: typeof import('../components/update-status').UpdateStatus
-  const VercelModelSelect: typeof import('../components/vercel-model-select').VercelModelSelect
+  const VERCEL_AI_GATEWAY_MODELS_URL: typeof import('../config/vercel-ai-gateway').VERCEL_AI_GATEWAY_MODELS_URL
   const agentTools: typeof import('../tools/index').agentTools
   const applyPatch: typeof import('../utils/apply-patch').applyPatch
   const applyUpdateHunk: typeof import('../utils/apply-patch-update').applyUpdateHunk
@@ -94,6 +98,7 @@ declare global {
   const exists: typeof import('../utils/fs-extra').exists
   const exportCron: typeof import('../utils/workspace-archive').exportCron
   const exportTools: typeof import('../utils/workspace-archive').exportTools
+  const fetchVercelModels: typeof import('../config/vercel-ai-gateway').fetchVercelModels
   const find: typeof import('../tools/file').find
   const forwardRef: typeof import('react').forwardRef
   const generateTitlePrompt: typeof import('../config/prompts').generateTitlePrompt
@@ -128,6 +133,7 @@ declare global {
   const readJson: typeof import('../utils/fs-extra').readJson
   const readTextFile: typeof import('../utils/fs-extra').readTextFile
   const readTextFileLines: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').readTextFileLines
+  const readTextFileOptional: typeof import('../utils/fs-extra').readTextFileOptional
   const remove: typeof import('../utils/fs-extra').remove
   const rename: typeof import('../../node_modules/.pnpm/@tauri-apps+plugin-fs@2.4.5/node_modules/@tauri-apps/plugin-fs/dist-js/index.js').rename
   const retry: typeof import('../utils/utility').retry
@@ -191,9 +197,6 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { Model } from '../database/model'
-  import('../database/model')
-  // @ts-ignore
   export type { Generated, Timestamp, Record, Report, Workspace, DB } from '../database/types'
   import('../database/types')
   // @ts-ignore
@@ -235,9 +238,6 @@ declare global {
   // @ts-ignore
   export type { IconMap, ToolIconProps } from '../components/tool-icon'
   import('../components/tool-icon')
-  // @ts-ignore
-  export type { VercelModelSelectProps } from '../components/vercel-model-select'
-  import('../components/vercel-model-select')
   // @ts-ignore
   export type { UpdateFileChunk } from '../utils/apply-patch-update'
   import('../utils/apply-patch-update')

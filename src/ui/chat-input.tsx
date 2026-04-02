@@ -8,7 +8,6 @@ import {
   Attachments,
   PromptInput,
   PromptInputBody,
-  PromptInputProvider,
   PromptInputSubmit,
   PromptInputTextarea,
   Suggestion,
@@ -93,9 +92,10 @@ function MessageAreaExtras() {
 const ADD_TOOL_SUGGESTION = QUICK_TAGS.find(t => t.label === '添加工具')!.suggestion
 const SEARCH_HOOK_SUGGESTION = '帮我添加或配置一个定时任务 Hook'
 
-function ChatInputInner() {
+export function ChatInput() {
   const [searchParams, setSearchParams] = useSearchParams()
-  const { streaming } = useStore(store.chat)
+  const { status } = useStore(store.session)
+  const streaming = status === 'streaming' || status === 'submitted'
   const controller = usePromptInputController()
   const attachments = usePromptInputAttachments()
 
@@ -119,44 +119,36 @@ function ChatInputInner() {
       // 发送后立即清空输入框和附件，不等待流式结束
       controller.textInput.clear()
       attachments.clear()
-      store.chat.send(text, files)
+      store.session.send(text)
     },
     [controller, attachments],
   )
 
   return (
-    <PromptInput
-      accept="image/*,.pdf,.txt,.md,application/pdf"
-      multiple
-      maxFiles={10}
-      onSubmit={handleSubmit}
-      className="w-full"
-    >
-      <PromptInputBody>
-        <PromptInputTextarea className="border-none" placeholder="Ask anything" />
-      </PromptInputBody>
-      <div className="flex gap-2 justify-between">
-        <MessageAreaExtras />
-        <div className="flex gap-2">
-          {SHOW_ATTACHMENTS && <AttachButton />}
-          <PromptInputSubmit
-            className="cursor-pointer"
-            status={streaming ? 'streaming' : undefined}
-            onStop={() => store.chat.abort()}
-          />
-        </div>
-      </div>
-    </PromptInput>
-  )
-}
-
-export function ChatInput() {
-  return (
     <Card className="flex flex-col" shadow="none">
       <CardBody className="flex flex-col h-full">
-        <PromptInputProvider>
-          <ChatInputInner />
-        </PromptInputProvider>
+        <PromptInput
+          accept="image/*,.pdf,.txt,.md,application/pdf"
+          multiple
+          maxFiles={10}
+          onSubmit={handleSubmit}
+          className="w-full"
+        >
+          <PromptInputBody>
+            <PromptInputTextarea className="border-none" placeholder="Ask anything" />
+          </PromptInputBody>
+          <div className="flex gap-2 justify-between">
+            <MessageAreaExtras />
+            <div className="flex gap-2">
+              {SHOW_ATTACHMENTS && <AttachButton />}
+              <PromptInputSubmit
+                className="cursor-pointer"
+                status={streaming ? 'streaming' : undefined}
+                onStop={() => store.session.stop()}
+              />
+            </div>
+          </div>
+        </PromptInput>
       </CardBody>
     </Card>
   )
