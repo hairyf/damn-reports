@@ -2,91 +2,79 @@ import { addToast } from '@heroui/react'
 import { streamText } from 'ai'
 import dayjs from 'dayjs'
 import { defineStore } from 'valtio-define'
+import {
+  buildDailyReportPrompt,
+  buildDailyReportSystemPrompt,
+  buildOptimizeReportPrompt,
+  buildOptimizeReportSystemPrompt,
+} from '@/ai'
+
 import { queryClient } from '@/config/client'
-import { dailyReportPrompt, optimizeReportPrompt } from '@/config/prompts'
 import { notifyReportGenerated } from '@/cron/report'
 import { store } from '@/store'
 import { writeTextFile } from '@/utils/fs-extra'
 import { buildRecordSummaryPrompt } from './utils'
 import 'valtio-define/types'
 
-/** 与旧 llm.streamGenerate 一致：从 fullStream 取 text-delta，遇 error/abort 抛出 */
+// --- 辅助工具函数 ---
+
+/** 将流式数据转换为文本序列 */
 async function* pipeFullStreamToText(
   stream: AsyncIterable<{ type: string, text?: string, error?: unknown }>,
 ): AsyncIterable<string> {
   for await (const part of stream) {
     if (part.type === 'text-delta' && part.text)
       yield part.text
-    else if (part.type === 'error')
+    if (part.type === 'error')
       throw part.error
-    else if (part.type === 'abort')
+    if (part.type === 'abort')
       throw new Error('Stream aborted')
   }
 }
 
+/** 统一验证摘要可用性 */
 function validateSummary(summary: string): string {
-  if (!summary?.trim() || summary === 'No record data available.') {
+  const isValid = summary?.trim() && summary !== 'No record data available.'
+  if (!isValid) {
     addToast({ title: '无可用的记录数据', description: '启用中的数据源今日暂无记录' })
     throw new Error('没有可用的记录数据')
   }
   return summary
 }
 
-/** 收集并验证记录数据，返回摘要 prompt */
-async function collectAndSummarize(): Promise<string> {
-  await store.source.collect()
-
-  const records = await db.record.findMany({
-    date: dayjs().startOf('day').toISOString(),
-  })
-
-  if (records.length === 0) {
-    addToast({ title: '暂无数据', description: '未收集到任何数据' })
-    throw new Error('未收集到任何数据')
+/** 将内容同步到文件系统（内存备份） */
+async function safeWriteToMemory(content: string, date?: string) {
+  try {
+    const reportPath = `memory/reports/${date ?? dayjs().format('YYYY-MM-DD')}.md`
+    await writeTextFile(reportPath, content)
   }
-
-  const summary = await buildRecordSummaryPrompt(store.source.raw, records)
-  return validateSummary(summary)
+  catch (err) {
+    console.warn('[report] Backup to memory failed:', err)
+  }
 }
 
-/** 验证摘要数据可用性（不重新收集） */
-async function ensureSummary(): Promise<string> {
-  const summary = await buildRecordSummaryPrompt(store.source.raw)
-  return validateSummary(summary)
-}
-
-/** 将报告内容写入 memory/reports/YYYY-MM-DD.md */
-async function writeReportToMemory(content: string, date?: string): Promise<void> {
-  const reportPath = `memory/reports/${date ?? dayjs().format('YYYY-MM-DD')}.md`
-  await writeTextFile(reportPath, content)
-}
+// --- Store 定义 ---
 
 export const report = defineStore({
   state: () => ({
     loading: false,
-    /** 流式生成过程中的实时文案 */
     streamingContent: '',
   }),
   getters: {
-    /** 是否正在流式生成中 */
     isStreaming(): boolean {
       return this.loading && this.streamingContent.length > 0
     },
   },
   actions: {
-    /** 清除流式内容 */
     resetStream() {
       this.streamingContent = ''
     },
 
-    /** 流式生成内容，更新 streamingContent 并返回最终文本 */
-    async streamGenerate(systemPrompt: string, userPrompt: string): Promise<string> {
-      const DEBUG = false
+    /** 通用流式生成引擎 */
+    async stream(systemPrompt: string, userPrompt: string): Promise<string> {
       this.loading = true
-      this.streamingContent = ''
+      this.resetStream() // 开始前自动重置
       const t0 = performance.now()
-      if (DEBUG)
-        console.warn('[report] streamGenerate start')
 
       try {
         const result = streamText({
@@ -94,130 +82,110 @@ export const report = defineStore({
           system: systemPrompt,
           prompt: userPrompt,
         })
-        const textStream = pipeFullStreamToText(result.fullStream)
-        let chunkCount = 0
-        for await (const delta of textStream) {
-          chunkCount++
+
+        for await (const delta of pipeFullStreamToText(result.fullStream)) {
           this.streamingContent += delta
-          if (DEBUG && chunkCount <= 3) {
-            console.warn('[report] chunk', chunkCount, 'len', delta.length, 'total', this.streamingContent.length)
-          }
-        }
-        if (DEBUG) {
-          console.warn('[report] streamGenerate done', {
-            chunkCount,
-            totalLength: this.streamingContent.length,
-            elapsed: `${(performance.now() - t0).toFixed(0)}ms`,
-          })
         }
         return this.streamingContent
       }
       catch (error) {
-        console.error('[report] streamGenerate error', {
-          elapsed: `${(performance.now() - t0).toFixed(0)}ms`,
-          contentLength: this.streamingContent.length,
-          error,
-        })
+        console.error(`[report] stream failed (${Math.round(performance.now() - t0)}ms):`, error)
         throw error
       }
       finally {
         this.loading = false
-        if (DEBUG)
-          console.warn('[report] streamGenerate finally, loading=false')
       }
     },
 
-    /** 首次生成日报：收集数据摘要 → 流式生成 → 创建报告 */
-    async generate(options?: { fromScheduled?: boolean }): Promise<string> {
-      try {
-        const summary = await collectAndSummarize()
-        const { system, prompt } = dailyReportPrompt(summary)
-        const content = await this.streamGenerate(system, prompt)
+    async upsert(
+      reportId: string | null,
+      content: string,
+      options?: { createdAt?: string, fromScheduled?: boolean },
+    ) {
+      const updatedAt = new Date().toISOString()
+      const reportDate = options?.createdAt ? dayjs(options.createdAt).format('YYYY-MM-DD') : undefined
 
+      if (reportId) {
+        // 更新现有报告
+        await db.report.update(reportId, { content, updatedAt })
+      }
+      else {
+        // 创建新报告
         await db.report.create({
-          name: `日报 ${new Date().toLocaleDateString('sv-SE')}`,
+          name: `日报 ${dayjs().format('YYYY-MM-DD')}`,
           type: 'daily',
           content,
-          updatedAt: new Date().toISOString(),
+          updatedAt,
         })
-
-        await Promise.all([
-          queryClient.invalidateQueries({ queryKey: ['reports'] }),
-          queryClient.invalidateQueries({ queryKey: ['records'] }),
-        ])
-        this.resetStream()
-
         notifyReportGenerated(content, options?.fromScheduled ?? false)
+      }
 
-        try {
-          await writeReportToMemory(content)
+      // 触发数据刷新与备份
+      await Promise.all([
+        queryClient.invalidateQueries({ queryKey: ['reports'] }),
+        queryClient.invalidateQueries({ queryKey: ['records'] }),
+        safeWriteToMemory(content, reportDate),
+      ])
+    },
+
+    /** 首次生成日报 */
+    async generate(options?: { fromScheduled?: boolean }): Promise<string> {
+      try {
+        await store.source.collect()
+        const records = await db.record.findMany({ date: dayjs().startOf('day').toISOString() })
+
+        if (records.length === 0) {
+          addToast({ title: '暂无数据', description: '未收集到任何数据' })
+          throw new Error('No records found')
         }
-        catch (err) { console.warn('writeReportToMemory failed', err) }
 
+        const summary = validateSummary(await buildRecordSummaryPrompt(store.source.raw, records))
+        const content = await this.stream(
+          buildDailyReportSystemPrompt(),
+          buildDailyReportPrompt(summary),
+        )
+
+        await this.upsert(null, content, { fromScheduled: options?.fromScheduled })
         return content
       }
       catch (error) {
-        console.error('generate error', error)
+        console.error('[report] generate error:', error)
         throw error
-      }
-      finally {
-        this.loading = false
       }
     },
 
-    /** 重新生成：基于最新数据重新生成并更新已有报告 */
+    /** 重新生成：基于最新数据 */
     async regenerate(reportId: string) {
       try {
-        const summary = await ensureSummary()
-        const { system, prompt } = dailyReportPrompt(summary)
-        const content = await this.streamGenerate(system, prompt)
-
+        const summary = validateSummary(await buildRecordSummaryPrompt(store.source.raw))
         const existing = await db.report.findUnique(Number(reportId) as never)
-        const reportDate = existing?.createdAt ? dayjs(existing.createdAt).format('YYYY-MM-DD') : undefined
+        const content = await this.stream(
+          buildDailyReportSystemPrompt(),
+          buildDailyReportPrompt(summary),
+        )
 
-        await db.report.update(reportId, {
-          content,
-          updatedAt: new Date().toISOString(),
-        })
-
-        try {
-          await writeReportToMemory(content, reportDate)
-        }
-        catch (err) { console.warn('writeReportToMemory failed', err) }
+        await this.upsert(reportId, content, { createdAt: existing?.createdAt })
       }
       catch (error) {
-        console.error('regenerate error', error)
+        console.error('[report] regenerate error:', error)
         throw error
-      }
-      finally {
-        this.loading = false
       }
     },
 
-    /** 优化日报：基于当前内容优化表述并更新报告 */
+    /** 优化日报内容 */
     async optimize(reportId: string, currentContent: string, userInstruction?: string) {
       try {
-        const { system, prompt } = optimizeReportPrompt(currentContent, userInstruction)
-        const content = await this.streamGenerate(system, prompt)
         const existing = await db.report.findUnique(Number(reportId) as never)
-        const reportDate = existing?.createdAt ? dayjs(existing.createdAt).format('YYYY-MM-DD') : undefined
+        const content = await this.stream(
+          buildOptimizeReportSystemPrompt(),
+          buildOptimizeReportPrompt(currentContent, userInstruction),
+        )
 
-        await db.report.update(reportId, {
-          content,
-          updatedAt: new Date().toISOString(),
-        })
-
-        try {
-          await writeReportToMemory(content, reportDate)
-        }
-        catch (err) { console.warn('writeReportToMemory failed', err) }
+        await this.upsert(reportId, content, { createdAt: existing?.createdAt })
       }
       catch (error) {
-        console.error('optimize error', error)
+        console.error('[report] optimize error:', error)
         throw error
-      }
-      finally {
-        this.loading = false
       }
     },
   },

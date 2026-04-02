@@ -10,8 +10,8 @@ import {
   readUIMessageStream,
 } from 'ai'
 import { defineStore } from 'valtio-define'
-import { createReportAgent } from '@/agents'
-import { presetProviders } from '@/agents/provider'
+import { createReportAgent } from '@/ai'
+import { presetProviders } from '@/ai/provider'
 
 export type Provider = 'deepseek' | 'openai' | 'anthropic' | 'google' | 'custom'
 export type Protocol = 'openai' | 'anthropic' | 'google'

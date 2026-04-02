@@ -3,7 +3,7 @@ import { Button, Card, CardBody, Input, Select, SelectItem } from '@heroui/react
 import { Icon } from '@iconify/react'
 import { useState } from 'react'
 import { useStore } from 'valtio-define'
-import { presetProviders } from '@/agents/provider'
+import { presetProviders } from '@/ai/provider'
 import { store } from '@/store'
 
 const PRESET_PROVIDERS = ['deepseek', 'openai', 'anthropic', 'google'] as const satisfies readonly Provider[]
