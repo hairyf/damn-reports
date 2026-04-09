@@ -16,7 +16,7 @@
 
 - `tool.json` 逻辑路径：
   - 仓库位置：`./tool.json`。
-  - 对 `read`、`write`、`edit`、`grep`：使用 `path: "tool.json"`（这些工具内部会加 `workspace` 前缀；见 `src/utils/fs-extra.ts`）。
+  - 对 `read`、`write`、`edit`、`grep`：使用 `path: "tool.json"`。
 
 - 辅助工具：
   - `read` – 以文本形式加载当前 JSON 内容。
@@ -56,7 +56,8 @@
 **执行器策略**
 
 - **简单**逻辑（单命令、少参数、输出直接）：使用内联 `executor`，配 `command` 和 `args`。
-- **复杂**逻辑（多步骤、分支、解析、JSON 整形）：优先在 `tools/` 下编写 Node.js 脚本，然后通过 `executor.command: "node"` 和 `executor.args: ["./tools/script.js", ...]` 引用。将脚本加入 `files`。见 SKILL.md 中“执行器复杂度：优先 Node 脚本”一节。
+- **复杂**逻辑（多步骤、分支、解析、JSON 整形）：优先在 `tools/` 下编写 Node.js 脚本，然后通过 `executor.command: "node"` 和 `executor.args: ["./tools/script.js", ...]` 引用。将脚本加入 `files`。
+- **表达式**：仅在逻辑较短时，使用以 `$` 开头的 JavaScript 表达式。表达式执行时只提供 `$data`。
 
 **输入（概念）**
 
@@ -120,8 +121,6 @@
 - 要快速定位 tool id 在文件中的原始文本，使用 `grep`：
   - 输入：`{"path": "tool.json", "pattern": "\"<toolid>\""}`
 
-- 可选参数：`literal`（pattern 含正则特殊字符时按字面量匹配）、`context`（显示匹配行前后行数）、`limit`、`glob`（path 为目录时过滤文件如 `*.json`）。
-
 - 这对编辑前了解上下文有帮助，但权威值仍应从解析后的 JSON 获取。
 
 ## /tool set
@@ -152,7 +151,7 @@
 
 **使用 edit 做小范围更新（可选）**
 
-仅当修改很小且已知（如更新 description 或单个 JSONata transformer 字符串）时：
+仅当修改很小且已知（如更新 description 或单个 transformer 字符串）时：
 
 1. 使用 `read` 和/或 `grep` 定位确切旧片段。
 2. 构建包含要替换的精确文本的 `oldContent` 和 `newContent`（含引号等）。
@@ -176,8 +175,8 @@
 
 1. 校验工具存在（可选；通常可省略）：
    - 若本回合**已读取过** `tool.json`，直接复用该结果，无需再次 `read`。
-   - 若未读取过且需预校验，可调用 `/tool get`；若已确认 `toolid` 存在（如来自刚添加的 source），**跳过此步**，直接调用 `exec_tool`。
-   - `exec_tool` 失败时会返回详细错误（含可用 tool id 列表），足以诊断问题。
+   - 若未读取过且需预校验，可调用 `/tool get`；若已确认 `toolid` 存在，直接调用 `exec_tool`。
+   - `exec_tool` 失败时会返回详细错误，足以诊断问题。
 
 2. 调用工作区工具 `exec_tool`：
    - 输入：`{"toolid": "<toolid>", "params": { /* 参数值 */ }}`
@@ -188,7 +187,7 @@
    - 执行底层 `executor`：
      - `"exec"` 类型：执行命令。
      - `"http"` 类型：发起 HTTP 请求。
-   - 应用 JSONata `transformer` 规范化输出。
+   - 应用 JavaScript `transformer` 规范化输出。
 
 4. 将 `exec_tool` 的返回作为 `/tool exec` 的响应返回。
 
@@ -209,18 +208,19 @@
   - 提供的参数
   - 底层错误信息（命令失败、transformer 失败等）
 - 对 `exec` 类型：命令失败时错误会包含退出码、stderr、stdout。
-- transformer 失败时，错误会包含原始输出预览和失败的 JSONata 表达式。
+- transformer 失败时，错误会包含原始输出预览和失败的 JavaScript 表达式。
 - 若在 `tool.json` 中未找到工具，错误会列出所有可用 tool id。
 - 若缺少必需参数，错误会列出缺失参数及其描述。
 
 **常见问题排查**
 
-- **UTF-8 编码错误**（Windows）：exec 层会设置 `chcp 65001`、`$OutputEncoding`、`[Console]::OutputEncoding`、`[Console]::InputEncoding` 为 UTF-8。若仍有编码问题，检查工具的輸出是否包含系统区域设置带来的非 UTF-8 字符。
-- **路径未找到**：确保 `executor.args` 中的路径相对于工作区根目录（如 `./tools/script.js`，而非 `./tool/script.js`）。同时确保 `files` 数组与实际路径一致。
+- **UTF-8 编码错误**（Windows）：exec 层会设置 `chcp 65001`、`$OutputEncoding`、`[Console]::OutputEncoding`、`[Console]::InputEncoding` 为 UTF-8。若仍有编码问题，检查工具输出是否包含系统区域设置带来的非 UTF-8 字符。
+- **路径未找到**：确保 `executor.args` 中的路径相对于工作区根目录（如 `./tools/script.js`）。同时确保 `files` 数组与实际路径一致。
 - **命令未找到**：exec 层在 Windows 使用 PowerShell，在 Unix 使用 sh。确保命令在系统 PATH 中可用。
 
-**使用 JSONata**
+**使用 JavaScript 表达式**
 
 - 调整工具的 `transformer` 时：
-  - 使用 `jsonata` 技能查阅语言细节和模式。
-  - 确保最终表达式始终产出上述规范结构。
+  - 只使用 `$data`。
+  - 保持表达式短小、直接、可读。
+  - 若逻辑开始变复杂，迁移到 Node 脚本中处理。

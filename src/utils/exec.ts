@@ -1,6 +1,6 @@
+/* eslint-disable no-new-func */
 import { resolveResource } from '@tauri-apps/api/path'
 import { Command } from '@tauri-apps/plugin-shell'
-import jsonata from 'jsonata'
 import mustache from 'mustache'
 
 // Disable Mustache's default HTML escaping — all templates here are for
@@ -13,6 +13,11 @@ function escapeForShellQuoted(path: string, isWindows: boolean): string {
   return isWindows
     ? path.replace(/'/g, '\'\'') // PowerShell: '' = escaped '
     : path.replace(/'/g, '\'\\\'\'') // sh: '\'' = embed single quote
+}
+
+function evaluateJavaScriptExpression<T>(expression: string, data: any): T {
+  const runner = new Function('$data', `return (${expression})`)
+  return runner(data) as T
 }
 
 export interface Collector {
@@ -32,14 +37,13 @@ export interface Collector {
 
 async function renderTemplate(value: any, config: Record<string, any>): Promise<any> {
   if (typeof value === 'string') {
-    // Check if it's a jsonata expression (starts with $)
+    // Strings starting with "$" are evaluated as JavaScript expressions.
+    // The current config object is bound to $data.
     if (value.trim().startsWith('$')) {
       try {
-        const expression = jsonata(value)
-        return await expression.evaluate(config)
+        return evaluateJavaScriptExpression(value, config)
       }
       catch {
-        // If jsonata fails, fall back to mustache
         return mustache.render(value, config)
       }
     }
@@ -74,7 +78,7 @@ export function executeCollector(collector: Collector, config: Record<string, an
 export async function executeCommandExpression(collector: Collector, config: Record<string, any>) {
   const { command, args = [] } = collector.executor
 
-  // Render command and args (supports mustache + jsonata, consistent with HTTP)
+  // Render command and args (supports mustache + JavaScript expressions, consistent with HTTP)
   const renderedCommand = await renderTemplate(command, config) as string
   const renderedArgs = (await Promise.all((args as string[]).map(arg => renderTemplate(arg, config)))) as string[]
 
@@ -94,8 +98,7 @@ export async function executeCommandExpression(collector: Collector, config: Rec
     // Apply transformer if provided
     if (collector.transformer) {
       try {
-        const expression = jsonata(collector.transformer)
-        return await expression.evaluate(result) || []
+        return evaluateJavaScriptExpression(collector.transformer, result) || []
       }
       catch (transformError) {
         const errMsg = transformError instanceof Error ? transformError.message : String(transformError)
@@ -153,8 +156,7 @@ export async function executeHttpRequestExpression(collector: Collector, config:
     const result = await response.json()
 
     if (collector.transformer) {
-      const expression = jsonata(collector.transformer)
-      return await expression.evaluate(result)
+      return evaluateJavaScriptExpression(collector.transformer, result)
     }
 
     return result

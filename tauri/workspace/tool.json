@@ -11,7 +11,7 @@
       "command": "git",
       "args": ["-C", "{{repository}}", "log", "--since=midnight", "--format=%h%x09%s%x09%an%x09%at", "--author={{author}}"]
     },
-    "transformer": "$split($, \"\n\")[$ != \"\"].($p := $split($, \"\t\"); $count($p) >= 4 ? {\"id\": $p[0], \"summary\": $p[1], \"createdAt\": $number($p[3]) * 1000, \"data\": {\"id\": $p[0], \"message\": $p[1], \"author\": $p[2], \"date\": $number($p[3])}} : null)[$]"
+    "transformer": "$data.split('\\n').filter(line => line !== '').map(line => { const p = line.split('\\t'); return p.length >= 4 ? { id: p[0], summary: p[1], createdAt: Number(p[3]) * 1000, data: { id: p[0], message: p[1], author: p[2], date: Number(p[3]) } } : null }).filter(Boolean)"
   },
   "clickup": {
     "name": "ClickUp Tasks",
@@ -32,12 +32,12 @@
       "query": {
         "include_closed": "true",
         "subtasks": "true",
-        "date_updated_gt": "$millis() - (24 * 60 * 60 * 1000)",
-        "date_updated_lt": "$millis()",
+        "date_updated_gt": "Date.now() - (24 * 60 * 60 * 1000)",
+        "date_updated_lt": "Date.now()",
         "assignees[]": "{{user}}"
       }
     },
-    "transformer": "tasks.{\"id\": id & \"-\" & $string(date_updated), \"summary\": name, \"createdAt\": $number(date_updated), \"data\": $}"
+    "transformer": "$data.tasks.map(task => ({ id: `${task.id}-${task.date_updated}`, summary: task.name, createdAt: Number(task.date_updated), data: task }))"
   },
   "test_nodejs": {
     "name": "Test Node.js",
@@ -49,6 +49,6 @@
       "command": "node",
       "args": ["./tools/get_current_time.js"]
     },
-    "transformer": "{\"id\": \"$now()\", \"summary\": \"Currency Date\", \"createdAt\": $now(), \"data\": $eval($)}"
+    "transformer": "({ id: String(Date.now()), summary: 'Currency Date', createdAt: Date.now(), data: JSON.parse($data) })"
   }
 }

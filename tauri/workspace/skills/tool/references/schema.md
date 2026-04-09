@@ -61,7 +61,7 @@
   - **复杂执行器**：优先在 `tools/` 下添加 Node 脚本并在此列出；使用 `executor.command: "node"` 和 `executor.args: ["./tools/script.js", ...]`。
 
 - `dependencies`（可选，对象）
-  - npm 依赖，与 workspace 根目录 `package.json` 的 `dependencies` 格式一致，键为包名，值为版本（如 `"^1.0.0"`）。导入 .tool 后若存在此字段，会在工作区自动执行 `pnpm install` 或 `npm install` 安装这些依赖。
+  - npm 依赖，与 workspace 根目录 `package.json` 的 `dependencies` 格式一致，键为包名，值为版本（如 `"^1.0.0"`）。导入 `.tool` 后若存在此字段，会在工作区自动执行 `pnpm install` 或 `npm install` 安装这些依赖。
 
 - `executor`（object）
   - 如何调用底层系统或 HTTP 层。
@@ -96,10 +96,13 @@
   ```
 
   - `{{...}}` 占位符在执行时由工具参数解析。
+  - 若某个字符串值以 `$` 开头，则会作为 **JavaScript 表达式**执行。
+  - 执行表达式时，**只提供一个变量：`$data`**。
 
-- `transformer`（string，JSONata 表达式）
-  - 用于将执行器原始输出转换为规范结构的 JSONata 表达式。
+- `transformer`（string，JavaScript 表达式）
+  - 用于将执行器原始输出转换为规范结构的 JavaScript 表达式。
   - 在执行器返回数据后求值。
+  - 表达式执行时，**只提供一个变量：`$data`**。
   - 应产出：
     - 单个对象，或
     - 对象数组。
@@ -110,8 +113,20 @@
 - `createdAt`（number）– 毫秒级 UNIX 时间戳。
 - `data`（any）– 与该条目关联的原始或结构化载荷。
 
-## JSONata 与 jsonata 技能
+## JavaScript 表达式约定
 
-- `transformer` 字段为纯 JSONata 文本。
-- **编写或调试 transformer 时，应加载 `jsonata` 技能**（`skills/jsonata`）查阅语法、函数与模式。
-- 推荐流程：先加载 jsonata 技能 → 设计并测试表达式 → 稳定后填入 `transformer` 字段。
+- 不要使用额外注入变量。
+- 不要依赖外部 helper。
+- 表达式内部只使用 `$data` 与 JavaScript 自带能力。
+- 推荐保持表达式短小；复杂逻辑应移到 Node 脚本。
+
+示例：
+
+```js
+$data.tasks.map(task => ({
+  id: `${task.id}-${task.date_updated}`,
+  summary: task.name,
+  createdAt: Number(task.date_updated),
+  data: task,
+}))
+```

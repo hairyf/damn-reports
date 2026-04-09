@@ -72,17 +72,19 @@ export const agent = defineStore({
       const uiStream = stream.toUIMessageStream({ generateMessageId: () => generateId() })
 
       return readUIMessageStream({
+        onError: this.printAgentError,
         stream: uiStream,
-        onError(error: any) {
-          addToast({
-            title: '错误',
-            description: error.message,
-            color: 'danger',
-          })
-          store.session.clearStaleStreaming()
-          store.session.stop(undefined, '系统错误，请重试')
-        },
       })
+    },
+
+    async printAgentError(error: any) {
+      addToast({
+        title: '错误',
+        description: error.message,
+        color: 'danger',
+      })
+      store.session.clearStaleStreaming()
+      store.session.stop(undefined, '系统错误，请重试')
     },
   },
   persist: true,

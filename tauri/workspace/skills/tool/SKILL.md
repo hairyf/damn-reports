@@ -26,7 +26,7 @@ description: "Manage App Workspace collector tools defined in tool.json: read al
 ## 使用的工具和技能
 
 - 工具：`read` `write` `edit` `grep` `exec_tool`
-- 技能：`jsonata` 设计/调试 transformer 时使用（`./skills/jsonata`）。
+- `tool.json` 中的动态表达式统一使用 **JavaScript 表达式**。
 
 ## 使用方式
 
@@ -42,9 +42,22 @@ description: "Manage App Workspace collector tools defined in tool.json: read al
      - `/tool set` – 更新已有工具
      - `/tool exec` – 通过 `exec_tool` 执行工具
 
-3. **正确使用 JSONata**
-   - 编写工具的 `transformer` 字段时，使用 `jsonata` 技能查阅语法、函数和模式。
-   - 确保 transformer 始终返回规范格式：
+3. **正确使用 JavaScript 表达式**
+   - `transformer` 字段也使用 **JavaScript 表达式**执行。
+   - 表达式执行时，**只提供一个变量：`$data`**。
+   - 不要依赖其他注入变量、辅助函数或旧语法约定。
+   - 示例：
+
+```js
+$data.tasks.map(task => ({
+  id: `${task.id}-${task.date_updated}`,
+  summary: task.name,
+  createdAt: Number(task.date_updated),
+  data: task,
+}))
+```
+
+   - 确保 `transformer` 始终返回规范格式：
      - 单个对象，或
      - 对象数组
    - 每个对象至少包含：`summary: string`、`createdAt: number`、`data: any`。
@@ -61,13 +74,14 @@ description: "Manage App Workspace collector tools defined in tool.json: read al
 
 ## 执行器复杂度：优先 Node 脚本
 
-当工具的执行逻辑较为复杂时，**优先编写 Node.js 执行文件**，而非在 `tool.json` 中嵌入复杂 shell 命令或长参数链。
+当工具的执行逻辑较为复杂时，**优先编写 Node.js 执行文件**，而非在 `tool.json` 中嵌入复杂 shell 命令、长参数链或过长的 JavaScript 表达式。
 
 **何时使用 Node 脚本：**
 - 逻辑涉及多步骤、分支或数据解析
 - 复杂参数处理或校验
 - 输出需在 transformer 运行前整理为 JSON
 - Shell 转义或跨平台考虑使长命令易出错
+- 表达式已经长到难以阅读或调试
 
 **做法：**
 1. 在 `tools/` 下创建脚本（如 `tools/my_collector.js`）
@@ -88,7 +102,7 @@ description: "Manage App Workspace collector tools defined in tool.json: read al
       "command": "node",
       "args": ["./tools/my_collector.js", "{{someParam}}"]
     },
-    "transformer": "..."
+    "transformer": "$data"
   }
 }
 ```

@@ -44,7 +44,6 @@
 
 <!-- SKILLS_TABLE_START -->
 <available_skills>
-<skill name="jsonata" location="skills/jsonata">JSONata 查询与转换。用于编写/调试 JSONata 表达式或转换 JSON 数据。</skill>
 <skill name="tool" location="skills/tool">管理 tool.json 中的采集工具：增删改查、exec_tool 执行。</skill>
 <skill name="source" location="skills/source">管理 source.json 中的数据源：增删改查。</skill>
 <skill name="record" location="skills/record">记录表操作：SQL 查询、sync_records 同步、AI 插入。</skill>
