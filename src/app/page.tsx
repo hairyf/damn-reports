@@ -1,10 +1,23 @@
 'use client'
-import { Button } from '@heroui/react'
 
-export default function Home() {
+import { AssistantRuntimeProvider } from "@assistant-ui/react";
+import { useChatRuntime, AssistantChatTransport } from "@assistant-ui/react-ai-sdk";
+import { ThreadList } from "assistant-ui";
+import { Thread } from "assistant-ui";
+
+export default function Page() {
+  const runtime = useChatRuntime({
+    transport: new AssistantChatTransport({
+      api: "/api/chat",
+    }),
+  });
+
   return (
-    <main className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <Button>Refetch</Button>
-    </main>
+    <AssistantRuntimeProvider runtime={runtime}>
+      <main className="h-screen flex flex-col">
+        <ThreadList />
+        <Thread />
+      </main>
+    </AssistantRuntimeProvider>
   );
 }

@@ -19,6 +19,8 @@
     "packages/*"
   ],
   "dependencies": {
+    "@assistant-ui/react": "^0.12.25",
+    "@assistant-ui/react-ai-sdk": "^1.3.19",
     "@hairy/react-lib": "^1.51.0",
     "@heroui/react": "^3.0.3",
     "@heroui/styles": "^3.0.3",
@@ -34,6 +36,7 @@
     "@tauri-apps/plugin-store": "~2",
     "ai": "^6.0.168",
     "ai-elements": "workspace:*",
+    "assistant-ui": "workspace:*",
     "kysely": "^0.28.16",
     "kysely-dialect-tauri": "^1.2.1",
     "kysely-model": "^0.1.0",

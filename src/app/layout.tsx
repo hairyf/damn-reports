@@ -1,9 +1,11 @@
 import { PropsWithChildren } from "react";
-import "../globals.css";
 import { Provider } from "./provider";
 import { Geist } from "next/font/google";
 import { cn } from 'ai-elements'
-import { TooltipProvider } from "ai-elements"
+import { TooltipProvider } from "assistant-ui"
+
+import "./globals.css";
+import "assistant-ui/style.css"
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
