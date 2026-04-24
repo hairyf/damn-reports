@@ -38,9 +38,10 @@
 | `BOOTSTRAP.md` | 首次引导 | 仅首次 |
 | `skills/` `skills/README.md` `tools/` `tool.json` `source.json` `cron.json` `package.json` | 技能/工具/配置 | 按需 |
 
-<skills_system priority="1">
 
 ## 可用技能
+
+<skills_system priority="1">
 
 <!-- SKILLS_TABLE_START -->
 <available_skills>

@@ -1,45 +1,47 @@
 import matter from 'front-matter'
 
-export interface Skill {
+interface SkillFrontmatter {
   name: string
-  description: string
+  description?: string
+}
+
+export interface Skill extends SkillFrontmatter {
   location: string
   content: string
 }
 
-export async function getSkills() {
-  const skills: Skill[] = []
+export async function getSkills(baseDir = 'skills'): Promise<Skill[]> {
+  const entries = await readDir(baseDir)
 
-  async function scan(relativeDir: string) {
-    const entries = await readDir(relativeDir)
-    for (const entry of entries) {
-      const childRelative = relativeDir ? `${relativeDir}/${entry.name}` : entry.name
-      if (entry.isDirectory) {
-        await scan(childRelative)
-      }
-      else if (entry.name === 'SKILL.md') {
-        const data = await readTextFile(childRelative)
-        const skill = parseSkill(data, childRelative)
-        if (skill)
-          skills.push(skill)
-      }
+  const tasks = entries.map(async (entry) => {
+    const fullPath = `${baseDir}/${entry.name}`
+
+    if (entry.isDirectory)
+      return getSkills(fullPath)
+
+    if (entry.name === 'SKILL.md') {
+      const rawData = await readTextFile(fullPath)
+      const skill = parseSkill(rawData, fullPath)
+      return skill ? [skill] : []
     }
-  }
 
-  await scan('skills')
-  return skills
+    return []
+  })
+
+  const results = await Promise.all(tasks)
+  return results.flat()
 }
 
 export function parseSkill(markdown: string, location: string): Skill | null {
-  const { attributes: data, body: content } = matter<{ name?: string, description?: string }>(markdown)
-  const frontmatter = data as { name?: string, description?: string }
-  if (!frontmatter.name)
+  const { attributes, body } = matter<SkillFrontmatter>(markdown)
+
+  if (!attributes?.name)
     return null
 
   return {
-    name: String(frontmatter.name),
-    description: frontmatter.description ? String(frontmatter.description) : '',
+    name: String(attributes.name),
+    description: attributes.description ? String(attributes.description) : '',
+    content: body.trim(),
     location,
-    content: content.trim(),
   }
 }
