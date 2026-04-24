@@ -10,7 +10,7 @@ import { PropsWithChildren } from "react"
  * @param props 
  * @returns
  */
-export function NextServerLoaded(props: PropsWithChildren) {
+export function ServiceLoaded(props: PropsWithChildren) {
   useFetchRequestIntercept((fetch, url, init) => {
     if (url.toString().startsWith('/') && process.env.NODE_ENV === 'production')
       return tauriFetch(`http://127.0.0.1:1420${url}`, init)

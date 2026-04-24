@@ -1,29 +1,22 @@
-"use client"
+import { PropsWithChildren } from "react";
+import "../globals.css";
+import { Provider } from "./provider";
 
-import { NextServerLoaded } from "./components/next-server-loaded";
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import "./globals.css";
-
-const queryClient = new QueryClient()
-
-export default function RootLayout({
-  children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+function Layout(props: PropsWithChildren) {
   return (
     <html
       lang="en"
       className={`h-full antialiased`}
     >
-      <QueryClientProvider client={queryClient}>
-        <body className="min-h-full flex flex-col">
-          <NextServerLoaded>
-            {children}
-          </NextServerLoaded>
-        </body>
-      </QueryClientProvider>
+      <body className="min-h-full flex flex-col">
+        <Provider>
+          <ServiceLoaded>
+            {props.children}
+          </ServiceLoaded>
+        </Provider>
+      </body>
     </html>
   );
 }
 
+export default Layout

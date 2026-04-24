@@ -37,9 +37,10 @@
     ]
   },
   "include": [
-    "src",
     ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
+    ".next/dev/types/**/*.ts",
+    "./auto-imports.d.ts",
+    "src"
   ],
   "exclude": [
     "sources"
