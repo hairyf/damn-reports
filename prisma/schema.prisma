@@ -1,0 +1,8 @@
+datasource db {
+  provider = "sqlite"
+}
+
+generator kysely {
+  provider = "prisma-kysely"
+  output   = "../../src/database"
+}
