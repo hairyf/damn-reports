@@ -1,17 +1,24 @@
 import { PropsWithChildren } from "react";
 import "../globals.css";
 import { Provider } from "./provider";
+import { Geist } from "next/font/google";
+import { cn } from 'ai-elements'
+import { TooltipProvider } from "ai-elements"
+
+const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 function Layout(props: PropsWithChildren) {
   return (
     <html
       lang="en"
-      className={`h-full antialiased`}
+      className={cn("h-full", "antialiased", "font-sans", geist.variable)}
     >
       <body className="min-h-full flex flex-col">
         <Provider>
           <ServiceLoaded>
-            {props.children}
+            <TooltipProvider>
+              {props.children}
+            </TooltipProvider>
           </ServiceLoaded>
         </Provider>
       </body>

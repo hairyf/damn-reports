@@ -13,8 +13,11 @@
     "windows": [
       {
         "title": "diana",
-        "width": 800,
-        "height": 600
+        "decorations": false,
+        "width": 1180,
+        "height": 720,
+        "minWidth": 860,
+        "minHeight": 574
       }
     ],
     "security": {

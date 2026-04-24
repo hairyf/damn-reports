@@ -32,6 +32,8 @@
     "@tauri-apps/plugin-shell": "~2",
     "@tauri-apps/plugin-sql": "~2",
     "@tauri-apps/plugin-store": "~2",
+    "ai": "^6.0.168",
+    "ai-elements": "workspace:*",
     "kysely": "^0.28.16",
     "kysely-dialect-tauri": "^1.2.1",
     "kysely-model": "^0.1.0",
@@ -61,6 +63,7 @@
     "tailwindcss": "^4.2.4",
     "tinyexec": "^1.1.1",
     "typescript": "~5.8.3",
-    "unimport-loader": "^0.2.5"
+    "unimport-loader": "^0.2.5",
+    "@types/bun": "latest"
   }
 }
