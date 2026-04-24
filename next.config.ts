@@ -3,7 +3,7 @@ import process from "node:process";
 import { unimport } from 'unimport-loader'
 
 const unimportLoader = unimport({
-  transpilePackages: ["ai-elements"],
+  transpilePackages: ["@assistant-ui/react", "@assistant-ui/react-ai-sdk"],
   presets: ['react', 'react-dom'],
   dts: true,
   dirs: [
