@@ -1,0 +1,77 @@
+diff --git a/node_modules/next-bun-compile/.bun-tag-27ee6e2db4bb149 b/.bun-tag-27ee6e2db4bb149
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/node_modules/next-bun-compile/.bun-tag-863da08201a02928 b/.bun-tag-863da08201a02928
+new file mode 100644
+index 0000000000000000000000000000000000000000..e69de29bb2d1d6434b8b29ae775ad8c2e48c5391
+diff --git a/dist/index-5m65k8kw.js b/dist/index-5m65k8kw.js
+index 502aafe518a38689301a5ed3597a35c1dab55f8e..449fa86cefd9d95bb6ec66034e0b347daa6c7d28 100644
+--- a/dist/index-5m65k8kw.js
++++ b/dist/index-5m65k8kw.js
+@@ -63,6 +63,46 @@ function generateStubs(standaloneDir) {
+       subpath: "dist/server/lib/router-utils/setup-dev-bundler.js",
+       content: "module.exports = {};"
+     },
++    {
++      pkg: "next",
++      subpath: "dist/dev/hot-reloader/app/hot-reloader-app.js",
++      content: "module.exports = { default: null };"
++    },
++    {
++      pkg: "next",
++      subpath: "dist/client/dev/hot-reloader/app/hot-reloader-app.js",
++      content: "module.exports = { default: null };"
++    },
++    {
++      pkg: "react-dom",
++      subpath: "server.js",
++      content: "module.exports = require('./server.node.js');"
++    },
++    {
++      pkg: "react-server-dom-webpack",
++      subpath: "client.js",
++      content: "module.exports = {};"
++    },
++    {
++      pkg: "react-server-dom-webpack",
++      subpath: "server.node.js",
++      content: "module.exports = {};"
++    },
++    {
++      pkg: "react-server-dom-turbopack",
++      subpath: "client.js",
++      content: "module.exports = {};"
++    },
++    {
++      pkg: "react-server-dom-turbopack",
++      subpath: "server.js",
++      content: "module.exports = {};"
++    },
++    {
++      pkg: "react-server-dom-turbopack",
++      subpath: "static.js",
++      content: "module.exports = {};"
++    },
+     {
+       pkg: "@opentelemetry/api",
+       subpath: "index.js",
+@@ -357,6 +397,7 @@ extractAssets().then(() => {
+ 
+ // src/compile.ts
+ import { execFileSync } from "node:child_process";
++import { env, platform } from "node:process";
+ import { join as join2 } from "node:path";
+ function compile(options) {
+   const { serverDir, outfile, extraArgs = [] } = options;
+@@ -380,7 +421,10 @@ function compile(options) {
+     ...extraArgs
+   ];
+   console.log(`next-bun-compile: Compiling to ${outfile}...`);
+-  execFileSync("bun", args, { stdio: "inherit" });
++  const bunFromNpmExecpath = env.npm_execpath && /bun(?:\.exe)?$/i.test(env.npm_execpath) ? env.npm_execpath : null;
++  const bunFromInstallDir = env.BUN_INSTALL ? join2(env.BUN_INSTALL, "bin", platform === "win32" ? "bun.exe" : "bun") : null;
++  const bunBin = env.BUN_BINARY || bunFromNpmExecpath || bunFromInstallDir || "bun";
++  execFileSync(bunBin, args, { stdio: "inherit" });
+   console.log(`next-bun-compile: Done → ${outfile}`);
+ }
+ 
