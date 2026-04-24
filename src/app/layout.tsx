@@ -1,30 +1,16 @@
 import { PropsWithChildren } from "react";
-import { Provider } from "./provider";
-import { Geist } from "next/font/google";
-import { cn } from 'ai-elements'
-import { TooltipProvider } from "assistant-ui"
-
-import "./globals.css";
-import "assistant-ui/style.css"
-
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
 function Layout(props: PropsWithChildren) {
   return (
-    <html
-      lang="en"
-      className={cn("h-full", "antialiased", "font-sans", geist.variable)}
-    >
-      <body className="min-h-full flex flex-col">
-        <Provider>
-          <ServiceLoaded>
-            <TooltipProvider>
-              {props.children}
-            </TooltipProvider>
-          </ServiceLoaded>
-        </Provider>
-      </body>
-    </html>
+    <div className='relative flex w-full h-screen'>
+      <Sidebar />
+      <div className="flex flex-col flex-1">
+        <Navbar />
+        <Main>
+          {props.children}
+        </Main>
+      </div>
+    </div>
   );
 }
 
