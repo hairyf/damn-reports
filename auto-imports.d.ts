@@ -31,6 +31,8 @@ declare global {
   const preloadModule: typeof import('react-dom').preloadModule
   const queryClient: typeof import('./src/config/client').queryClient
   const startTransition: typeof import('react').startTransition
+  const storage: typeof import('./src/config/storage').storage
+  const tauriStorageDriver: typeof import('./src/config/storage.driver').tauriStorageDriver
   const use: typeof import('react').use
   const useActionState: typeof import('react').useActionState
   const useCallback: typeof import('react').useCallback
@@ -55,4 +57,10 @@ declare global {
   const useStore: typeof import('valtio-define').useStore
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
   const useTransition: typeof import('react').useTransition
+}
+// for type re-export
+declare global {
+  // @ts-ignore
+  export type { TauriStorageDriverOptions } from './src/config/storage.driver'
+  import('./src/config/storage.driver')
 }
