@@ -1,2 +1,5 @@
 @import "tailwindcss";
 @import "@heroui/styles"; 
+html, body {
+  background-color: transparent;
+}

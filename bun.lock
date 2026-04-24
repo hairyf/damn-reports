@@ -7,6 +7,7 @@
       "dependencies": {
         "@assistant-ui/react": "^0.12.25",
         "@assistant-ui/react-ai-sdk": "^1.3.19",
+        "@gravity-ui/icons": "^2.18.0",
         "@hairy/react-lib": "^1.51.0",
         "@heroui/react": "^3.0.3",
         "@heroui/styles": "^3.0.3",
@@ -262,6 +263,8 @@
     "@formatjs/icu-skeleton-parser": ["@formatjs/icu-skeleton-parser@1.8.16", "", { "dependencies": { "@formatjs/ecma402-abstract": "2.3.6", "tslib": "^2.8.0" } }, "sha512-H13E9Xl+PxBd8D5/6TVUluSpxGNvFSlN/b3coUp0e0JpuWXXnQDiavIpY3NnvSp4xhEMoXyyBvVfdFX8jglOHQ=="],
 
     "@formatjs/intl-localematcher": ["@formatjs/intl-localematcher@0.6.2", "", { "dependencies": { "tslib": "^2.8.0" } }, "sha512-XOMO2Hupl0wdd172Y06h6kLpBz6Dv+J4okPLl4LPtzbr8f66WbIoy4ev98EBuZ6ZK4h5ydTN6XneT4QVpD7cdA=="],
+
+    "@gravity-ui/icons": ["@gravity-ui/icons@2.18.0", "", { "dependencies": { "tslib": "^2.8.1" }, "peerDependencies": { "react": "*" }, "optionalPeers": ["react"] }, "sha512-JoRc/4Ch9GLaufZfpGd2ePRRisMXEjMI+r3y8kPKyYIAdQZz07jpIXEgsft1gvBxjSht2MS2uu5+vfhe1WP0ow=="],
 
     "@hairy/react-lib": ["@hairy/react-lib@1.51.0", "", { "dependencies": { "@hairy/utils": "1.51.0", "html-parse-stringify": "^3.0.1", "mitt": "^3.0.1", "valtio": "^2" }, "peerDependencies": { "react": "^18.2.0", "react-dom": "^18.2.0", "react-i18next": "^14.1.2", "react-use": "^17.0.0" }, "optionalPeers": ["react-i18next"] }, "sha512-y5G+5aMvmjzc/1rLsQFRVhymWNtvJM2BwtfCxiCetnkKQKJAJcKEvfL10ibYJ6738KI78WS++C98q8ysa6zc+g=="],
 

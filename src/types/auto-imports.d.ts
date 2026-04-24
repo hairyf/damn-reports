@@ -9,6 +9,17 @@ declare global {
   const Activity: typeof import('react').Activity
   const Else: typeof import('react-if-lite').Else
   const Fragment: typeof import('react').Fragment
+  const IconArrowUp: typeof import('../components/icons').IconArrowUp
+  const IconChat: typeof import('../components/icons').IconChat
+  const IconChevronDown: typeof import('../components/icons').IconChevronDown
+  const IconCompass: typeof import('../components/icons').IconCompass
+  const IconCopy: typeof import('../components/icons').IconCopy
+  const IconEllipsis: typeof import('../components/icons').IconEllipsis
+  const IconLibrary: typeof import('../components/icons').IconLibrary
+  const IconPaperclip: typeof import('../components/icons').IconPaperclip
+  const IconPlus: typeof import('../components/icons').IconPlus
+  const IconSearch: typeof import('../components/icons').IconSearch
+  const IconShare: typeof import('../components/icons').IconShare
   const If: typeof import('react-if-lite').If
   const Link: typeof import('react-router-dom').Link
   const Main: typeof import('../components/main').Main
@@ -23,6 +34,7 @@ declare global {
   const Sidebar: typeof import('../components/sidebar').Sidebar
   const Suspense: typeof import('react').Suspense
   const Then: typeof import('react-if-lite').Then
+  const baseProps: typeof import('../components/icons').baseProps
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
   const clsx: typeof import('clsx').clsx

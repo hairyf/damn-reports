@@ -27,3 +27,6 @@ binaries
 *.njsproj
 *.sln
 *.sw?
+# heroui-agents-md
+.heroui-docs/
+skills
