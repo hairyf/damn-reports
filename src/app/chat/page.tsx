@@ -1,7 +1,7 @@
 import { Button, Card, Surface } from '@heroui/react'
 
 import { ArrowUp, Copy, Ellipsis, Microphone, PlugConnection, Plus } from "@gravity-ui/icons";
-import { InputGroup, Kbd, Spinner, TextField, Tooltip } from "@heroui/react";
+import { InputGroup, Kbd, Spinner, TextField, Tooltip, ScrollShadow } from "@heroui/react";
 
 function Page() {
 
@@ -18,11 +18,11 @@ function Page() {
 
   return (
     <div className="flex min-h-full flex-col gap-6">
-      <div className="flex flex-col gap-10">
+      <ScrollShadow className="flex-1 flex flex-col gap-10 min-h-0">
         <div className="flex justify-end">
           <Surface
             variant="tertiary"
-            className="max-w-[520px] rounded-2xl px-4 py-2 text-sm text-foreground/90"
+            className="max-w-130 rounded-2xl px-4 py-2 text-sm text-foreground/90"
           >
             how it looks option 3? i want to see if i would like it
           </Surface>
@@ -30,7 +30,7 @@ function Page() {
 
         <div className="mx-auto flex w-full flex-col gap-4">
           <div className="text-sm text-foreground/80">Sure! It looks like this:</div>
-          <Card className="w-full max-w-[440px] overflow-hidden rounded-2xl">
+          <Card className="w-full max-w-110 overflow-hidden rounded-2xl">
             <Card.Content className="p-0">
               <img
                 alt="Breakfast wrap"
@@ -48,9 +48,9 @@ function Page() {
             </Button>
           </div>
         </div>
-      </div>
+      </ScrollShadow>
 
-      <div className="sticky bottom-0 mt-auto pt-4">
+      <div className="mt-auto">
         <TextField
           fullWidth
           aria-label="Prompt input"
@@ -113,6 +113,7 @@ function Page() {
           </InputGroup>
         </TextField>
       </div>
+      <Webview className='min-h-24' url="https://www.bilibili.com" autoresize />
     </div>
   )
 }

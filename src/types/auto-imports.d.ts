@@ -34,6 +34,8 @@ declare global {
   const Sidebar: typeof import('../components/sidebar').Sidebar
   const Suspense: typeof import('react').Suspense
   const Then: typeof import('react-if-lite').Then
+  const Webview: typeof import('../components/webview').Webview
+  const WebviewContainer: typeof import('../components/webview').WebviewContainer
   const baseProps: typeof import('../components/icons').baseProps
   const cache: typeof import('react').cache
   const cacheSignal: typeof import('react').cacheSignal
@@ -68,6 +70,7 @@ declare global {
   const useMemo: typeof import('react').useMemo
   const useNavigate: typeof import('react-router-dom').useNavigate
   const useNavigationType: typeof import('react-router-dom').useNavigationType
+  const useObserver: typeof import('../components/webview.hooks').useObserver
   const useOptimistic: typeof import('react').useOptimistic
   const useOutlet: typeof import('react-router-dom').useOutlet
   const useOutletContext: typeof import('react-router-dom').useOutletContext
@@ -80,6 +83,8 @@ declare global {
   const useState: typeof import('react').useState
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
   const useTransition: typeof import('react').useTransition
+  const useWebview: typeof import('../components/webview.hooks').useWebview
+  const useWebviewResizeToElement: typeof import('../components/webview.hooks').useWebviewResizeToElement
 }
 // for type re-export
 declare global {
@@ -89,4 +94,7 @@ declare global {
   // @ts-ignore
   export type { TauriStorageDriverOptions } from '../config/storage.driver'
   import('../config/storage.driver')
+  // @ts-ignore
+  export type { WebviewProps } from '../components/webview'
+  import('../components/webview')
 }

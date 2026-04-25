@@ -28,6 +28,7 @@
     "opener:allow-open-url",
     "opener:allow-default-urls",
     "opener:allow-reveal-item-in-dir",
+    "core:webview:allow-set-webview-position",
     "notification:default",
     "store:default",
     "sql:default",
