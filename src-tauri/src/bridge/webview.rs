@@ -3,7 +3,7 @@ use tauri::{AppHandle, LogicalPosition, LogicalSize, Manager};
 use tauri_utils::config::WebviewUrl;
 
 #[tauri::command]
-pub async fn create_webview(
+pub async fn webview_create(
     app_handle: AppHandle,
     label: String,
     url: String,
@@ -13,8 +13,8 @@ pub async fn create_webview(
     height: Option<i32>,
 ) -> Result<String, String> {
     let parsed_url = url.parse().map_err(|e| format!("URL 解析失败: {}", e))?;
-    let main_window = app_handle.get_window("main").ok_or_else(|| "未找到主窗口".to_string())?;
-    
+    let window = app_handle.get_window("main").ok_or_else(|| "未找到主窗口".to_string())?;
+
     // 准备构建器
     let webview_builder = tauri::webview::WebviewBuilder::new(&label, WebviewUrl::External(parsed_url))
         .transparent(true)
@@ -26,7 +26,7 @@ pub async fn create_webview(
 
     // 在主线程执行 UI 挂载
     app_handle.run_on_main_thread(move || {
-        let result = main_window
+        let result = window
             .add_child(
                 webview_builder,
                 LogicalPosition::new(x.unwrap_or(0), y.unwrap_or(0)),
@@ -42,24 +42,13 @@ pub async fn create_webview(
 }
 
 #[tauri::command]
-pub fn resize_webview(
+pub fn webview_eval(
     app_handle: AppHandle,
     label: String,
-    x: i32,
-    y: i32,
-    width: i32,
-    height: i32,
+    js: String,
 ) -> Result<(), String> {
     let webview = find_webview(&app_handle, &label)?;
-    webview.set_position(LogicalPosition::new(x, y)).map_err(|e| e.to_string())?;
-    webview.set_size(LogicalSize::new(width, height)).map_err(|e| e.to_string())?;
-    Ok(())
-}
-
-#[tauri::command]
-pub fn close_webview(app_handle: AppHandle, label: String) -> Result<(), String> {
-    let webview = find_webview(&app_handle, &label)?;
-    webview.close().map_err(|e| e.to_string())
+    webview.eval(&js).map_err(|e| e.to_string())
 }
 
 fn find_webview(app_handle: &AppHandle, label: &str) -> Result<tauri::Webview, String> {

@@ -57,7 +57,7 @@ export function useWebview(label: string, url: string, elementRef: RefObject<HTM
       }
       if (isAborted) return;
       const rect = elementRef.current?.getBoundingClientRect()!;
-      await invoke<string>('create_webview', {
+      await invoke<string>('webview_create', {
         label, url,
         x: +rect.left.toFixed(0),
         y: +rect.top.toFixed(0),
@@ -66,6 +66,10 @@ export function useWebview(label: string, url: string, elementRef: RefObject<HTM
       });
       webviewRef.current = await getWebview(label);
       initializing.current = false;
+      invoke<string>('webview_eval', {
+        label,
+        js: 'console.log("Hello Webview", document)',
+      });
     }
 
     init();

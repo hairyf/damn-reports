@@ -16,9 +16,8 @@ fn setup(app_handle: tauri::AppHandle) {
 // configure invoke handler
 fn handler() -> impl Fn(Invoke<Wry>) -> bool + Send + Sync + 'static {
     tauri::generate_handler![
-      bridge::create_webview,
-      bridge::resize_webview,
-      bridge::close_webview,
+      bridge::webview_create,
+      bridge::webview_eval,
     ]
 }
 
