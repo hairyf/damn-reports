@@ -17,11 +17,9 @@ function Layout(props: PropsWithChildren) {
     >
       <body className="min-h-full flex flex-col">
         <Provider>
-          <ServiceLoaded>
-            <TooltipProvider>
-              {props.children}
-            </TooltipProvider>
-          </ServiceLoaded>
+          <TooltipProvider>
+            {props.children}
+          </TooltipProvider>
         </Provider>
       </body>
     </html>
