@@ -22,6 +22,8 @@ binaries
 .idea
 .next
 .DS_Store
+.env
+
 *.suo
 *.ntvs*
 *.njsproj
