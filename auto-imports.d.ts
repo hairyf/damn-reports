@@ -10,6 +10,7 @@ declare global {
   const Else: typeof import('react-if-lite').Else
   const Fragment: typeof import('react').Fragment
   const If: typeof import('react-if-lite').If
+  const Menu: typeof import('./src/components/menu').Menu
   const Suspense: typeof import('react').Suspense
   const Then: typeof import('react-if-lite').Then
   const cache: typeof import('react').cache
@@ -61,6 +62,9 @@ declare global {
 }
 // for type re-export
 declare global {
+  // @ts-ignore
+  export type { MenuItemProps, MenuGroupProps } from './src/components/menu'
+  import('./src/components/menu')
   // @ts-ignore
   export type { TauriStorageDriverOptions } from './src/config/storage.driver'
   import('./src/config/storage.driver')

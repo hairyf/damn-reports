@@ -1,6 +1,4 @@
 import type { PropsWithChildren } from 'react'
-import { Sidebar } from './components/sidebar'
-
 import { Provider } from './provider'
 import './globals.css'
 import 'assistant-ui/style.css'
@@ -10,9 +8,8 @@ function Layout(props: PropsWithChildren) {
     <html lang="en" suppressHydrationWarning>
       <body className="min-h-screen">
         <Provider>
-          <layouts.default sidebar={<Sidebar />}>
-            {props.children}
-          </layouts.default>
+          {props.children}
+
         </Provider>
       </body>
     </html>
