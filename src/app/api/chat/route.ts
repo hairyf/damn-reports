@@ -1,18 +1,21 @@
-import { deepseek } from "@ai-sdk/deepseek";
-import { frontendTools } from "@assistant-ui/react-ai-sdk";
-import {
+import type {
   JSONSchema7,
-  streamText,
+  UIMessage,
+} from 'ai'
+import { deepseek } from '@ai-sdk/deepseek'
+import { frontendTools } from '@assistant-ui/react-ai-sdk'
+import {
   convertToModelMessages,
-  type UIMessage,
-  tool,
   stepCountIs,
+
+  streamText,
+  tool,
   zodSchema,
-} from "ai";
-import { z } from "zod";
+} from 'ai'
+import { z } from 'zod'
 
 // Allow streaming responses up to 30 seconds
-export const maxDuration = 30;
+export const maxDuration = 30
 
 export async function POST(req: Request) {
   const {
@@ -20,31 +23,31 @@ export async function POST(req: Request) {
     system,
     tools,
   }: {
-    messages: UIMessage[];
-    system?: string;
-    tools?: Record<string, { description?: string; parameters: JSONSchema7 }>;
-  } = await req.json();
+    messages: UIMessage[]
+    system?: string
+    tools?: Record<string, { description?: string, parameters: JSONSchema7 }>
+  } = await req.json()
 
   const result = streamText({
-    model: deepseek("deepseek-chat"),
+    model: deepseek('deepseek-chat'),
     messages: await convertToModelMessages(messages),
     ...(system ? { system } : {}),
     stopWhen: stepCountIs(10),
     tools: {
       ...frontendTools(tools ?? {}),
       get_current_weather: tool({
-        description: "Get the current weather",
+        description: 'Get the current weather',
         inputSchema: zodSchema(
           z.object({
             city: z.string(),
           }),
         ),
         execute: async ({ city }) => {
-          return `The weather in ${city} is sunny`;
+          return `The weather in ${city} is sunny`
         },
       }),
     },
-  });
+  })
 
-  return result.toUIMessageStreamResponse();
+  return result.toUIMessageStreamResponse()
 }

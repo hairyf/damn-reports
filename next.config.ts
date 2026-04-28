@@ -1,5 +1,4 @@
-import type { NextConfig } from "next";
-import process from "node:process";
+import type { NextConfig } from 'next'
 import { unimport } from 'unimport-loader'
 
 const unimportLoader = unimport({
@@ -34,4 +33,4 @@ const nextConfig: NextConfig = {
   reactStrictMode: false,
 }
 
-export default nextConfig;
+export default nextConfig
