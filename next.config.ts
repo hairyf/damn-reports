@@ -3,7 +3,6 @@ import process from "node:process";
 import { unimport } from 'unimport-loader'
 
 const unimportLoader = unimport({
-  transpilePackages: ["@assistant-ui/react", "@assistant-ui/react-ai-sdk"],
   presets: ['react', 'react-dom'],
   dts: true,
   dirs: [
@@ -34,14 +33,5 @@ const nextConfig: NextConfig = {
   },
   reactStrictMode: false,
 }
-
-if (process.env.ONLY_SERVER)
-  Object.assign(nextConfig, {
-    adapterPath: import.meta.resolve("next-bun-compile"),
-    output: 'standalone',
-  })
-
-if (process.env.ONLY_CLIENT)
-  Object.assign(nextConfig, { output: 'export' })
 
 export default nextConfig;

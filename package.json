@@ -6,11 +6,8 @@
   "packageManager": "bun@1.3.13",
   "scripts": {
     "dev": "next dev -p 1420",
-    "build": "bun run scripts/build.ts",
-    "tauri": "tauri",
     "lint": "eslint .",
-    "typecheck": "tsc --noEmit",
-    "tauri:icon": "pnpm tauri icon"
+    "typecheck": "tsc --noEmit"
   },
   "workspaces": [
     "packages/*"
@@ -23,15 +20,6 @@
     "@heroui/react": "^3.0.3",
     "@heroui/styles": "^3.0.3",
     "@tanstack/react-query": "^5.100.1",
-    "@tauri-apps/api": "^2",
-    "@tauri-apps/plugin-dialog": "~2",
-    "@tauri-apps/plugin-http": "~2",
-    "@tauri-apps/plugin-notification": "~2",
-    "@tauri-apps/plugin-opener": "^2",
-    "@tauri-apps/plugin-process": "~2",
-    "@tauri-apps/plugin-shell": "~2",
-    "@tauri-apps/plugin-sql": "~2",
-    "@tauri-apps/plugin-store": "~2",
     "ai": "^6.0.168",
     "ai-elements": "workspace:*",
     "assistant-ui": "workspace:*",
@@ -46,16 +34,13 @@
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4.2.4",
-    "@tauri-apps/cli": "^2",
-    "@types/fs-extra": "^11.0.4",
+    "@types/bun": "latest",
     "@types/node": "25",
     "@types/react": "19.2.14",
     "fs-extra": "^11.3.4",
     "glob": "^13.0.6",
     "tailwindcss": "^4.2.4",
-    "tinyexec": "^1.1.1",
     "typescript": "~5.8.3",
-    "unimport-loader": "^0.2.5",
-    "@types/bun": "latest"
+    "unimport-loader": "^0.2.5"
   }
 }

@@ -10,7 +10,6 @@ declare global {
   const Else: typeof import('react-if-lite').Else
   const Fragment: typeof import('react').Fragment
   const If: typeof import('react-if-lite').If
-  const ServiceLoaded: typeof import('./src/components/service-loaded').ServiceLoaded
   const Suspense: typeof import('react').Suspense
   const Then: typeof import('react-if-lite').Then
   const cache: typeof import('react').cache

@@ -2,7 +2,7 @@ import { PropsWithChildren } from "react";
 import { Provider } from "./provider";
 import { Geist } from "next/font/google";
 import { cn } from 'ai-elements'
-import { TooltipProvider } from "assistant-ui"
+// import { TooltipProvider } from "assistant-ui"
 
 import "./globals.css";
 import "assistant-ui/style.css"
@@ -17,9 +17,9 @@ function Layout(props: PropsWithChildren) {
     >
       <body className="min-h-full flex flex-col">
         <Provider>
-          <TooltipProvider>
+          {/* <TooltipProvider> */}
             {props.children}
-          </TooltipProvider>
+          {/* </TooltipProvider> */}
         </Provider>
       </body>
     </html>
