@@ -1,6 +1,6 @@
 'use client'
 
-import { ChevronDown, LayoutSideContent } from '@gravity-ui/icons'
+import { ChevronDown, Gear, LayoutSideContent } from '@gravity-ui/icons'
 import { Avatar, Button, Dropdown, Label } from '@heroui/react'
 import { storeToState } from 'valtio-define'
 
@@ -35,9 +35,12 @@ export function Sidebar() {
             </Dropdown.Menu>
           </Dropdown.Popover>
         </Dropdown>
-        <div className="flex gap-2">
+        <div className="flex gap-0.5">
           <Button className="rounded-md" size="sm" variant="ghost" isIconOnly onClick={() => setAsideShow(false)}>
             <LayoutSideContent />
+          </Button>
+          <Button className="rounded-md" size="sm" variant="ghost" isIconOnly>
+            <Gear />
           </Button>
         </div>
       </div>
