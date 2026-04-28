@@ -6,6 +6,7 @@ const unimportLoader = unimport({
   dts: true,
   dirs: [
     'src/store/index.ts',
+    'src/layout/index.ts',
     'src/components/**',
     'src/config/**',
     'src/hooks/**',

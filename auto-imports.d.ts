@@ -20,6 +20,7 @@ declare global {
   const defineStore: typeof import('valtio-define').defineStore
   const flushSync: typeof import('react-dom').flushSync
   const forwardRef: typeof import('react').forwardRef
+  const layouts: typeof import('./src/layout/index').layouts
   const lazy: typeof import('react').lazy
   const memo: typeof import('react').memo
   const preconnect: typeof import('react-dom').preconnect
@@ -31,6 +32,7 @@ declare global {
   const queryClient: typeof import('./src/config/client').queryClient
   const startTransition: typeof import('react').startTransition
   const storage: typeof import('./src/config/storage').storage
+  const store: typeof import('./src/store/index').store
   const tauriStorageDriver: typeof import('./src/config/storage.driver').tauriStorageDriver
   const use: typeof import('react').use
   const useActionState: typeof import('react').useActionState

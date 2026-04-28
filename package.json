@@ -3,6 +3,7 @@
   "type": "module",
   "version": "0.1.0",
   "private": true,
+  "packageManager": "pnpm@10.33.0+sha512.10568bb4a6afb58c9eb3630da90cc9516417abebd3fabbe6739f0ae795728da1491e9db5a544c76ad8eb7570f5c4bb3d6c637b2cb41bfdcdb47fa823c8649319",
   "scripts": {
     "dev": "next dev -p 1420",
     "lint": "eslint .",
@@ -13,6 +14,7 @@
   ],
   "dependencies": {
     "@ai-sdk/deepseek": "^2.0.29",
+    "@gravity-ui/icons": "^2.18.0",
     "@hairy/react-lib": "^1.51.0",
     "@heroui/react": "^3.0.3",
     "@heroui/styles": "^3.0.3",
@@ -20,7 +22,9 @@
     "ai": "^6.0.168",
     "ai-elements": "workspace:*",
     "assistant-ui": "workspace:*",
+    "motion": "^12.38.0",
     "next": "^16.2.4",
+    "next-themes": "^0.4.6",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-if-lite": "^0.1.0",

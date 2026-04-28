@@ -1,9 +1,5 @@
 function Page() {
-  return (
-    <section className="bg-background-secondary h-screen">
-      12312
-    </section>
-  )
+  return null
 }
 
 export default Page
