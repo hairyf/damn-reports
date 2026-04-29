@@ -7,7 +7,6 @@ import { frontendTools } from '@assistant-ui/react-ai-sdk'
 import {
   convertToModelMessages,
   stepCountIs,
-
   streamText,
   tool,
   zodSchema,
@@ -27,7 +26,6 @@ export async function POST(req: Request) {
     system?: string
     tools?: Record<string, { description?: string, parameters: JSONSchema7 }>
   } = await req.json()
-
   const result = streamText({
     model: deepseek('deepseek-chat'),
     messages: await convertToModelMessages(messages),
@@ -48,6 +46,5 @@ export async function POST(req: Request) {
       }),
     },
   })
-
   return result.toUIMessageStreamResponse()
 }

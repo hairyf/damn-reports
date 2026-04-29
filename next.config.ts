@@ -13,6 +13,7 @@ const unimportLoader = unimport({
     'src/utils/**',
   ],
   imports: [
+    { from: 'next/navigation', imports: ['useRouter'] },
     { from: 'valtio-define', imports: ['useStore', 'defineStore'] },
     { from: 'react-if-lite', imports: ['If', 'Then', 'Else'] },
     {
@@ -23,6 +24,7 @@ const unimportLoader = unimport({
 })
 
 const nextConfig: NextConfig = {
+  output: 'standalone',
   turbopack: {
     rules: {
       '*.{tsx,ts,jsx,js}': {
@@ -30,6 +32,9 @@ const nextConfig: NextConfig = {
         loaders: [unimportLoader],
       },
     },
+  },
+  outputFileTracingIncludes: {
+    '*': ['./prisma/**/*', './data/storage.default.json'],
   },
   reactStrictMode: false,
 }

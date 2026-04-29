@@ -7,10 +7,14 @@
 export {}
 declare global {
   const Activity: typeof import('react').Activity
+  const CollapseTransition: typeof import('./src/components/collapse-transition').CollapseTransition
   const Else: typeof import('react-if-lite').Else
   const Fragment: typeof import('react').Fragment
   const If: typeof import('react-if-lite').If
   const Menu: typeof import('./src/components/menu').Menu
+  const MenuCollapse: typeof import('./src/components/menu').MenuCollapse
+  const MenuGroup: typeof import('./src/components/menu').MenuGroup
+  const MenuItem: typeof import('./src/components/menu').MenuItem
   const Suspense: typeof import('react').Suspense
   const Then: typeof import('react-if-lite').Then
   const cache: typeof import('react').cache
@@ -24,6 +28,7 @@ declare global {
   const layouts: typeof import('./src/layout/index').layouts
   const lazy: typeof import('react').lazy
   const memo: typeof import('react').memo
+  const nextFsClientDriver: typeof import('./src/utils/driver').nextFsClientDriver
   const preconnect: typeof import('react-dom').preconnect
   const prefetchDNS: typeof import('react-dom').prefetchDNS
   const preinit: typeof import('react-dom').preinit
@@ -32,9 +37,9 @@ declare global {
   const preloadModule: typeof import('react-dom').preloadModule
   const queryClient: typeof import('./src/config/client').queryClient
   const startTransition: typeof import('react').startTransition
-  const storage: typeof import('./src/config/storage').storage
+  const storageClient: typeof import('./src/config/storage.client').storageClient
+  const storageServer: typeof import('./src/config/storage.server').storageServer
   const store: typeof import('./src/store/index').store
-  const tauriStorageDriver: typeof import('./src/config/storage.driver').tauriStorageDriver
   const use: typeof import('react').use
   const useActionState: typeof import('react').useActionState
   const useCallback: typeof import('react').useCallback
@@ -55,6 +60,7 @@ declare global {
   const useQuery: typeof import('@tanstack/react-query').useQuery
   const useReducer: typeof import('react').useReducer
   const useRef: typeof import('react').useRef
+  const useRouter: typeof import('next/navigation').useRouter
   const useState: typeof import('react').useState
   const useStore: typeof import('valtio-define').useStore
   const useSyncExternalStore: typeof import('react').useSyncExternalStore
@@ -63,9 +69,9 @@ declare global {
 // for type re-export
 declare global {
   // @ts-ignore
-  export type { MenuItemProps, MenuGroupProps } from './src/components/menu'
-  import('./src/components/menu')
+  export type { CollapseTransitionProps } from './src/components/collapse-transition'
+  import('./src/components/collapse-transition')
   // @ts-ignore
-  export type { TauriStorageDriverOptions } from './src/config/storage.driver'
-  import('./src/config/storage.driver')
+  export type { MenuGroupProps, MenuItemProps, MenuCollapseProps } from './src/components/menu'
+  import('./src/components/menu')
 }

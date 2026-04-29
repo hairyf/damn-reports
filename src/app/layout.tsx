@@ -9,7 +9,6 @@ function Layout(props: PropsWithChildren) {
       <body className="min-h-screen">
         <Provider>
           {props.children}
-
         </Provider>
       </body>
     </html>

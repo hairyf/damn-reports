@@ -6,4 +6,7 @@ export default antfu({
   ignores: [
     'packages',
   ],
+  rules: {
+    'antfu/no-top-level-await': 'off',
+  },
 })

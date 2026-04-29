@@ -21,6 +21,7 @@ binaries
 
 .idea
 .next
+.data/config.json
 .DS_Store
 .env
 
