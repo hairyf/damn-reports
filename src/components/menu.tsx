@@ -17,6 +17,7 @@ export function Menu(props: PropsWithChildren) {
 
 Menu.Item = MenuItem
 Menu.Group = MenuGroup
+Menu.Expand = MenuExpand
 
 export interface MenuItemProps extends Omit<ButtonProps, 'children'> {
   prefix?: ReactNode
@@ -27,7 +28,7 @@ export interface MenuItemProps extends Omit<ButtonProps, 'children'> {
 
 function MenuItem(props: MenuItemProps) {
   return (
-    <Button className="w-full justify-between rounded-md">
+    <Button className="w-full justify-between rounded-md" variant="ghost">
       <div className="flex gap-2">
         {props.prefix}
         {props.children}
@@ -45,6 +46,21 @@ export interface MenuGroupProps {
 }
 
 function MenuGroup(props: MenuGroupProps) {
+  return (
+    <div className="flex flex-col">
+      {props.children}
+    </div>
+  )
+}
+
+export interface MenuExpandProps {
+  suffix?: ReactNode
+  label?: string
+  children?: ReactNode
+  defaultOpen?: boolean
+}
+
+function MenuExpand(props: MenuExpandProps) {
   const [expanded, setExpanded] = useState(props.defaultOpen)
   return (
     <div className="flex flex-col">

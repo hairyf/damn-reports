@@ -1,60 +1,58 @@
-/* eslint-disable no-alert */
 'use client'
 
-import { House, Magnifier } from '@gravity-ui/icons'
-import { Label } from '@heroui/react'
+import { ChartDonut, ChartPie, FileText, House, Magnifier, Plus, SparklesFill, SquareChartBar } from '@gravity-ui/icons'
+import { Button } from '@heroui/react'
+import { Menu } from '../../../components/menu'
 import { Topbar } from './topbar'
 
 export function Sidebar() {
   return (
     <div className="flex flex-col gap-1">
       <Topbar />
-      <Menu>
-        <Menu.Item prefix={<Magnifier />} onClick={() => alert('Search')}>
-          Search
-        </Menu.Item>
-
-        <Menu.Item prefix={<House />} to="/">
-          Home
-        </Menu.Item>
-
-        <div>
-          <Label className="px-1.5 text-xs text-foreground/50">Addons</Label>
-          <Menu.Group label="日报插件" defaultOpen>
-            <Menu.Item>
+      <Menu className="px-1">
+        <Menu.Group>
+          <Menu.Item icon={<Magnifier className="size-3.5 text-foreground/70" />}>
+            Search
+          </Menu.Item>
+          <Menu.Item icon={<House className="size-3.5 text-foreground/70" />}>
+            Home
+          </Menu.Item>
+        </Menu.Group>
+        <Menu.Group
+          label="Addons"
+          extra={(
+            <Button isIconOnly className="rounded-md size-4 mt-px" variant="ghost">
+              <Plus className="size-3 text-foreground/70" />
+            </Button>
+          )}
+        >
+          <Menu.Collapse label="日报系统" icon={<SquareChartBar />}>
+            <Menu.Item icon={<ChartPie className="size-3.5 text-foreground/70" />}>
               概览
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item icon={<FileText className="size-3.5 text-foreground/70" />}>
               报告
             </Menu.Item>
-            <Menu.Item>
+            <Menu.Item icon={<ChartDonut className="size-3.5 text-foreground/70" />}>
               来源
             </Menu.Item>
-            <Menu.Item>
-              工具
-            </Menu.Item>
-          </Menu.Group>
-        </div>
-
-        <div>
-          <Label className="px-1.5 text-xs text-foreground/50">Recents</Label>
-          <Menu.Item>
-            Hello Exchange
-          </Menu.Item>
-          <Menu.Item>
-            旅游攻略
-          </Menu.Item>
-        </div>
-
-        <div>
-          <Label className="px-1.5 text-xs text-foreground/50">Agents</Label>
-          <Menu.Item>
+          </Menu.Collapse>
+        </Menu.Group>
+        <Menu.Group
+          label="Agents"
+          extra={(
+            <Button isIconOnly className="rounded-md size-4 mt-px" variant="ghost">
+              <Plus className="size-3 text-foreground/70" />
+            </Button>
+          )}
+        >
+          <Menu.Item icon={<SparklesFill className="size-3.5 text-foreground/70" />}>
             Diana AI
           </Menu.Item>
-          <Menu.Item>
-            电脑操控
+          <Menu.Item icon={<SparklesFill className="size-3.5 text-foreground/70" />}>
+            Computer AI
           </Menu.Item>
-        </div>
+        </Menu.Group>
       </Menu>
     </div>
   )
