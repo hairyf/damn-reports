@@ -22,6 +22,7 @@ declare global {
   const createContext: typeof import('react').createContext
   const createPortal: typeof import('react-dom').createPortal
   const createRef: typeof import('react').createRef
+  const defineAgent: typeof import('./src/utils/define').defineAgent
   const defineStore: typeof import('valtio-define').defineStore
   const flushSync: typeof import('react-dom').flushSync
   const forwardRef: typeof import('react').forwardRef
@@ -74,4 +75,7 @@ declare global {
   // @ts-ignore
   export type { MenuGroupProps, MenuItemProps, MenuCollapseProps } from './src/components/menu'
   import('./src/components/menu')
+  // @ts-ignore
+  export type { DefineAgentOptions, Agent } from './src/utils/define'
+  import('./src/utils/define')
 }

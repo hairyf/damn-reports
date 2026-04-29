@@ -7,6 +7,8 @@ export default antfu({
     'packages',
   ],
   rules: {
+    'array-callback-return': 'off',
     'antfu/no-top-level-await': 'off',
+    'react/no-array-index-key': 'off',
   },
 })

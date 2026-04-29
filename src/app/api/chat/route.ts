@@ -1,50 +1,19 @@
-import type {
-  JSONSchema7,
-  UIMessage,
-} from 'ai'
-import { deepseek } from '@ai-sdk/deepseek'
-import { frontendTools } from '@assistant-ui/react-ai-sdk'
+import type { UIMessage } from 'ai'
 import {
   convertToModelMessages,
-  stepCountIs,
-  streamText,
-  tool,
-  zodSchema,
-} from 'ai'
-import { z } from 'zod'
 
-// Allow streaming responses up to 30 seconds
-export const maxDuration = 30
+} from 'ai'
+import { defaultAgent } from '@/ai'
+// import { frontendTools } from '@assistant-ui/react-ai-sdk'
+
+export interface ChatRequestBody {
+  // tools?: Record<string, { description?: string, parameters: JSONSchema7 }>
+  messages: UIMessage[]
+}
 
 export async function POST(req: Request) {
-  const {
-    messages,
-    system,
-    tools,
-  }: {
-    messages: UIMessage[]
-    system?: string
-    tools?: Record<string, { description?: string, parameters: JSONSchema7 }>
-  } = await req.json()
-  const result = streamText({
-    model: deepseek('deepseek-chat'),
-    messages: await convertToModelMessages(messages),
-    ...(system ? { system } : {}),
-    stopWhen: stepCountIs(10),
-    tools: {
-      ...frontendTools(tools ?? {}),
-      get_current_weather: tool({
-        description: 'Get the current weather',
-        inputSchema: zodSchema(
-          z.object({
-            city: z.string(),
-          }),
-        ),
-        execute: async ({ city }) => {
-          return `The weather in ${city} is sunny`
-        },
-      }),
-    },
-  })
-  return result.toUIMessageStreamResponse()
+  const body: ChatRequestBody = await req.json()
+  const agent = await defaultAgent()
+  const messages = await convertToModelMessages(body.messages)
+  return agent.stream({ messages })
 }
