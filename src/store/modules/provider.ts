@@ -37,6 +37,7 @@ export const provider = defineStore({
       default: '',
       title: '',
       compress: '',
+      assistant: '',
     },
   }),
 })
