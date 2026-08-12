@@ -1,0 +1,41 @@
+{
+  "version": 1,
+  "skills": {
+    "agent-browser": {
+      "source": "vercel-labs/agent-browser",
+      "sourceType": "github",
+      "skillPath": "skills/agent-browser/SKILL.md",
+      "computedHash": "a674b7d81066e3cc471a7512ddb4ae724418cbfefa75cbb050b0dc430e4d57a0"
+    },
+    "create-skill": {
+      "source": "hairyf/skills",
+      "sourceType": "github",
+      "skillPath": "skills/create-skill/SKILL.md",
+      "computedHash": "88a7d992bc757bcc89f1f75c0afaa6d7715e60b64576240df5720a58fd25ce3b"
+    },
+    "create-skill-from-repo": {
+      "source": "hairyf/skills",
+      "sourceType": "github",
+      "skillPath": "skills/create-skill-from-repo/SKILL.md",
+      "computedHash": "ba3f1e413e04cf64116180c54c9ab552b0558efcc41f3e50fa2984d82cf8e421"
+    },
+    "react-use": {
+      "source": "hairyf/skills",
+      "sourceType": "github",
+      "skillPath": "skills/react-use/SKILL.md",
+      "computedHash": "8d04192c4cb6bdec58c2d96fd836289a76223387dda36f97fd8b4b8887556dbb"
+    },
+    "tailwindcss": {
+      "source": "hairyf/skills",
+      "sourceType": "github",
+      "skillPath": "skills/tailwindcss/SKILL.md",
+      "computedHash": "78937e1d72496af3e902292eb66b8ad2cdd2d34b90b5428257aae9056678d465"
+    },
+    "tauri": {
+      "source": "hairyf/skills",
+      "sourceType": "github",
+      "skillPath": "skills/tauri/SKILL.md",
+      "computedHash": "5d2d4e87a48d0e73b7ef0df0514b363c127af4c45373e1f3fc25f468cfbe2988"
+    }
+  }
+}

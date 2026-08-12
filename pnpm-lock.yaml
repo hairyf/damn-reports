@@ -67,7 +67,7 @@ importers:
         version: 4.1.11
       '@tailwindcss/vite':
         specifier: 4.1.11
-        version: 4.1.11(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2))
+        version: 4.1.11(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0))
       '@tanstack/react-query':
         specifier: ^5.90.20
         version: 5.90.20(react@19.2.3)
@@ -230,7 +230,7 @@ importers:
         version: 19.2.3(@types/react@19.2.9)
       '@vitejs/plugin-react':
         specifier: ^4.7.0
-        version: 4.7.0(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2))
+        version: 4.7.0(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0))
       bumpp:
         specifier: ^10.4.0
         version: 10.4.0(patch_hash=0260007e7b0e80809a1cfa8eb84f6fc95a08ec99d20bf6b3b9b33c0695caa14c)
@@ -253,11 +253,8 @@ importers:
         specifier: ^3.0.0
         version: 3.0.0(prisma@7.3.0(@types/react@19.2.9)(react-dom@19.2.3(react@19.2.3))(react@19.2.3)(typescript@5.8.3))
       skills:
-        specifier: ^1.3.5
-        version: 1.3.5
-      skills-manifest:
-        specifier: ^0.3.3
-        version: 0.3.3(skills@1.3.5)
+        specifier: ^1.5.22
+        version: 1.5.22
       tailwindcss:
         specifier: 4.1.11
         version: 4.1.11
@@ -275,13 +272,13 @@ importers:
         version: 20.3.0
       vite:
         specifier: ^7.3.1
-        version: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2)
+        version: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0)
       vite-plugin-pages:
         specifier: ^0.33.2
-        version: 0.33.2(@vue/compiler-sfc@3.5.26)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2))
+        version: 0.33.2(@vue/compiler-sfc@3.5.26)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0))
       vite-tsconfig-paths:
         specifier: ^5.1.4
-        version: 5.1.4(typescript@5.8.3)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2))
+        version: 5.1.4(typescript@5.8.3)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0))
 
   packages/ai-elements:
     dependencies:
@@ -3792,9 +3789,6 @@ packages:
   citty@0.1.6:
     resolution: {integrity: sha512-tskPPKEs8D2KPafUypv2gxwJP8h/OaJmC82QQGGDQcHvXX43xF2VDACcJVmZ0EuSxkpO9Kc4MlrA3q0+FG58AQ==}
 
-  citty@0.2.0:
-    resolution: {integrity: sha512-8csy5IBFI2ex2hTVpaHN2j+LNE199AgiI7y4dMintrr8i0lQiFn+0AWMZrWdHKIgMOer65f8IThysYhoReqjWA==}
-
   class-variance-authority@0.7.1:
     resolution: {integrity: sha512-Ka+9Trutv7G8M6WT6SeiRWz792K5qEqIGEGzXKhAE6xOWAY6pPH8U+9IY3oCMv6kqTmLsv7Xh/2w2RigkePMsg==}
 
@@ -5439,11 +5433,6 @@ packages:
     engines: {node: ^14.16.0 || >=16.10.0}
     hasBin: true
 
-  nypm@0.6.4:
-    resolution: {integrity: sha512-1TvCKjZyyklN+JJj2TS3P4uSQEInrM/HkkuSXsEzm1ApPgBffOn8gFguNnZf07r/1X6vlryfIqMUkJKQMzlZiw==}
-    engines: {node: '>=18'}
-    hasBin: true
-
   object-deep-merge@2.0.0:
     resolution: {integrity: sha512-3DC3UMpeffLTHiuXSy/UG4NOIYTLlY9u3V82+djSCLYClWobZiS4ivYzpIUWrRY/nfsJ8cWsKyG3QfyLePmhvg==}
 
@@ -6028,15 +6017,9 @@ packages:
   sisteransi@1.0.5:
     resolution: {integrity: sha512-bLGGlR1QxBcynn2d5YmDX4MGjlZvy2MRBDRNHLJ8VI6l6+9FUiyTFNJ0IveOSP0bcXgVDPRcfGqA0pjaqUpfVg==}
 
-  skills-manifest@0.3.3:
-    resolution: {integrity: sha512-aSjKzEGbr0ZKxIj0+UsWy65RGu2ooFr+BaaP0PW50iv140vkZyEs9OjJQ7GyXgQ8NQ15gBfmhjfxxh66+NXghw==}
-    hasBin: true
-    peerDependencies:
-      skills: ^1.3.4
-
-  skills@1.3.5:
-    resolution: {integrity: sha512-nTOe4xzEL0gTHzU9vX3TpVdk5vsnGANh7PjmPkbLa2tD/JzVLChr+/QF+EovsyDSY4p03U83+kXZHMKsHfctJw==}
-    engines: {node: '>=18'}
+  skills@1.5.22:
+    resolution: {integrity: sha512-cHiLjwZEawWFvudIqeeMZlvZayTLbRouydMbblyrdiyH7ZLbqUrSrEEr+Tg+X265iztRlVMsyOYRwpD5JxBsvg==}
+    engines: {node: '>=22.20.0'}
     hasBin: true
 
   snarkdown@2.0.0:
@@ -6170,6 +6153,10 @@ packages:
 
   tar@7.5.2:
     resolution: {integrity: sha512-7NyxrTE4Anh8km8iEy7o0QYPs+0JKBTj5ZaqHg6B39erLg0qYXN3BijtShwbsNSvQ+LN75+KV+C4QR/f6Gwnpg==}
+    engines: {node: '>=18'}
+
+  tar@7.5.22:
+    resolution: {integrity: sha512-MFO/QzvtAOmJbkhOaCTvbGcFN9L9b+JunIsDwaKljSOdcLMea3NJ1k9Usz/rjdfSXTq4dfzfeS7W4p4YOAAHeA==}
     engines: {node: '>=18'}
 
   throttle-debounce@3.0.1:
@@ -6646,6 +6633,11 @@ packages:
 
   yaml@2.8.2:
     resolution: {integrity: sha512-mplynKqc1C2hTVYxd0PU2xQAc22TI1vShAYGksCCfxbn/dFwnHTNi1bvYsBTkhdUNtGIf5xNOg938rrSSYvS9A==}
+    engines: {node: '>= 14.6'}
+    hasBin: true
+
+  yaml@2.9.0:
+    resolution: {integrity: sha512-2AvhNX3mb8zd6Zy7INTtSpl1F15HW6Wnqj0srWlkKLcpYl/gMIMJiyuGq2KeI2YFxUPjdlB+3Lc10seMLtL4cA==}
     engines: {node: '>= 14.6'}
     hasBin: true
 
@@ -10073,12 +10065,12 @@ snapshots:
       postcss: 8.5.6
       tailwindcss: 4.1.11
 
-  '@tailwindcss/vite@4.1.11(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2))':
+  '@tailwindcss/vite@4.1.11(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0))':
     dependencies:
       '@tailwindcss/node': 4.1.11
       '@tailwindcss/oxide': 4.1.11
       tailwindcss: 4.1.11
-      vite: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0)
 
   '@tanstack/query-core@5.90.20': {}
 
@@ -10749,7 +10741,7 @@ snapshots:
 
   '@vercel/oidc@3.1.0': {}
 
-  '@vitejs/plugin-react@4.7.0(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2))':
+  '@vitejs/plugin-react@4.7.0(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0))':
     dependencies:
       '@babel/core': 7.28.5
       '@babel/plugin-transform-react-jsx-self': 7.27.1(@babel/core@7.28.5)
@@ -10757,7 +10749,7 @@ snapshots:
       '@rolldown/pluginutils': 1.0.0-beta.27
       '@types/babel__core': 7.20.5
       react-refresh: 0.17.0
-      vite: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
 
@@ -11034,8 +11026,6 @@ snapshots:
   citty@0.1.6:
     dependencies:
       consola: 3.4.2
-
-  citty@0.2.0: {}
 
   class-variance-authority@0.7.1:
     dependencies:
@@ -13068,12 +13058,6 @@ snapshots:
       pkg-types: 2.3.0
       tinyexec: 1.0.2
 
-  nypm@0.6.4:
-    dependencies:
-      citty: 0.2.0
-      pathe: 2.0.3
-      tinyexec: 1.0.2
-
   object-deep-merge@2.0.0: {}
 
   ofetch@1.5.1:
@@ -13754,17 +13738,10 @@ snapshots:
 
   sisteransi@1.0.5: {}
 
-  skills-manifest@0.3.3(skills@1.3.5):
+  skills@1.5.22:
     dependencies:
-      c12: 3.3.3
-      citty: 0.2.0
-      nypm: 0.6.4
-      skills: 1.3.5
-      tinyexec: 1.0.2
-    transitivePeerDependencies:
-      - magicast
-
-  skills@1.3.5: {}
+      tar: 7.5.22
+      yaml: 2.9.0
 
   snarkdown@2.0.0: {}
 
@@ -13889,6 +13866,14 @@ snapshots:
   tapable@2.3.0: {}
 
   tar@7.5.2:
+    dependencies:
+      '@isaacs/fs-minipass': 4.0.1
+      chownr: 3.0.0
+      minipass: 7.1.2
+      minizlib: 3.1.0
+      yallist: 5.0.0
+
+  tar@7.5.22:
     dependencies:
       '@isaacs/fs-minipass': 4.0.1
       chownr: 3.0.0
@@ -14191,7 +14176,7 @@ snapshots:
       d3-time: 3.1.0
       d3-timer: 3.0.1
 
-  vite-plugin-pages@0.33.2(@vue/compiler-sfc@3.5.26)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2)):
+  vite-plugin-pages@0.33.2(@vue/compiler-sfc@3.5.26)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0)):
     dependencies:
       '@types/debug': 4.1.12
       debug: 4.4.3
@@ -14202,25 +14187,25 @@ snapshots:
       micromatch: 4.0.8
       picocolors: 1.1.1
       tinyglobby: 0.2.15
-      vite: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0)
       yaml: 2.8.2
     optionalDependencies:
       '@vue/compiler-sfc': 3.5.26
     transitivePeerDependencies:
       - supports-color
 
-  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2)):
+  vite-tsconfig-paths@5.1.4(typescript@5.8.3)(vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0)):
     dependencies:
       debug: 4.4.3
       globrex: 0.1.2
       tsconfck: 3.1.6(typescript@5.8.3)
     optionalDependencies:
-      vite: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2)
+      vite: 7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0)
     transitivePeerDependencies:
       - supports-color
       - typescript
 
-  vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.8.2):
+  vite@7.3.1(@types/node@24.10.9)(jiti@2.6.1)(lightningcss@1.30.1)(yaml@2.9.0):
     dependencies:
       esbuild: 0.27.2
       fdir: 6.5.0(picomatch@4.0.3)
@@ -14233,7 +14218,7 @@ snapshots:
       fsevents: 2.3.3
       jiti: 2.6.1
       lightningcss: 1.30.1
-      yaml: 2.8.2
+      yaml: 2.9.0
 
   void-elements@3.1.0: {}
 
@@ -14290,6 +14275,8 @@ snapshots:
       yaml: 2.8.2
 
   yaml@2.8.2: {}
+
+  yaml@2.9.0: {}
 
   yocto-queue@0.1.0: {}
 
